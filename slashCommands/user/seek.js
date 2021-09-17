@@ -10,34 +10,8 @@ module.exports = {
         .setName('fetch')
         .setDescription('Moderator Imformations')
         .addUserOption(option => option.setName('user').setDescription('Moderator informations of a user')),
+    permission: ["MANAGE_MESSAGES",],
     run: async(client, interation) =>{
-        const permData = await GuildRole.findOne({
-            guildID: interation.guild.id,
-            Active: true
-        });
-
-        const missingPerm = new Discord.MessageEmbed()
-            .setAuthor(interation.user.tag, interation.user.displayAvatarURL({dynamic: false, format: "png", size: 1024}))
-            .setDescription("Missing permission to execute this command")
-            .setTimestamp()
-            .setColor('#ff303e')
-
-        const roleSet = permData.Moderator;
-        if (interation.guild.ownerID !== interation.user.id){
-            if(!interation.member.permissions.has(["ADMINISTRATOR"])){
-                if(permData.ModOptions.Enabled === true){
-                    if(!interation.member.roles.cache.some(r=>roleSet.includes(r.id))){
-                        if(!interation.member.permissions.has(["MANAGE_GUILD", "ADMINISTRATOR", "BAN_MEMBERS"])){
-                            return await interation.channel.send({content: missingPerm}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-                        }
-                    }
-                }else if(permData.ModOptions.Enabled === false){
-                    if(!interation.member.permissions.has(["BAN_MEMBERS", "MANAGE_GUILD", "ADMINISTRATOR"])){
-                        return await interation.reply({content: missingPerm}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-                    }
-                }
-            }
-        }
 
         const { options } = interation;
         const MemberID = options.getUser('user')
