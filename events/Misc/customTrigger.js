@@ -5,18 +5,17 @@ const { CustomCommand, Guild } = require('../../models');
 module.exports = {
     event: 'message',
     once: false,
-    run: async(message) =>{
+    run: async(message, client) =>{
 
         let settings = await Guild.findOne({guildID: message.guild.id})
-        const prefix = settings ? settings.prefix : config.default_prefix
+        const prefix = settings ? settings.prefix : client.config.default_prefix
 
         let contentValue = message.content.split(" ")[0]
         let cmds = contentValue.slice(prefix.length)
 
         const Data = await CustomCommand.findOne({
             guildID: message.guild.id,
-            Active: false,
-            Command: cmds
+            [`Data.name`]: cmds
         })
 
         if(!message.content.startsWith(prefix)){
@@ -26,41 +25,36 @@ module.exports = {
         const Member = message.mentions.users.first();
 
         function variable(Array) {
+            Array.replace(/{author}/g, `${message.author}`)
+            Array.replace(/{author.id}/g, `${message.author.id}`)
+            Array.replace(/{author.tag}/g, `${message.author.tag}`)
+            Array.replace(/{author.name}/g, `${message.author.username}`)
+            Array.replace(/{channel}/g, `${message.channel}`)
+            Array.replace(/{channel.name}/g, `${message.channel.name}`)
+            Array.replace(/{channel.id}/g, `${message.channel.id}`)
+            Array.replace(/{guild}/g, `${message.guild.name}`)
+            Array.replace(/{guild.id}/g, `${message.guild.id}`)
             return Array
-            .replace("{author}", `${message.author}`)
-            .replace("{author.id}", `${message.author.id}`)
-            .replace("{author.tag}", `${message.author.tag}`)
-            .replace("{author.name}", `${message.author.username}`)
-            .replace("{channel}", `${message.channel}`)
-            .replace("{channel.name}", `${message.channel.name}`)
-            .replace("{channel.id}", `${message.channel.id}`)
-            .replace("{guild}", `${message.guild.name}`)
-            .replace("{guild.id}", `${message.guild.id}`)
         }
 
         if(Data){
             let obj = {
-                command: Data.Command ? Data.Command : null,
-                delete: Data.CmdProperty ? Data.CmdProperty.Delete : false,
-                mention: Data.Mention ? Data.Mention : false,
-                content: Data.Content ? Data.Content : "",
-                embed: Data.Embed ? Data.Embed : false,
-                desc: Data.EmbedProperty ? Data.EmbedProperty.Desc : null,
-                author: Data.EmbedProperty ? Data.EmbedProperty.Author : null,
-                title: Data.EmbedProperty ? Data.EmbedProperty.Title : null,
-                url: Data.EmbedProperty ? Data.EmbedProperty.URL : "",
-                image: Data.Image ? Data.Image : "",
-                color: Data.EmbedProperty ? Data.EmbedProperty.Color : null,
-                roles: Data.Perms ? Data.Perms : [],
+                delete: Data.Data.deleteC ? Data.Data.deleteC : false,
+                mention: Data.Data.mention ? Data.Data.mention : false,
+                content: Data.Data.content ? Data.Data.content : "",
+                embed: Data.Data.embed ? Data.Data.embed : false,
+                desc: Data.Data.description ? Data.Data.description : "",
+                author: Data.Data.author ? Data.Data.author : "",
+                title: Data.Data.title ? Data.Data.title : "",
+                image: Data.Data.image ? Data.Data.image : "",
+                color: Data.Data.color ? Data.Data.color : "",
+                roles: Data.Data.permission ? Data.Data.permission : [],
             }
+
             try{
                 if(message.member.roles.cache.some(r=>obj["roles"].includes(r.id))){
 
-                    let url = obj["url"];
                     let image = obj["image"];
-                    if(!obj["url"].startsWith('https') || !obj["url"].startsWith('http')){
-                        url = null
-                    };
                     if(!obj["image"].startsWith('https') || !obj["image"].startsWith('http')){
                         image = null
                     }
@@ -75,24 +69,22 @@ module.exports = {
                             url: image
                         },
                         title: variable(obj["title"]),
-                        url: url
                     }
         
                     if(obj["mention"] === false){
                         if(obj["embed"] === false){
-                            message.channel.send(variable(obj["content"]))
+                            message.channel.send({content: variable(obj["content"])})
                             if(obj["delete"] === true){
                                 message.delete()
                             }
                         }else {
-                            message.channel.send(variable(obj["content"]),{embeds: [userEmbed]})
+                            message.channel.send({content: variable(obj["content"]),embeds: [userEmbed]})
                             if(obj["delete"] === true){
                                 message.delete()
                             }
                         }
-                    }else if(Data.Mention === true){
+                    }else if(Data.Data.mention === true){
                         if(Member){
-        
                             function memberVariable(Array) {
                                 return Array
                                 .replace("{author}", `${message.author}`)
@@ -109,7 +101,12 @@ module.exports = {
                                 .replace("{guild}", `${message.guild.name}`)
                                 .replace("{guild.id}", `${message.guild.id}`)
                             }
-    
+
+                            let image = obj["image"];
+                            if(!obj["image"].startsWith('https') || !obj["image"].startsWith('http')){
+                                image = null
+                            }
+
                             const mentionEmbed = {
                                 color: obj["color"],
                                 author: {
@@ -120,7 +117,6 @@ module.exports = {
                                     url: image
                                 },
                                 title: memberVariable(obj["title"]),
-                                url: url
                             }
     
                             if(obj["embed"] === false){
@@ -129,9 +125,16 @@ module.exports = {
                                     message.delete()
                                 }
                             }else {
-                                message.channel.send(memberVariable(obj["content"]),{embeds: [mentionEmbed]})
-                                if(obj["delete"] === true){
-                                    message.delete()
+                                if(obj['content'].match(/{empty}/g)){
+                                    message.channel.send({embeds: [mentionEmbed]})
+                                    if(obj["delete"] === true){
+                                        message.delete()
+                                    }
+                                }else {
+                                    message.channel.send({content: variable(obj["content"]), embeds: [mentionEmbed]})
+                                    if(obj["delete"] === true){
+                                        message.delete()
+                                    }
                                 }
                             }
                         }else return false;

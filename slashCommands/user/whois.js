@@ -7,7 +7,7 @@ const moment = require('moment');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('whos')
+        .setName('user-info')
         .setDescription('User Inofrmations')
         .addUserOption(option => option.setName('user').setDescription('Informations of another user')),
     run: async(client, interation) =>{

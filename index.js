@@ -44,7 +44,7 @@ readdirSync("./events/").forEach(dir => {
     const once = eventFunction.once;
 
     try {
-        emitter[once ? 'once' : 'on'](event, (...args) => eventFunction.run(...args));
+        emitter[once ? 'once' : 'on'](event, (...args) => eventFunction.run(...args, client));
     } catch (error) {
         console.error(error.stack);
     }
@@ -96,7 +96,7 @@ client.on('messageCreate', async message =>{
   
   let settings = await Guild.findOne({guildID: message.guild.id})
 
-  const prefix = settings ? settings.prefix : config.default_prefix
+  const prefix = settings ? settings.prefix : client.config.default_prefix
   if(!message.content.startsWith(prefix)) return
   if(!prefix) return
 

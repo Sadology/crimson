@@ -24,6 +24,7 @@ module.exports = {
     run: async(client, interaction) =>{
         const { options, guild } = interaction;
 
+        let TutEmbed = new Discord.MessageEmbed()
         const User = options.getUser('user')
         if(User){
             const Member = interaction.guild.members.cache.get(User.id);
@@ -32,7 +33,11 @@ module.exports = {
                     const duration = options.getString('duration')
                     const timeex = /[\d*]/g;
                     if(!duration.match(timeex)){
-                        return console.log("doesn't match")
+                        return interaction.reply({embeds: [new Discord.MessageEmbed()
+                            .setDescription("Please provide a duration for mute \n**Usage**: `/mute [ member ] [ duration ]`")
+                            .setColor("RED")
+                        ], ephermal: true
+                        })
                     }
 
                     let muteLength = ms( duration );

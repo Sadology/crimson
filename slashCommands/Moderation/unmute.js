@@ -16,7 +16,8 @@ module.exports = {
     permission: ["MANAGE_MESSAGES",],
     run: async(client, interaction) =>{
         const { options, guild } = interaction;
-
+        
+        let TutEmbed = new Discord.MessageEmbed()
         const User = options.getUser('user')
         if(User){
             const Member = interaction.guild.members.cache.get(User.id);
@@ -32,6 +33,7 @@ module.exports = {
     
                     const muteRole = await guild.roles.cache.find(r => r.name === 'Muted');
                     if( !muteRole ){
+                        
                         TutEmbed.setDescription( `The \`Muted\` role does not exist` )
                         TutEmbed.setColor( "#fffafa" )
                         return interaction.reply( {embeds: [TutEmbed], ephermal: true} )

@@ -4,7 +4,7 @@ const Discord = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('pong')
+        .setName('ping')
         .setDescription('Ping pong'),
     permission: ["MANAGE_MESSAGES"],
     run: async(client, interation) =>{
