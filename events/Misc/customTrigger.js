@@ -25,16 +25,16 @@ module.exports = {
         const Member = message.mentions.users.first();
 
         function variable(Array) {
-            Array.replace(/{author}/g, `${message.author}`)
-            Array.replace(/{author.id}/g, `${message.author.id}`)
-            Array.replace(/{author.tag}/g, `${message.author.tag}`)
-            Array.replace(/{author.name}/g, `${message.author.username}`)
-            Array.replace(/{channel}/g, `${message.channel}`)
-            Array.replace(/{channel.name}/g, `${message.channel.name}`)
-            Array.replace(/{channel.id}/g, `${message.channel.id}`)
-            Array.replace(/{guild}/g, `${message.guild.name}`)
-            Array.replace(/{guild.id}/g, `${message.guild.id}`)
             return Array
+            .replace(/{author}/g, `${message.author}`)
+            .replace(/{author.id}/g, `${message.author.id}`)
+            .replace(/{author.tag}/g, `${message.author.tag}`)
+            .replace(/{author.name}/g, `${message.author.username}`)
+            .replace(/{channel}/g, `${message.channel}`)
+            .replace(/{channel.name}/g, `${message.channel.name}`)
+            .replace(/{channel.id}/g, `${message.channel.id}`)
+            .replace(/{server}/g, `${message.guild.name}`)
+            .replace(/{server.id}/g, `${message.guild.id}`)
         }
 
         if(Data){
@@ -47,7 +47,7 @@ module.exports = {
                 author: Data.Data.author ? Data.Data.author : "",
                 title: Data.Data.title ? Data.Data.title : "",
                 image: Data.Data.image ? Data.Data.image : "",
-                color: Data.Data.color ? Data.Data.color : "",
+                color: Data.Data.color ? Data.Data.color : message.guild.me.displayColor,
                 roles: Data.Data.permission ? Data.Data.permission : [],
             }
 
@@ -58,9 +58,16 @@ module.exports = {
                     if(!obj["image"].startsWith('https') || !obj["image"].startsWith('http')){
                         image = null
                     }
+
+                    let NewColor
+                    if(obj["color"] == null){
+                        NewColor = message.guild.me.displayColor
+                    }else {
+                        NewColor = obj['color'] ? obj['color'] : message.guild.me.displayColor
+                    }
         
                     const userEmbed = {
-                        color: obj["color"],
+                        color: NewColor,
                         author: {
                             name: variable(obj["author"])
                         },
@@ -78,37 +85,55 @@ module.exports = {
                                 message.delete()
                             }
                         }else {
-                            message.channel.send({content: variable(obj["content"]),embeds: [userEmbed]})
-                            if(obj["delete"] === true){
-                                message.delete()
+                            if(obj['content'].match(/{empty}/g)){
+                                message.channel.send({embeds: [userEmbed]})
+                                if(obj["delete"] === true){
+                                    message.delete()
+                                }
+                            }else if(obj["content"] == null || obj["content"] == ""){
+                                message.channel.send({embeds: [userEmbed]})
+                                if(obj["delete"] === true){
+                                    message.delete()
+                                }
+                            }else {
+                                message.channel.send({content: variable(obj["content"]),embeds: [userEmbed]})
+                                if(obj["delete"] === true){
+                                    message.delete()
+                                }
                             }
+
                         }
                     }else if(Data.Data.mention === true){
                         if(Member){
                             function memberVariable(Array) {
                                 return Array
-                                .replace("{author}", `${message.author}`)
-                                .replace("{author.id}", `${message.author.id}`)
-                                .replace("{author.tag}", `${message.author.tag}`)
-                                .replace("{author.name}", `${message.author.username}`)
-                                .replace("{member}", `${Member}`)
-                                .replace("{member.id}", `${Member.id}`)
-                                .replace("{member.tag}", `${Member.tag}`)
-                                .replace("{member.name}", `${Member.username}`)
-                                .replace("{channel}", `${message.channel}`)
-                                .replace("{channel.name}", `${message.channel.name}`)
-                                .replace("{channel.id}", `${message.channel.id}`)
-                                .replace("{guild}", `${message.guild.name}`)
-                                .replace("{guild.id}", `${message.guild.id}`)
+                                .replace(/{member}/g, `${Member}`)
+                                .replace(/{member.id}/g, `${Member.id}`)
+                                .replace(/{member.tag}/g, `${Member.tag}`)
+                                .replace(/{member.name}/g, `${Member.username}`)
+                                .replace(/{author}/g, `${message.author}`)
+                                .replace(/{author.id}/g, `${message.author.id}`)
+                                .replace(/{author.tag}/g, `${message.author.tag}`)
+                                .replace(/{author.name}/g, `${message.author.username}`)
+                                .replace(/{channel}/g, `${message.channel}`)
+                                .replace(/{channel.name}/g, `${message.channel.name}`)
+                                .replace(/{channel.id}/g, `${message.channel.id}`)
+                                .replace(/{server}/g, `${message.guild.name}`)
+                                .replace(/{server.id}/g, `${message.guild.id}`)
                             }
 
                             let image = obj["image"];
                             if(!obj["image"].startsWith('https') || !obj["image"].startsWith('http')){
                                 image = null
                             }
-
+                            let NewColor
+                            if(obj["color"] == null){
+                                NewColor = message.guild.me.displayColor
+                            }else {
+                                NewColor = obj['color'] ? obj['color'] : message.guild.me.displayColor
+                            }
                             const mentionEmbed = {
-                                color: obj["color"],
+                                color: NewColor,
                                 author: {
                                     name: memberVariable(obj["author"])
                                 },
@@ -127,6 +152,11 @@ module.exports = {
                             }else {
                                 if(obj['content'].match(/{empty}/g)){
                                     message.channel.send({embeds: [mentionEmbed]})
+                                    if(obj["delete"] === true){
+                                        message.delete()
+                                    }
+                                }else if(obj["content"] == null || obj["content"] == ""){
+                                    message.channel.send({embeds: [userEmbed]})
                                     if(obj["delete"] === true){
                                         message.delete()
                                     }
