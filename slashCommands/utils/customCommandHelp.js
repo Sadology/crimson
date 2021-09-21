@@ -30,7 +30,7 @@ module.exports = {
                 const cmdName = options.getString('name');
                 if(!cmdName){
                     interaction.editReply({embeds: [new Discord.MessageEmbed()
-                        .setDescription("You forgot yo privide command name")
+                        .setDescription("You forgot to provide command name")
                         .setColor("RED")
                     ]})
                 }
@@ -61,8 +61,8 @@ module.exports = {
                         .setDescription(`**Name:** ${DataToDelete.name}
                         **Content:** ${DataToDelete.content}
                         **Delete:** ${DataToDelete.deleteC}
-                        **Mention:** ${DataToDelete.name}
-                        **Embed:** ${DataToDelete.name}`)
+                        **Mention:** ${DataToDelete.mention}
+                        **Embed:** ${DataToDelete.embed}`)
                         .setColor("WHITE")
                         .addField(`Roles access`, DataToDelete.permission ? DataToDelete.permission.toString() : "Error finding he roles")
                         if(DataToDelete.embed === true){
@@ -70,7 +70,7 @@ module.exports = {
                                 `**Author:** ${DataToDelete.author == null ? "None" : DataToDelete.author}`,
                                 `\n**Description:** ${DataToDelete.description == null ? "None" : DataToDelete.description}`,
                                 `\n**Title:** ${DataToDelete.title == null ? "None" : DataToDelete.title}`,
-                                `\n**Color:** ${DataToDelete.color == null ? "None": DataToDelete.color === null}`,
+                                `\n**Color:** ${DataToDelete.color == null ? "None": DataToDelete.color}`,
                                 `\n**Image:** [Image URL](${DataToDelete.image == null ? "https://youtu.be/dQw4w9WgXcQ" : DataToDelete.image})`,
                                 `\n**Footer:** ${DataToDelete.footer == null ? "None" : DataToDelete.footer}`,
                             ].toString())

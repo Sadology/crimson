@@ -6,7 +6,8 @@ const { Permissions } = require('discord.js');
 module.exports = {
     name: 'test',
     description: 'ping pong',
-    category: 'utils',
+    category: 'Utils',
+    disabled: true,
     run: async(client, message, args)=> {
         const { author } = message;
 

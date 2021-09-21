@@ -5,6 +5,10 @@ const { commandUsed } = require('../../Functions/CommandUsage')
 
 module.exports = {
     name: 'warn',
+    description: "Warns a member.",
+    permissions: ["MANAGE_MESSAGES"],
+    usage: "warn [ reason ]",
+    category: "Moderation",
 
     run: async(client, message, args, prefix) =>{
         await message.delete();

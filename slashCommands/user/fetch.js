@@ -16,9 +16,10 @@ module.exports = {
         const { options } = interation;
         const MemberID = options.getUser('user')
 
-        const count = await LogsDatabase.countDocuments({
-            guildID: interation.guild.id, 
-            userID: MemberID ? MemberID : interation.user.id
+        let docsAmount;
+        docsAmount = await LogsDatabase.countDocuments({
+            guildID: interation.guild.id,
+            userID: MemberID ? MemberID.id : interation.user.id
         })
 
         if(MemberID){
@@ -38,7 +39,7 @@ module.exports = {
                         }))
                         .addField('User', `\`\`\`${Member.user.tag}\`\`\``, true)
                         .addField('User ID', `\`\`\`${Member.user.id}\`\`\``, true)
-                        .addField("Logs", count ? `\`\`\`${count}\`\`\`` : "\`\`\`0\`\`\`", true)
+                        .addField("Logs", docsAmount ? `\`\`\`${docsAmount}\`\`\`` : "\`\`\`0\`\`\`", true)
                         .addField('Created At', `\`\`\`${moment(Member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.user.createdAt, "YYYYMMDD").fromNow()}\`\`\``,true)
                         .addField('Joined at', `\`\`\`${moment(Member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.joinedAt, "YYYYMMDD").fromNow()}\`\`\``,true)
                         .setColor(Member.displayColor)
@@ -63,7 +64,7 @@ module.exports = {
                 }))
                 .addField('User', `\`\`\`${interation.user.tag}\`\`\``, true)
                 .addField('User ID', `\`\`\`${interation.user.id}\`\`\``, true)
-                .addField("Logs", count ? `\`\`\`${count}\`\`\`` : "\`\`\`0\`\`\`", true)
+                .addField("Logs", docsAmount ? `\`\`\`${docsAmount}\`\`\`` : "\`\`\`0\`\`\`", true)
                 .addField('Created At', `\`\`\`${moment(interation.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(interation.user.createdAt, "YYYYMMDD").fromNow()}\`\`\``,true)
                 .addField('Joined at', `\`\`\`${moment(interation.user.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(interation.user.joinedAt, "YYYYMMDD").fromNow()}\`\`\``,true)
                 .setColor(interation.user.displayColor)

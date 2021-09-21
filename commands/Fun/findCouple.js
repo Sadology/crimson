@@ -2,6 +2,10 @@ const Discord = require('discord.js');
 module.exports = {
     name: 'findgf',
     aliases: ['findbf'],
+    description: "Lonely? not anymore, bot will find the best match couple for you.",
+    permissions: ["EVERYONE"],
+    usage: "findgf",
+    category: "Fun",
 
     run: async(client, message, args,prefix, cmd) =>{
 

@@ -2,7 +2,10 @@ const Discord = require('discord.js');
 
 module.exports = {
     name: 'ping',
-
+    description: "Ping! Pong!. Check bots ping",
+    permissions: ["MANAGE_MESSAGES"],
+    usage: "ping",
+    category: "Utils",
     run: async(client, message, args)=> {
         let choices = ["Checking pings...","Pinging...", "What's my ping?...", "Now checking..."]
         let response = choices[Math.floor(Math.random() * choices.length)]

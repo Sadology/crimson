@@ -97,65 +97,71 @@ module.exports = {
         if(Embed){
             newData['embed'] = Embed
         }
-        if(Embed === true){
-            const author = options.getString('author');
-            const description = options.getString('description');
-            const title = options.getString('title');
-            const color = options.getString('color');
-            const image = options.getString('image');
-            const footer = options.getString('footer');
+        
+        if(deleteCmds){
+            newData['deleteC'] = deleteCmds
+        }
 
-            if(description){
-                let descLimit = description.split(" ")
+        if(mention){
+            newData['mention'] = mention
+        }
+        const author = options.getString('author');
+        const description = options.getString('description');
+        const title = options.getString('title');
+        const color = options.getString('color');
+        const image = options.getString('image');
+        const footer = options.getString('footer');
 
-                if(descLimit.length >= 1000){
-                    return interaction.reply({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`Description can't exceed more than 1000 words`)
-                        .setColor("RED")
-                    ], ephermal: true})
-                }
-                newData["description"] = description;
-            }
-            if(author){
-                let authorLimit = author.split(" ")
+        if(description){
+            let descLimit = description.split(" ")
 
-                if(authorLimit.length >= 50){
-                    return interaction.reply({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`Author can't exceed more than 20 words`)
-                        .setColor("RED")
-                    ], ephermal: true})
-                }
-                newData["author"] = author;
+            if(descLimit.length >= 1000){
+                return interaction.reply({embeds: [new Discord.MessageEmbed()
+                    .setDescription(`Description can't exceed more than 1000 words`)
+                    .setColor("RED")
+                ], ephermal: true})
             }
-            if(title){
-                let titleLimit = title.split(" ")
+            newData["description"] = description;
+        }
+        if(author){
+            let authorLimit = author.split(" ")
 
-                if(titleLimit.length >= 50){
-                    return interaction.reply({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`Title can't exceed more than 50 words`)
-                        .setColor("RED")
-                    ], ephermal: true})
-                }
-                newData["title"] = title;
+            if(authorLimit.length >= 50){
+                return interaction.reply({embeds: [new Discord.MessageEmbed()
+                    .setDescription(`Author can't exceed more than 20 words`)
+                    .setColor("RED")
+                ], ephermal: true})
             }
-            if(footer){
-                let footerLimit = footer.split(" ")
+            newData["author"] = author;
+        }
+        if(title){
+            let titleLimit = title.split(" ")
 
-                if(footerLimit.length >= 50){
-                    return interaction.reply({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`Footer can't exceed more than 50 words`)
-                        .setColor("RED")
-                    ], ephermal: true})
-                }
-                newData["footer"] = footer;
+            if(titleLimit.length >= 50){
+                return interaction.reply({embeds: [new Discord.MessageEmbed()
+                    .setDescription(`Title can't exceed more than 50 words`)
+                    .setColor("RED")
+                ], ephermal: true})
             }
+            newData["title"] = title;
+        }
+        if(footer){
+            let footerLimit = footer.split(" ")
 
-            if(color){
-                newData["color"] = color;
+            if(footerLimit.length >= 50){
+                return interaction.reply({embeds: [new Discord.MessageEmbed()
+                    .setDescription(`Footer can't exceed more than 50 words`)
+                    .setColor("RED")
+                ], ephermal: true})
             }
-            if(image){
-                newData["image"] = image;
-            }
+            newData["footer"] = footer;
+        }
+
+        if(color){
+            newData["color"] = color;
+        }
+        if(image){
+            newData["image"] = image;
         }
 
         rolesString = []
@@ -192,14 +198,6 @@ module.exports = {
             }
         }
 
-        if(deleteCmds){
-            newData['deleteC'] = deleteCmds
-        }
-
-        if(mention){
-            newData['mention'] = mention
-        }
-
         let messageEmbed = new Discord.MessageEmbed()
             .setAuthor("Custom-command: Create")
             .setDescription(`**Name:** ${newData.name ? newData.name : "None"}
@@ -207,18 +205,15 @@ module.exports = {
             **Delete:** ${newData.deleteC ? newData.deleteC : "None"}
             **Mention:** ${newData.mention ? newData.name : "None"}
             **Embed:** ${newData.embed ? newData.embed : "None"}`)
-            .setColor("WHITE")
-            
-            if(Embed === true){
-                messageEmbed.addField("Embed Properties", [
-                    `**Author:** ${newData.author ? newData.author : "None"}`,
-                    `\n**Description:** ${newData.description ? newData.description : "None"}`,
-                    `\n**Title:** ${newData.title ? newData.title : "None"}`,
-                    `\n**Color:** ${newData.color ? newData.color : "None"}`,
-                    `\n**Image:** [Image URL](${newData.image ? newData.image : "https://youtu.be/dQw4w9WgXcQ"})`,
-                    `\n**Footer:** ${newData.footer ? newData.image : "None"}`,
-                ].toString())
-            }
+            .setColor("WHITE")   
+            .addField("Embed Properties", [
+                `**Author:** ${newData.author ? newData.author : "None"}`,
+                `\n**Description:** ${newData.description ? newData.description : "None"}`,
+                `\n**Title:** ${newData.title ? newData.title : "None"}`,
+                `\n**Color:** ${newData.color ? newData.color : "None"}`,
+                `\n**Image:** [Image URL](${newData.image ? newData.image : "https://youtu.be/dQw4w9WgXcQ"})`,
+                `\n**Footer:** ${newData.footer ? newData.image : "None"}`,
+            ].toString())
 
         const row = new Discord.MessageActionRow()
         .addComponents(

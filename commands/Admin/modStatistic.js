@@ -3,7 +3,11 @@ const { ModStats } = require('../../models')
 module.exports = {
     name: 'mod-stats',
     aliases: ["modstats"],
-
+    description: "Moderators statistic. Moderation data of all time.",
+    permissions: ["ADMINISTRATOR"],
+    usage: "mod-stats [ user ]",
+    category: "Administrator",
+    
     run: async(client, message, args,prefix) =>{
         await message.delete();
 

@@ -5,7 +5,8 @@ const { errLog } = require('../../Functions/erroHandling');
 module.exports = {
     name: 'roles-log',
     aliases: ["rolelog", "roleslog", "roles-log"],
-
+    category: "Administrator",
+    
     run: async(client, message, args,prefix) =>{
 
         if(!message.member.permissions.has("ADMINISTRATOR")){

@@ -6,7 +6,11 @@ const moment = require('moment');
 module.exports = {
     name: 'delete-log',
     aliases: ["deletelog"],
-
+    description: "Delete a moderation log",
+    permissions: ["ADMINISTRATOR"],
+    usage: "delete-log [ log ID ]",
+    category: "Administrator",
+    
     run: async(client, message, args,prefix) =>{
 
         if(!message.member.permissions.has("ADMINISTRATOR")){

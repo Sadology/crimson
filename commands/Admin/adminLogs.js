@@ -6,6 +6,10 @@ const { errLog } = require('../../Functions/erroHandling');
 module.exports = {
     name: 'admin-log',
     aliases: ["adminlog"],
+    description: "Most powerful log, view every single log in the server",
+    permissions: ["ADMINISTRATOR"],
+    usage: "admin-log [ options ]",
+    category: "Administrator",
 
     run: async(client, message, args,prefix) =>{
         let cmd = args[0];

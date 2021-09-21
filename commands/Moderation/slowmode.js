@@ -7,6 +7,10 @@ const { errLog } = require('../../Functions/erroHandling');
 module.exports = {
     name: 'slowmode',
     aliases: ["sm", "slomo"],
+    description: "Sets a slowmode in the channel.",
+    permissions: ["MANAGE_CHANNELS"],
+    usage: "sm [ limit ]",
+    category: "Moderation",
 
     run: async(client, message, args, prefix) =>{
         if(message.guild.me.permissions.has(["MANAGE_MESSAGES"])){

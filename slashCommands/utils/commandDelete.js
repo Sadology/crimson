@@ -43,20 +43,18 @@ module.exports = {
                 .setDescription(`**Name:** ${DataToDelete.name}
                 **Content:** ${DataToDelete.content}
                 **Delete:** ${DataToDelete.deleteC}
-                **Mention:** ${DataToDelete.name}
-                **Embed:** ${DataToDelete.name}`)
+                **Mention:** ${DataToDelete.mention}
+                **Embed:** ${DataToDelete.embed}`)
                 .setColor("WHITE")
                 .addField(`Roles access`, DataToDelete.permission ? DataToDelete.permission.toString() : "Error finding he roles")
-                if(DataToDelete.embed === true){
-                    messageEmbed.addField("Embed Properties", [
-                        `**Author:** ${DataToDelete.author == null ? "None" : DataToDelete.author}`,
-                        `\n**Description:** ${DataToDelete.description == null ? "None" : DataToDelete.description}`,
-                        `\n**Title:** ${DataToDelete.title == null ? "None" : DataToDelete.title}`,
-                        `\n**Color:** ${DataToDelete.color == null ? "None": DataToDelete.color === null}`,
-                        `\n**Image:** [Image URL](${DataToDelete.image == null ? "https://youtu.be/dQw4w9WgXcQ" : DataToDelete.image})`,
-                        `\n**Footer:** ${DataToDelete.footer == null ? "None" : DataToDelete.footer}`,
-                    ].toString())
-                }
+                .addField("Embed Properties", [
+                    `**Author:** ${DataToDelete.author == null ? "None" : DataToDelete.author}`,
+                    `\n**Description:** ${DataToDelete.description == null ? "None" : DataToDelete.description}`,
+                    `\n**Title:** ${DataToDelete.title == null ? "None" : DataToDelete.title}`,
+                    `\n**Color:** ${DataToDelete.color == null ? "None": DataToDelete.color}`,
+                    `\n**Image:** [Image URL](${DataToDelete.image == null ? "https://youtu.be/dQw4w9WgXcQ" : DataToDelete.image})`,
+                    `\n**Footer:** ${DataToDelete.footer == null ? "None" : DataToDelete.footer}`,
+                ].toString())
 
             interaction.deferReply({ephermal: true})
             await new Promise(resolve => setTimeout(resolve, 1000))

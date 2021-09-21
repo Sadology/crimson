@@ -2,7 +2,10 @@ const Discord = require('discord.js');
 module.exports = {
     name: '8ball',
     aliases: ['eightball'],
-
+    description: "Ask the 8ball any question, it will reply and remove the confusion.",
+    permissions: ["EVERYONE"],
+    usage: "8ball [ question ]",
+    category: "Fun",
     run: async(client, message, args,prefix) =>{
 
         let eightBallmessage = args.slice(0).join(' ')

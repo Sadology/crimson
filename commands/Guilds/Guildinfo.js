@@ -28,37 +28,13 @@ const verificationLevels = {
 module.exports = {
     name: 'server',
     aliases: ['guild'],
+    description: "Get informations of your server.",
+    permissions: ["EVERYONE"],
+    usage: "server [ options ]",
+    category: "Utils",
+
     run: async (client, message, args,prefix) =>{
-
-        const permData = await GuildRole.findOne({
-            guildID: message.guild.id,
-            Active: true
-        });
-
         const { author, content, guild } = message;
-
-        const missingPerm = new MessageEmbed()
-            .setAuthor(author.tag, author.displayAvatarURL({dynamic: false, format: "png", size: 1024}))
-            .setDescription("Missing permission to execute this command")
-            .setTimestamp()
-            .setColor('#ff303e')
-
-        const roleSet = permData.Moderator;
-        if (message.guild.ownerID !== message.author.id){
-            if(!message.member.permissions.has(["ADMINISTRATOR"])){
-                if(permData.ModOptions.Enabled === true){
-                    if(!message.member.roles.cache.some(r=>roleSet.includes(r.id))){
-                        if(!message.member.permissions.has(["MANAGE_GUILD", "ADMINISTRATOR", "BAN_MEMBERS"])){
-                            return await message.channel.send({embeds: [missingPerm]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-                        }
-                    }
-                }else if(permData.ModOptions.Enabled === false){
-                    if(!message.member.permissions.has(["BAN_MEMBERS", "MANAGE_GUILD", "ADMINISTRATOR"])){
-                        return await message.channel.send({embeds: [missingPerm]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-                    }
-                }
-            }
-        }
 
         if(!args[0]){
             message.channel.send({embeds: [new Discord.MessageEmbed()

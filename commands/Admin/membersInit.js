@@ -3,6 +3,11 @@ const fs = require('fs')
 module.exports = {
     name: 'memberinit',
 
+    description: "Members in a single role",
+    permissions: ["ADMINISTRATOR"],
+    usage: "memberinit [ role ]",
+    category: "Administrator",
+    
     run: async(client, message, args,prefix) =>{
         if(!message.member.permissions.has("ADMINISTRATOR")){
             return

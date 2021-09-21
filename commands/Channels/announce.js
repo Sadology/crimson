@@ -4,7 +4,8 @@ const { errLog } = require('../../Functions/erroHandling')
 
 module.exports = {
     name: 'announce',
-
+    category: "Administrator",
+    
     run: async(client, message, args,prefix) =>{
 
         if(!message.member.permissions.has("ADMINISTRATOR")){

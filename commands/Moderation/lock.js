@@ -4,6 +4,10 @@ const { Permissions } = require('discord.js');
 const { errLog } = require('../../Functions/erroHandling')
 module.exports = {
     name: 'lock',
+    description: "Locks a channel from everyone.",
+    permissions: ["MANAGE_CHANNELS"],
+    usage: "lock [ channel ]",
+    category: "Moderation",
 
     run: async(client, message, args,prefix) =>{
         await message.delete();

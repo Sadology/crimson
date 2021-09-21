@@ -2,6 +2,10 @@ const Discord = require('discord.js');
 const { GuildRole } = require('../../models');
 module.exports = {
     name: 'unlock',
+    description: "Unlock a locked channel.",
+    permissions: ["MANAGE_CHANNELS"],
+    usage: "unlock [ channel ]",
+    category: "Moderation",
 
     run: async(client, message, args,prefix) =>{
         await message.delete();

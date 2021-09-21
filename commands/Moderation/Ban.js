@@ -4,6 +4,10 @@ const { permission } = require('../../Functions/CommandPerms');
 const { GuildRole } = require('../../models')
 module.exports = {
     name: 'ban',
+    description: "Bans a member from the server",
+    permissions: ["BAN_MEMBERS"],
+    usage: "ban [ member ]",
+    category: "Moderation",
 
     run: async(client, message, args,prefix) =>{
         await message.delete();

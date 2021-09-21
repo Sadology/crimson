@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { log } = require('console');
 const wait = require('util').promisify(setTimeout);
 const Discord = require('discord.js');
 const { GuildRole } = require('../../models')
@@ -7,8 +8,13 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('purge')
         .setDescription('Purge messages')
-        .addStringOption(option => option.setName("amount").setDescription("Amount of message to delete").setRequired(true))
-        .addUserOption(option => option.setName('user').setDescription('Purge messages of a user')),
+        .addStringOption(option => 
+            option.setName("amount")
+            .setDescription("Amount of message to delete")
+            .setRequired(true))
+        .addUserOption(option => 
+            option.setName('user')
+            .setDescription('Purge messages of a user')),
     permission: ["MANAGE_MESSAGES",],
     run: async(client, interaction) =>{
 
@@ -16,61 +22,85 @@ module.exports = {
         let amt = options.getString('amount');
         const Amount = parseInt(amt)
 
+        if(!Amount){
+            return interaction.reply({embeds: [new Discord.MessageEmbed()
+                .setDescription("Please provide a message amount to delete. Limit: 100")
+                .setColor("RED")
+            ], ephemeral: true})   
+        }
         if(Amount >= 100){
             return interaction.reply({embeds: [new Discord.MessageEmbed()
                 .setDescription("Can't delete more than 100 messages at once. Limit: 100")
                 .setColor("RED")
             ], ephemeral: true})
         }
+        
         const MemberID = options.getUser('user');
         if(MemberID){
             const Member = interaction.guild.members.cache.get(MemberID.id);
             if(Member){
                 try{
                     interaction.channel.messages.fetch({
-                        limit: Amount ? Amount + 1 : 100,
+                        limit: 100,
                     }).then(async messages => {
                         if ( Member ) {
-                                messages = messages.filter(m => m.author.id === Member.id && !m.pinned)
-                                await interaction.channel.bulkDelete( messages, true )
+                            interaction.channel.messages.fetch({
+                                limit: 100,
+                            }).then(async messages => {
+                                let Arr = []
+                                messages.forEach(messages =>{
+                                    Arr.push(...[messages].filter(m => m.author.id === Member.id && !m.pinned))
+                                })
+                                let message = Arr.slice(0, Amount)
+                
+                                await interaction.channel.bulkDelete( message, true )
                                 .then(async ( messages ) =>{
-
+                
                                     interaction.reply({ embeds: [new Discord.MessageEmbed()
-                                        .setDescription(`Purged ${messages.size} messages of ${Member.user}`)
+                                        .setDescription(`Purged ${messages.size} messages`)
                                         .setColor("GREEN")
                                     ], ephemeral: true })
-
-                                    //logMessage("Bulk", messages.size, Member.user.id, Member.user.tag);
+                
+                                    //logMessage( "Bulk", messages.size, message.author.id );
                                     //commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                                 })
+                            }).catch(( err ) => console.log( err ))
                         }else {
-                            console.log('failed')
+                            return interaction.reply({embeds: new Discord.MessageEmbed()
+                                .setDescription("Please mention a valid member")
+                                .setColor('RED')
+                            })
                         }
-                    }).catch( error => console.log( error ));
+                    })
                 }catch(err){
-                    console.error(err)
+                    console.log(err)
                 }
             }
         }else {
             try{
                 interaction.channel.messages.fetch({
-                    limit: Amount ? Amount + 1 : 100,
+                    limit: 100,
                 }).then(async messages => {
-                    messages = messages.filter(m => !m.pinned)
-                    await interaction.channel.bulkDelete( messages, true )
+                    let Arr = []
+                    messages.forEach(messages =>{
+                        Arr.push(...[messages].filter((m) => !m.pinned))
+                    })
+                    let message = Arr.slice(0, Amount)
+    
+                    await interaction.channel.bulkDelete( message, true )
                     .then(async ( messages ) =>{
-
+    
                         interaction.reply({ embeds: [new Discord.MessageEmbed()
                             .setDescription(`Purged ${messages.size} messages`)
                             .setColor("GREEN")
                         ], ephemeral: true })
-
+    
                         //logMessage( "Bulk", messages.size, message.author.id );
                         //commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                     })
                 }).catch(( err ) => console.log( err ))
             }catch(err){
-                console.error(err)
+                console.log(err)
             }
         }
     }

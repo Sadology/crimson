@@ -5,7 +5,8 @@ module.exports = {
     aliases: ['copycat', 'repeat'],
     description:'returns the arguement',
     category: 'moderation',
-
+    disabled: true,
+    
     run: async(client, message, args,prefix) =>{
         if(message.author.id !== "571964900646191104"){
             return
