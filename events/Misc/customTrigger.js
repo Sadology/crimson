@@ -49,6 +49,7 @@ module.exports = {
                 image: Data.Data.image ? Data.Data.image : "",
                 color: Data.Data.color ? Data.Data.color : message.guild.me.displayColor,
                 roles: Data.Data.permission ? Data.Data.permission : [],
+                footer: Data.Data.footer ? Data.Data.footer : "",
             }
 
             try{
@@ -76,6 +77,7 @@ module.exports = {
                             url: image
                         },
                         title: variable(obj["title"]),
+                        footer: memberVariable(obj['footer'])
                     }
         
                     if(obj["mention"] === false){
@@ -142,6 +144,7 @@ module.exports = {
                                     url: image
                                 },
                                 title: memberVariable(obj["title"]),
+                                footer: memberVariable(obj['footer']),
                             }
     
                             if(obj["embed"] === false){

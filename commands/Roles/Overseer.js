@@ -5,7 +5,7 @@ module.exports = {
     aliases: ["overseer-role"],
     description: "Set a moderator role in the server",
     permissions: ["ADMINISTRATOR"],
-    usage: "moderator [ option ] [ roles ]",
+    usage: "overseer [ option ] [ roles ]",
     category: "Administrator",
     
     run: async(client, message, args, prefix) =>{

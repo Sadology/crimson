@@ -89,7 +89,15 @@ module.exports = {
                         .setColor("RED")
                     ], ephermal: true})
                 }
-                commandConstructor['content'] = Embed
+                commandConstructor['content'] = Content
+            }
+
+            if(deleteCmds){
+                commandConstructor["deleteC"] = deleteCmds
+            }
+
+            if(mention){
+                commandConstructor['mention'] = mention
             }
 
             rolesString = []
@@ -196,8 +204,8 @@ module.exports = {
                 .setDescription(`**Name:** ${commandConstructor.name}
                 **Content:** ${commandConstructor.content}
                 **Delete:** ${commandConstructor.deleteC}
-                **Mention:** ${commandConstructor.name}
-                **Embed:** ${commandConstructor.name}`)
+                **Mention:** ${commandConstructor.mention}
+                **Embed:** ${commandConstructor.embed}`)
                 .setColor("WHITE")
                 .addField(`Roles permission`, rolesString ? rolesString.toString() : "Error finding he roles")
                 if(Embed === true){

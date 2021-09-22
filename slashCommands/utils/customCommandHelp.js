@@ -17,7 +17,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName("name")
             .setDescription("Command name for command info option")),
-    permission: ["ADMINISTRATOR"],
+    permission: ["MANAGE_MESSAGES"],
     run: async(client, interaction) =>{
         const { options, guild } = interaction;
         const optionName = options.getString('options');
@@ -41,7 +41,7 @@ module.exports = {
                 if(!fetchedData){
                     return await interaction.editReply({ content: 'Failed', components: [] , embeds: [new Discord.MessageEmbed().setDescription(`The command ${cmdName} doesn't exist.`).setColor("RED")], ephermal: true})
                 }else if(fetchedData){
-                    const DataToDelete = {
+                    const DataFromDB = {
                         name: fetchedData.Data.name,
                         content: fetchedData.Data.content,
                         deleteC: fetchedData.Data.deleteC,
@@ -55,24 +55,33 @@ module.exports = {
                         footer: fetchedData.Data.footer,
                         color: fetchedData.Data.color
                     }
+
+                    let rolesArr = []
+                    DataFromDB.permission.forEach(role =>{
+                        let findTheRoles = interaction.guild.roles.cache.find(r => r.id == role)
+            
+                        if(findTheRoles){
+                            rolesArr.push(findTheRoles.toString())
+                        }
+                    })
         
                     let messageEmbed = new Discord.MessageEmbed()
                         .setAuthor("Custom-command: Info")
-                        .setDescription(`**Name:** ${DataToDelete.name}
-                        **Content:** ${DataToDelete.content}
-                        **Delete:** ${DataToDelete.deleteC}
-                        **Mention:** ${DataToDelete.mention}
-                        **Embed:** ${DataToDelete.embed}`)
+                        .setDescription(`**Name:** ${DataFromDB.name}
+                        **Content:** ${DataFromDB.content}
+                        **Delete:** ${DataFromDB.deleteC}
+                        **Mention:** ${DataFromDB.mention}
+                        **Embed:** ${DataFromDB.embed}`)
                         .setColor("WHITE")
-                        .addField(`Roles access`, DataToDelete.permission ? DataToDelete.permission.toString() : "Error finding he roles")
-                        if(DataToDelete.embed === true){
+                        .addField(`Roles access`, DataFromDB.permission ? rolesArr.toString() : "Error finding the roles")
+                        if(DataFromDB.embed === true){
                             messageEmbed.addField("Embed Properties", [
-                                `**Author:** ${DataToDelete.author == null ? "None" : DataToDelete.author}`,
-                                `\n**Description:** ${DataToDelete.description == null ? "None" : DataToDelete.description}`,
-                                `\n**Title:** ${DataToDelete.title == null ? "None" : DataToDelete.title}`,
-                                `\n**Color:** ${DataToDelete.color == null ? "None": DataToDelete.color}`,
-                                `\n**Image:** [Image URL](${DataToDelete.image == null ? "https://youtu.be/dQw4w9WgXcQ" : DataToDelete.image})`,
-                                `\n**Footer:** ${DataToDelete.footer == null ? "None" : DataToDelete.footer}`,
+                                `**Author:** ${DataFromDB.author == null ? "None" : DataFromDB.author}`,
+                                `\n**Description:** ${DataFromDB.description == null ? "None" : DataFromDB.description}`,
+                                `\n**Title:** ${DataFromDB.title == null ? "None" : DataFromDB.title}`,
+                                `\n**Color:** ${DataFromDB.color == null ? "None": DataFromDB.color}`,
+                                `\n**Image:** [Image URL](${DataFromDB.image == null ? "https://youtu.be/dQw4w9WgXcQ" : DataFromDB.image})`,
+                                `\n**Footer:** ${DataFromDB.footer == null ? "None" : DataFromDB.footer}`,
                             ].toString())
                         }
 
@@ -99,10 +108,11 @@ module.exports = {
                             ], ephermal: true
                             })
                         }
-
+                        
                         const embed = new Discord.MessageEmbed()
                             .setDescription(`Custom-command: List`)
                             .setColor("#fffafa")
+                            .setFooter("/custom-command [ info ] [ command-name ] to learn more")
     
                         for (i = 0; i < res.length; i++){
                             embed.addField(`**${i + 1}**• [ ${res[i] && res[i].Data.name} ]`,[

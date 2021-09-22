@@ -198,13 +198,23 @@ module.exports = {
             }
         }
 
+        let rolesArr = []
+        newData.permission.forEach(role =>{
+            findTheRoles = interaction.guild.roles.cache.find(r => r.id == role)
+
+            if(findTheRoles){
+                rolesArr.push(findTheRoles.toString())
+            }
+        })
+
         let messageEmbed = new Discord.MessageEmbed()
             .setAuthor("Custom-command: Create")
             .setDescription(`**Name:** ${newData.name ? newData.name : "None"}
             **Content:** ${newData.content ? newData.content : "None"}
             **Delete:** ${newData.deleteC ? newData.deleteC : "None"}
-            **Mention:** ${newData.mention ? newData.name : "None"}
+            **Mention:** ${newData.mention ? newData.mention : "None"}
             **Embed:** ${newData.embed ? newData.embed : "None"}`)
+            .addField('Permissions', rolesArr.toString())
             .setColor("WHITE")   
             .addField("Embed Properties", [
                 `**Author:** ${newData.author ? newData.author : "None"}`,
