@@ -120,7 +120,7 @@ module.exports = {
                 if(cmdName == commands.name){
                     let name = commands.name ? commands.name : "Not found";
                     let desc = commands.description ?commands.description : "No descriptions avaiable :(";
-                    let alias = commands.aliases ? client.commands.aliease : "None";
+                    let alias = commands.aliases ? commands.aliases : "None";
                     let perms = commands.permissions ? commands.permissions : "None";
                     let usage = commands.usage ? commands.usage : "None";
                     let categ = commands.category ? commands.category : "None";

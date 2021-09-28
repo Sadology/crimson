@@ -77,7 +77,9 @@ module.exports = {
                             url: image
                         },
                         title: variable(obj["title"]),
-                        footer: memberVariable(obj['footer'])
+                        footer: {
+                            text: variable(obj['footer'])
+                        }
                     }
         
                     if(obj["mention"] === false){
@@ -144,7 +146,9 @@ module.exports = {
                                     url: image
                                 },
                                 title: memberVariable(obj["title"]),
-                                footer: memberVariable(obj['footer']),
+                                footer: {
+                                    text: memberVariable(obj['footer'])
+                                }
                             }
     
                             if(obj["embed"] === false){

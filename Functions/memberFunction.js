@@ -1,19 +1,26 @@
 class Member{
+    /**
+     * @param {string} member
+     * @param {string} message
+     * @returns 
+     */
     constructor (member, message){
         this.member = member
         this.message = message
+        this.mentionedMember
+        if(this.member.startsWith('<@')){
+            this.mentionedMember = this.member.replace('<@', '').replace('>', '')
+            .replace('&', '')
+            .replace('!', '').trim();
+        }else {
+            this.mentionedMember = this.member
+        }
         const regex = /[\d]/g;
 
-        if(this.member.match(regex)){
-            const Member = this.message.guild.members.fetch(this.member)
-
-            if(Member){
-                return Member
-            }else {
-                throw new console.error("Member is not valid"); 
-            }
+        if(this.mentionedMember.match(regex)){
+            return this.mentionedMember
         }
     }
 }
 
-module.exports = { Member }
+module.exports = Member
