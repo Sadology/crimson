@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const { GuildRole, GuildChannel } = require('../../models')
 const { commandUsed } = require('../../Functions/CommandUsage')
+const {Member} = require('../../Functions/MemberFunction');
 module.exports = {
     name: 'purge',
     aliases: ['purne'],
@@ -10,41 +11,15 @@ module.exports = {
     category: "Moderation",
     
     run: async(client, message, args,prefix) =>{
-        await message.delete();
+        if(message.guild.me.permissions.has(["MANAGE_MESSAGES"])){
+            await message.delete();
+        }
 
         if(!message.member.permissions.has("MANAGE_MESSAGES")){
             return message.author.send('None of your role proccess to use this command')
         }
 
-        const permData = await GuildRole.findOne({
-            guildID: message.guild.id,
-            Active: true
-        });
-
         const { author, content, guild, channel } = message;
-
-        const missingPerm = new Discord.MessageEmbed()
-            .setAuthor(author.tag, author.displayAvatarURL({ dynamic: false, format: "png", size: 1024 }))
-            .setDescription( "Missing permission to execute this command" )
-            .setTimestamp()
-            .setColor( '#ff303e' )
-
-        const roleSet = permData.Moderator;
-        if (message.guild.ownerID !== message.author.id){
-            if(!message.member.permissions.has(["ADMINISTRATOR"])){
-                if(permData.ModOptions.Enabled === true){
-                    if(!message.member.roles.cache.some(r=>roleSet.includes(r.id))){
-                        if(!message.member.permissions.has(["MANAGE_GUILD", "ADMINISTRATOR", "BAN_MEMBERS"])){
-                            return await message.channel.send({embeds: [missingPerm]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-                        }
-                    }
-                }else if(permData.ModOptions.Enabled === false){
-                    if(!message.member.permissions.has(["BAN_MEMBERS", "MANAGE_GUILD", "ADMINISTRATOR"])){
-                        return await message.channel.send({embeds: [missingPerm]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-                    }
-                }
-            }
-        }
 
         const Embed = new Discord.MessageEmbed()
             .setAuthor( "Command - Purge", client.user.displayAvatarURL({ dynamic: true, type: "png", size: 1024 }) )
@@ -75,54 +50,27 @@ module.exports = {
             .setTimestamp()
 
         if( !args.length ) {
-            return channel.send({embeds: [TutEmbed]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
+            return channel.send({embeds: [TutEmbed]}).then(m=>setTimeout(() => m.delete(), 1000 * 30));
         }
 
-        const Amount = parseInt( args[0] );// if args 1 is a numberic value.
+        let errorEmbed = new Discord.MessageEmbed()
+            .setDescription(`Please provide a number to purge \n\n**Usage:** ${prefix}purge [ amount ] [ option ]`)
+            .setColor("#ff303e")
+        const Amount = parseInt( args[0] );
         if( !Amount ){
-            Embed.setDescription("Please provide a number to purge")
-            Embed.setColor("#ff303e")
-            return message.channel.send({embeds: [Embed]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
+            return message.channel.send({embeds: [errorEmbed]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
+        }else if (isNaN(args[0])){
+            return message.channel.send({embeds: [errorEmbed]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
         }
         if(Amount >= 101){
             Embed.setDescription("Bot can't delete more than 100 message at the same time")
             Embed.setColor("#ff303e")
             return message.channel.send({embeds: [Embed]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-        }// If amount is greater than 100, then throw an error.
+        }
 
         const options = args[1];
         const word = args[2];
-
-        const regex = /[\d]/g; // If mention type is ID
-        const findMember = args[1]; // If mention type is <@>
-        const member = findMember ? findMember.replace(/^<@!([^>]+)>$/gim, '$1') : null; // Removing <@> from mention
-
-        async function logMessage( element, amount, ID, user )  {
-            const LogData = await GuildChannel.findOne({
-                guildID: guild.id,
-                Active: true,
-                "MessageLog.DeleteEnabled": true
-            })
-            if( LogData ){
-                const logChannel = guild.channels.cache.get( LogData.MessageLog.MessageDelete )
-
-                if( logChannel ){
-                    const logEmbed = new Discord.MessageEmbed()
-                        .setAuthor(`${ element } Message Deleted `, message.author.displayAvatarURL({dynamic: true , format: 'png', size: 1024}))
-                        .addField('Moderator', `\`\`\`${message.author.tag}\`\`\``.toString(), true)
-                        .addField('Amount', `\`\`\`${ amount ? amount : "100" }\`\`\``.toString(), true)
-                        .addField('Channel', `${ message.channel }`.toString(), true)
-                        .setTimestamp()
-                        .setColor("#fffafa")
-                        logEmbed.setFooter(`${ ID }`)
-                        if( user ){
-                            logEmbed.addField("Member", `\`\`\`${ user }\`\`\``, true)
-                        }
-
-                    logChannel.send({embeds: [logEmbed]});
-                }
-            }
-        }
+        const regex = /[\d]/g;
 
         switch( options ){
 
@@ -134,10 +82,9 @@ module.exports = {
                     messages.forEach(messages =>{
                         Arr.push(...[messages].filter(m => m.author.bot && !m.pinned))
                     })
-                    let message = Arr.slice(0, Amount)
+                    let Message = Arr.slice(0, Amount)
 
-                    await channel.bulkDelete( message, true ).then(async ( messages ) =>{
-                        logMessage( "Bots", messages.size, message.author.id );
+                    await channel.bulkDelete( Message, true ).then(async ( messages ) =>{
                         commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                     })
                 }).catch(( err ) => console.log( err ));
@@ -151,10 +98,9 @@ module.exports = {
                     messages.forEach(messages =>{
                         Arr.push(...[messages].filter(m => !m.author.bot && !m.pinned))
                     })
-                    let message = Arr.slice(0, Amount)
+                    let Message = Arr.slice(0, Amount)
 
-                    await channel.bulkDelete( message, true ).then(async ( messages ) =>{
-                        logMessage( "Humans", messages.size, message.author.id );
+                    await channel.bulkDelete( Message, true ).then(async ( messages ) =>{
                         commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                     })
                 }).catch(( err ) => console.log( err ));
@@ -168,10 +114,9 @@ module.exports = {
                     messages.forEach(messages =>{
                         Arr.push(...[messages].filter(m => m.pinned))
                     })
-                    let message = Arr.slice(0, Amount)
+                    let Message = Arr.slice(0, Amount)
 
-                    await channel.bulkDelete( message, true ).then(async ( messages ) =>{
-                        logMessage( "Pinned", messages.size, message.author.id );
+                    await channel.bulkDelete( Message, true ).then(async ( messages ) =>{
                         commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                     })
                 }).catch((err) => console.log(err));
@@ -190,10 +135,9 @@ module.exports = {
                     messages.forEach(messages =>{
                         Arr.push(...[messages].filter(m => m.content.startsWith( word ) && !m.pinned))
                     })
-                    let message = Arr.slice(0, Amount)
+                    let Message = Arr.slice(0, Amount)
 
-                    await channel.bulkDelete(message, true).then(async (messages) =>{
-                        logMessage( "Starts-With", messages.size, message.author.id );
+                    await channel.bulkDelete(Message, true).then(async (messages) =>{
                         commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                     })
                 }).catch(( err ) => console.log( err ));
@@ -212,10 +156,9 @@ module.exports = {
                     messages.forEach(messages =>{
                         Arr.push(...[messages].filter(m => m.content.endsWith( word ) && !m.pinned))
                     })
-                    let message = Arr.slice(0, Amount)
+                    let Message = Arr.slice(0, Amount)
 
-                    await channel.bulkDelete(message, true).then(async ( messages ) =>{
-                        logMessage( "Ends-With", messages.size, message.author.id );
+                    await channel.bulkDelete(Message, true).then(async ( messages ) =>{
                         commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                     })
                 }).catch((err) => console.log(err));
@@ -234,10 +177,9 @@ module.exports = {
                     messages.forEach(messages =>{
                         Arr.push(...[messages].filter(m => m.content.includes(word) && !m.pinned))
                     })
-                    let message = Arr.slice(0, Amount)
+                    let Message = Arr.slice(0, Amount)
 
-                    await channel.bulkDelete(message, true).then(async ( messages ) =>{
-                        logMessage("Matched", messages.size, message.author.id);
+                    await channel.bulkDelete(Message, true).then(async ( messages ) =>{
                         commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                     })
                 }).catch(( err ) => console.log( err ))
@@ -256,10 +198,9 @@ module.exports = {
                     messages.forEach(messages =>{
                         Arr.push(...[messages].filter(m => !m.content.includes(word) && !m.pinned))
                     })
-                    let message = Arr.slice(0, Amount)
+                    let Message = Arr.slice(0, Amount)
 
-                    await channel.bulkDelete(message, true).then(async (messages) =>{
-                        logMessage( "MisMatched", messages.size, message.author.id );
+                    await channel.bulkDelete(Message, true).then(async (messages) =>{
                         commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                     })
                 }).catch((err) => console.log(err))
@@ -267,29 +208,39 @@ module.exports = {
             default:
                 if( args[1] ){
                     if( args[1].match(regex) ){
-                        const Member = await message.guild.members.fetch(member);
+                        const FindMembers = new Member(args[1], message);
+                        await message.guild.members.fetch();
+                        const member = message.guild.members.cache.get(FindMembers.mentionedMember)
 
-                        if( Member ){
+                        if( member ){
                             channel.messages.fetch({
                                 limit: 100,
                             }).then(async messages => {
-                                if ( Member ) {
                                     let Arr = []
                                     messages.forEach(messages =>{
-                                        Arr.push(...[messages].filter(m => m.author.id === Member.id && !m.pinned))
+                                        Arr.push(...[messages].filter(m => m.user.id === member.id && !m.pinned))
                                     })
-                                    let message = Arr.slice(0, Amount)
+                                    let Message = Arr.slice(0, Amount)
 
-                                    await channel.bulkDelete( message, true )
+                                    await channel.bulkDelete( Message, true )
                                         .then(async ( messages ) =>{
-                                            logMessage("Bulk", messages.size, Member.user.id, Member.user.tag);
                                             commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                                         })
-                                }else {
-                                    Embed.setDescription(`Please mention a Member \n**Usage**: \`${prefix}purge [ Amount ] [ User ]\` \n**Example**: \`${prefix}purge 18 @shadow~\``)
-                                    Embed.setColor("#ff303e")
-                                    channel.send({embeds: [Embed]})
-                                }
+                            }).catch( error => console.log( error ));
+                        }else {
+                            channel.messages.fetch({
+                                limit: 100,
+                            }).then(async messages => {
+                                    let Arr = []
+                                    messages.forEach(messages =>{
+                                        Arr.push(...[messages].filter(m => m.author.id === FindMembers.mentionedMember && !m.pinned))
+                                    })
+                                    let Message = Arr.slice(0, Amount)
+
+                                    await channel.bulkDelete( Message, true )
+                                        .then(async ( messages ) =>{
+                                            commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
+                                        })
                             }).catch( error => console.log( error ));
                         }
                     }else {
@@ -306,9 +257,8 @@ module.exports = {
                         messages.forEach(messages =>{
                             Arr.push(...[messages].filter(m => !m.pinned))
                         })
-                        let message = Arr.slice(0, Amount)
-                        await channel.bulkDelete( message, true ).then(async ( messages ) =>{
-                            logMessage( "Bulk", messages.size, message.author.id );
+                        let Message = Arr.slice(0, Amount)
+                        await channel.bulkDelete( Message, true ).then(async ( messages ) =>{
                             commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Purge", messages.size, content );
                         })
                     }).catch(( err ) => console.log( err ))

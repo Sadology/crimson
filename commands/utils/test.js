@@ -4,20 +4,19 @@ const { errLog } = require('../../Functions/erroHandling');
 const { Member } = require('../../Functions/MemberFunction');
 const { GuildRole } = require('../../models');
 const { Permissions } = require('discord.js');
+const { GuildChannel } = require('../../models');
+const { LogChannel } = require('../../Functions/logChannelFunctions');
 module.exports = {
     name: 'test',
     description: 'ping pong',
     category: 'Utils',
     disabled: true,
     run: async(client, message, args)=> {
-        const member = args[0]
-        const memberInfo = new Member(member, message)
-
-        const GuildMember = message.guild.members.cache.get(memberInfo.id)
-        if(GuildMember){
-            return console.log("yes")
-        }else {
-            return console.log("nop")
-        }
+        LogChannel('banLog', message.guild.id, message).then(c => {
+            if(c == null) return;
+            if(!c) return;
+            else c.send("hi")
+        })
+        return
     }
 }

@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { LogsDatabase, GuildChannel } = require('../models')
-
+const { LogChannel } = require('../Functions/logChannelFunctions');
 module.exports = (client, message) =>{
     const checkMute = async () =>{
         const now = new Date()
@@ -45,52 +45,47 @@ module.exports = (client, message) =>{
                     })
                 }
 
-                const logChannelData = await GuildChannel.findOne({
-                    guildID: guild.id,
-                    Active: true,
-                    "ActionLog.UnMuteEnanled": true
-                })
+                LogChannel('actionLog', guild).then(c =>{
+                    if(!c) return;
+                    if(c === null) return;
 
-                if(logChannelData){
-                    try{
-                        const logChannel = guild.channels.cache.get(logChannelData.ActionLog.UnMuteChannel)
-
-                        if(logChannel){
-
-                            const informations = {
-                                color: "#45f766",
-                                author: {
-                                    name: `Unmute - ${memberID.user.userName}`,
-                                    icon_url: memberID.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                    else {
+                        const informations = {
+                            color: "#45f766",
+                            author: {
+                                name: `Unmute - ${memberID.user.userName}`,
+                                icon_url: memberID.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                            },
+                            fields: [
+                                {
+                                    name: "User",
+                                    value: `\`\`\`${memberID.user.tag}\`\`\``,
+                                    inline: true
                                 },
-                                fields: [
-                                    {
-                                        name: "User",
-                                        value: `\`\`\`${memberID.user.tag}\`\`\``,
-                                        inline: true
-                                    },
-                                    {
-                                        name: "Moderator",
-                                        value: `\`\`\`${client.user.tag}\`\`\``,
-                                        inline: true
-                                    },
-                                    {
-                                        name: "Reason",
-                                        value: `\`\`\`[ AUTO ]\`\`\``,
-                                    },
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `User ID: ${memberID.user.id}`
-                                }
-
+                                {
+                                    name: "Moderator",
+                                    value: `\`\`\`${client.user.tag}\`\`\``,
+                                    inline: true
+                                },
+                                {
+                                    name: "Reason",
+                                    value: `\`\`\`[ AUTO ]\`\`\``,
+                                },
+                            ],
+                            timestamp: new Date(),
+                            footer: {
+                                text: `User ID: ${memberID.user.id}`
                             }
-                            logChannel.send({embeds: [informations]})
+
                         }
-                    }catch (err){
-                        console.log(err)
+                        const hasPermInChannel = c
+                        .permissionsFor(client.user)
+                        .has('SEND_MESSAGES', false);
+                        if (hasPermInChannel) {
+                            c.send({embeds: [informations]})
+                        }
                     }
-                }
+                })
            }
         }
 
@@ -150,53 +145,47 @@ module.exports = (client, message) =>{
                 }catch(err){
                     console.log(err)
                 }
+                LogChannel('actionLog', guild).then(c =>{
+                    if(!c) return;
+                    if(c === null) return;
 
-                const logChannelData = await GuildChannel.findOne({
-                    guildID: guild.id,
-                    Active: true,
-                    "ActionLog.UnMuteEnanled": true
-                })
-
-                if(logChannelData){
-                    try{
-                        const logChannel = guild.channels.cache.get(logChannelData.ActionLog.UnMuteChannel)
-
-                        if(logChannel){
-
-                            const informations = {
-                                color: "#ff303e",
-                                author: {
-                                    name: `Unmute - ${memberID.user.username}`,
-                                    icon_url: member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                    else {
+                        const informations = {
+                            color: "#ff303e",
+                            author: {
+                                name: `Unmute - ${memberID.user.username}`,
+                                icon_url: member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                            },
+                            fields: [
+                                {
+                                    name: "User",
+                                    value: `\`\`\`${member.user.tag}\`\`\``,
+                                    inline: true
                                 },
-                                fields: [
-                                    {
-                                        name: "User",
-                                        value: `\`\`\`${member.user.tag}\`\`\``,
-                                        inline: true
-                                    },
-                                    {
-                                        name: "Moderator",
-                                        value: `\`\`\`${client.user.tag}\`\`\``,
-                                        inline: true
-                                    },
-                                    {
-                                        name: "Reason",
-                                        value: `\`\`\`Mute evade detection [ Auto muted ]\`\`\``,
-                                    },
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `User ID: ${member.user.id}`
-                                }
-
+                                {
+                                    name: "Moderator",
+                                    value: `\`\`\`${client.user.tag}\`\`\``,
+                                    inline: true
+                                },
+                                {
+                                    name: "Reason",
+                                    value: `\`\`\`Mute evade detection [ Auto muted ]\`\`\``,
+                                },
+                            ],
+                            timestamp: new Date(),
+                            footer: {
+                                text: `User ID: ${member.user.id}`
                             }
-                            logChannel.send({embeds: [informations]})
+
                         }
-                    }catch (err){
-                        console.log(err)
+                        const hasPermInChannel = c
+                        .permissionsFor(client.user)
+                        .has('SEND_MESSAGES', false);
+                        if (hasPermInChannel) {
+                            c.send({embeds: [informations]})
+                        }
                     }
-                }
+                })
             }
         }
     })

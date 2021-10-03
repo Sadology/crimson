@@ -3,7 +3,7 @@ const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js')
 const { LogsDatabase, GuildRole} = require('../../models')
 const moment = require('moment');
 const { errLog } = require('../../Functions/erroHandling');
-const Member = require('../../Functions/MemberFunction');
+const {Member} = require('../../Functions/MemberFunction');
 
 module.exports = {
     name: 'seek',

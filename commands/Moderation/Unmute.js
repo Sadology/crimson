@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
 const ms = require('ms')
 const { LogsDatabase, GuildChannel, GuildRole } = require('../../models')
-const Member = require('../../Functions/MemberFunction');
+const {Member} = require('../../Functions/MemberFunction');
+const { LogChannel } = require('../../Functions/logChannelFunctions');
 
 module.exports = {
     name: 'unmute',
@@ -18,6 +19,8 @@ module.exports = {
             return message.author.send('None of your role proccess to use this command')
         }
 
+        const { author, content, guild, channel } = message;
+
         const TutEmbed = new Discord.MessageEmbed()
         .setAuthor( "Command - UnMUTE" )
 
@@ -28,121 +31,124 @@ module.exports = {
             return message.channel.send( {embeds: [TutEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 10));
         }
 
+        if(!args[0]){
+            return message.channel.send({
+                embeds: [new Discord.MessageEmbed()
+                    .setDescription(`Please mention a member. \n\n**Usage:** ${prefix}unmute [ member ]`)
+                    .setColor("RED")
+                ]
+            }).then(m=>setTimeout(() => m.delete(), 1000 * 10));
+        }
+
         const FindMembers = new Member(args[0], message);
         message.guild.members.fetch()
         const member = message.guild.members.cache.get(FindMembers.mentionedMember)
 
-        if(member){
-            const previosMute = await LogsDatabase.find({
-                userID: member.id,
-            });
-    
-            const currentlyMuted = previosMute.filter(mute => {
-                return mute.Muted === true
-            });
-
-            const muteRole = await message.guild.roles.cache.find(r => r.name === 'Muted');
-            if( !muteRole ){
-                TutEmbed.setDescription( `The \`Muted\` role does not exist` )
-                TutEmbed.setColor( "#fffafa" )
-                return message.channel.send( {embeds: [TutEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-            };
-
-            const authorHighestRole = message.guild.members.resolve( client.user ).roles.highest.position;
-            const  mentionHighestRole = member.roles.highest.position;
-
-            if(mentionHighestRole >= authorHighestRole) {
-                TutEmbed.setDescription( `Can't Unmute a member with higher role than me` )
-                TutEmbed.setColor( '#ff303e' )
-    
-                return await message.channel.send({embeds: [TutEmbed]}).then(m=>setTimeout(() => m.delete(), 1000 * 10))
-            }
-            
-            if ( currentlyMuted.length ){
-                await LogsDatabase.findOneAndUpdate({
-                    guildID: guild.id,
-                    Muted: true
-                },{
-                    Muted: false
-                })
-
-                try{
-                    await member.roles.remove(muteRole.id);
-                    
-                    channel.send({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`${member.user.tag} has been UnMuted `)
-                        .setColor("#45f766")
-                    ]
-                    }).then(m=>setTimeout(() => m.delete(), 1000 * 10))
-                }catch(err){
-                    console.log(err)
-                };
-            }else if(member.roles.cache.has(muteRole.id)){
-                try{
-                    await member.roles.remove(muteRole.id);
-
-                    channel.send({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`${member.user.tag} has been UnMuted `)
-                        .setColor("#45f766")
-                    ]
-                    }).then(m=>setTimeout(() => m.delete(), 1000 * 10))
-                }catch(err){
-                    console.log(err)
-                };
-            }else {
-                return channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`${member.user.tag} is not Muted `)
-                    .setColor("#ff303e")
-                ]
-                }).then(m=>setTimeout(() => m.delete(), 1000 * 10))
-            }
-
-            const logChannelData = await GuildChannel.findOne({
-                guildID: message.guild.id,
-                Active: true,
-                "ActionLog.UnMuteEnanled": true
-            })
-            if(logChannelData){
-                try{
-                    const logChannel = message.guild.channels.cache.get(logChannelData.ActionLog.UnMuteChannel)
-
-                    if(logChannel){
-
-                        const informations = {
-                            color: "#45f766",
-                            author: {
-                                name: `Unmute`,
-                                icon_url: member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
-                            },
-                            fields: [
-                                {
-                                    name: "User",
-                                    value: `\`\`\`${member.user.tag}\`\`\``,
-                                    inline: true
-                                },
-                                {
-                                    name: "Moderator",
-                                    value: `\`\`\`${message.author.tag}\`\`\``,
-                                    inline: true
-                                },
-                            ],
-                            timestamp: new Date(),
-                            footer: {
-                                text: `User ID: ${member.user.id}`
-                            }
-
-                        }
-                        logChannel.send({embeds: [informations]})
-                    }
-                }catch (err){
-                    console.log(err)
-                }
-            }
-        }else {
+        if(!member){
             TutEmbed.setDescription( `Invalid member | Couldn't find the member` )
     
             TutEmbed.setColor( "#ff303e" )
             return message.channel.send( {embeds: [TutEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 10))
         }
+
+        const previosMute = await LogsDatabase.find({
+            userID: member.id,
+        });
+
+        const currentlyMuted = previosMute.filter(mute => {
+            return mute.Muted === true
+        });
+
+        const muteRole = await message.guild.roles.cache.find(r => r.name === 'Muted');
+        if( !muteRole ){
+            TutEmbed.setDescription( `\`Muted\` role does not exist` )
+            TutEmbed.setColor( "#fffafa" )
+            return message.channel.send( {embeds: [TutEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 10));
+        };
+
+        const authorHighestRole = message.guild.members.resolve( client.user ).roles.highest.position;
+        const  mentionHighestRole = member.roles.highest.position;
+
+        if(mentionHighestRole >= authorHighestRole) {
+            TutEmbed.setDescription( `Can't Unmute a member with higher role than me` )
+            TutEmbed.setColor( '#ff303e' )
+
+            return await message.channel.send({embeds: [TutEmbed]}).then(m=>setTimeout(() => m.delete(), 1000 * 10))
+        }
+        
+        if ( currentlyMuted.length ){
+            await LogsDatabase.findOneAndUpdate({
+                guildID: guild.id,
+                Muted: true
+            },{
+                Muted: false
+            })
+
+            try{
+                await member.roles.remove(muteRole.id);
+                
+                channel.send({embeds: [new Discord.MessageEmbed()
+                    .setDescription(`${member.user.tag} has been UnMuted `)
+                    .setColor("#45f766")
+                ]
+                }).then(m=>setTimeout(() => m.delete(), 1000 * 10))
+            }catch(err){
+                console.log(err)
+            };
+        }else if(member.roles.cache.has(muteRole.id)){
+            try{
+                await member.roles.remove(muteRole.id);
+
+                channel.send({embeds: [new Discord.MessageEmbed()
+                    .setDescription(`${member.user.tag} has been UnMuted `)
+                    .setColor("#45f766")
+                ]
+                }).then(m=>setTimeout(() => m.delete(), 1000 * 10))
+            }catch(err){
+                console.log(err)
+            };
+        }else {
+            return channel.send({embeds: [new Discord.MessageEmbed()
+                .setDescription(`${member.user.tag} is not Muted `)
+                .setColor("#ff303e")
+            ]
+            }).then(m=>setTimeout(() => m.delete(), 1000 * 10))
+        }
+            
+        LogChannel('actionLog', guild).then(c => {
+            if(!c) return;
+            if (c === null) return
+
+            const informations = {
+                color: "#45f766",
+                author: {
+                    name: `Unmute`,
+                    icon_url: member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                },
+                fields: [
+                    {
+                        name: "User",
+                        value: `\`\`\`${member.user.tag}\`\`\``,
+                        inline: true
+                    },
+                    {
+                        name: "Moderator",
+                        value: `\`\`\`${message.author.tag}\`\`\``,
+                        inline: true
+                    },
+                ],
+                timestamp: new Date(),
+                footer: {
+                    text: `User ID: ${member.user.id}`
+                }
+
+            }
+            const hasPermInChannel = c
+            .permissionsFor(client.user)
+            .has('SEND_MESSAGES', false);
+            if (hasPermInChannel) {
+                c.send({embeds: [informations]})
+            }
+        }).catch(err => console.log(err));
     }
 }

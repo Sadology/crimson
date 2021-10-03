@@ -3,7 +3,7 @@ module.exports = {
     name: '8ball',
     aliases: ['eightball'],
     description: "Ask the 8ball any question, it will reply and remove the confusion.",
-    permissions: ["EVERYONE"],
+    permissions: ["SEND_MESSAGES"],
     usage: "8ball [ question ]",
     category: "Fun",
     run: async(client, message, args,prefix) =>{

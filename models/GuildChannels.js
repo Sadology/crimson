@@ -46,7 +46,8 @@ const serverSchema = mongoose.Schema({
   Ticket: {
     TicketChannel: String,
     TicketEnabled: Boolean,
-  }
+  },
+  Data: Array
 })
 
 module.exports = mongoose.model('Guild-Channels', serverSchema);

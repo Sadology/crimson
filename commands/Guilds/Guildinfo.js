@@ -1,22 +1,8 @@
 const Discord = require('discord.js');
 const moment = require('moment');
 const { GuildRole } = require("../../models");
-const { MessageEmbed } = require('discord.js');
-const Regions = {
-    brazil: "Brazil",
-    europe: "Europe",
-    hongkong: "Hong Kong",
-    india: "India",
-    japan: "Japan",
-    russia: "Russia",
-    singapore: "Singapore",
-    southafrica: "South Africa",
-    sydeny: "Sydeny",
-    "us-central": "US Central",
-    "us-east": "US East",
-    "us-west": "US West",
-    "us-south": "US South"
-}
+const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+
 const verificationLevels = {
     NONE: "None - unrestricted",
     LOW: "Low - Require verified Email",
@@ -27,61 +13,107 @@ const verificationLevels = {
 
 module.exports = {
     name: 'server',
-    aliases: ['guild'],
-    description: "Get informations of your server.",
-    permissions: ["EVERYONE"],
-    usage: "server [ options ]",
+    aliases: ['guild', 'serverinfo', 'guildinfo', 'server-info', 'guild-info'],
+    description: "Get informations about your server.",
+    permissions: ["VIEW_MESSAGES"],
+    usage: "server-info",
     category: "Utils",
 
     run: async (client, message, args,prefix) =>{
         const { author, content, guild } = message;
 
-        if(!args[0]){
-            message.channel.send({embeds: [new Discord.MessageEmbed()
-                .setAuthor("Command - Server")
-                .setDescription(`Which option you would like to check? \ninfo\nroles \n**Example**: ${prefix}server info`)
-                .setColor("#fffafa")
-            ]
-            })
+        const row = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                .setCustomId('serverRoles')
+                .setLabel("Roles")
+                .setStyle("PRIMARY")
+            )
+            .addComponents(
+                new MessageButton()
+                .setCustomId('serverEmojis')
+                .setLabel("Emojis")
+                .setStyle("PRIMARY")
+            )
+            .addComponents(
+                new MessageButton()
+                .setCustomId('serverStickers')
+                .setLabel("Stickers")
+                .setStyle("PRIMARY")
+            )
 
-        }
-        let serverCmd = args[0]
         const Channels = message.guild.channels.cache
-        
         const Roles = message.guild.roles.cache
             .sort((a,b) => b.position - a.position)
             .map(role => role.toString())
             .slice(0, -1)
             .join(', ') || "No roles in this server yet"
 
-        switch(serverCmd){
-            case'info':{
-                serverInfo = new Discord.MessageEmbed()
-                .setAuthor(message.guild.name, message.guild.displayAvatarURL)
-                .setThumbnail(message.guild.iconURL({
-                    dynamic: true , format: 'png' , size:1024
-                }))
-                .addField('Server name:', message.guild.name)
-                .addField('Owner:', message.guild.owner.user.tag, true)
-                .addField('Server-Region:',`${Regions[message.guild.region]}`, true )
-                .addField('Verification-Level:', `${verificationLevels[message.guild.verificationLevel]}`)
-                .addField('Total-Members:', message.guild.memberCount)
-                .addField('Text-Channels:', `${Channels.filter(c => c.type === 'text').size}`, true)
-                .addField('Voice-Channels:', `${Channels.filter(vc => vc.type === 'voice').size}`, true)
-                .addField('Categories:', `${Channels.filter(cc => cc.type === 'category').size}`, true)
-                .setFooter(`Created at: ${moment(message.guild.createdTimestamp).format("LL")} | server ID:${message.guild.id}`)
-                .setColor("#fffafa")
-             message.channel.send({embeds: [serverInfo]})
-            }
-        break;
-            case'roles':{
-                serverInfo = new Discord.MessageEmbed()
-                .setAuthor(`${message.guild.name}'s server roles: `)
-                .setDescription(Roles)
-                .setColor("#fffafa")
-             message.channel.send({embeds: [serverInfo]})
-            }
-        }
+        const Emojis = message.guild.emojis.cache
+            .sort((a,b) => b.position - a.position)
+            .map(e => e)
+            .join(', ') || "No emojis in this server yet"
+        
+        const Stickers = message.guild.stickers.cache
+            .sort((a,b) => b.position - a.position)
+            .map(s => s)
+            .join(', ') || "No stickers in this server yet"
 
+        serverInfo = new Discord.MessageEmbed()
+        .setAuthor(message.guild.name, message.guild.displayAvatarURL)
+        .setThumbnail(message.guild.iconURL({
+            dynamic: true , format: 'png' , size:1024
+        }))
+        .setDescription(message.guild.description ? message.guild.description : "Server description not available")
+        .addField('Server name:', message.guild.name.toString(), true)
+        .addField('Owner:', `<@${message.guild.ownerId}>`.toString(), true)
+        .addField('Verification-Level:', `${verificationLevels[message.guild.verificationLevel]}`.toString())
+        .addField('Total-Members:', message.guild.memberCount.toString())
+        .addField('Text-Channels:', `${Channels.filter(c => c.type === 'GUILD_TEXT').size}`.toString(), true)
+        .addField('Voice-Channels:', `${Channels.filter(vc => vc.type === 'GUILD_VOICE').size}`.toString(), true)
+        .addField('Categories:', `${Channels.filter(cc => cc.type === 'GUILD_CATEGORY').size}`.toString(), true)
+        .addField("MFS Levels", message.guild.mfaLevel.toString(), true)
+        .addField("Explict Filter", message.guild.explicitContentFilter.toString(), true)
+        .addField("Large Guild", message.guild.large.toString(), true)
+        .addField("Max Members", message.guild.maximumMembers.toString(), true)
+        .addField("Partnered", message.guild.partnered.toString(), true)
+        .addField("Verified", message.guild.verified.toString(), true)
+        .addField("Rules Channel", message.guild.rulesChannel.toString(), true)
+        .addField("Shard", message.guild.shardId.toString(), true)
+        .addField("Banner", `[Banner Link](${message.guild.banner ? message.guild.banner : "https://youtu.be/dQw4w9WgXcQ"})`.toString(), true)
+        .addField("Boost Tier", message.guild.premiumTier.toString(), true)
+        .addField("Boosters", message.guild.premiumSubscriptionCount.toString(), true)
+        .addField("Vanity URL",`${message.guild.vanityURLCode ? message.guild.vanityURLCode : "None"}`.toString(), true)
+        .setFooter(`Created at: ${moment(message.guild.createdTimestamp).format("LL")} | server ID:${message.guild.id}`)
+        .setColor("#fffafa")
+                
+            message.channel.send({embeds: [serverInfo], components: [row]}).then(msg =>{
+                const filter = (button) => button.clicker.user.id === message.author.id
+
+                const collector = msg.createMessageComponentCollector(filter, { time: 1000 * 120, errors: ['time'] });
+
+                collector.on('collect', (b) =>{
+                    if(b.customId === 'serverRoles'){
+                        let rolesEmbed = new Discord.MessageEmbed()
+                            .setDescription(`Server Roles \`[${message.guild.roles.cache.size}]\` \n${Roles}`)
+                            .setColor("#fffafa")
+                            b.update({embeds: [rolesEmbed], components: []})
+                    }else if(b.customId === 'serverEmojis'){
+                        let EmojiEmbed = new Discord.MessageEmbed()
+                        .setAuthor(`Server Emojis [${message.guild.emojis.cache.size}]`)
+                        .setDescription(`${Emojis}`)
+                        .setColor("#fffafa")
+                        b.update({embeds: [EmojiEmbed], components: []})
+                    }else if(b.customId === 'serverStickers'){
+                        let stickersEmbed = new Discord.MessageEmbed()
+                        .setAuthor(`Server Stickers [${message.guild.stickers.cache.size}]`)
+                        .setDescription(`${Stickers}`)
+                        .setColor("#fffafa")
+                        b.update({embeds: [stickersEmbed], components: []})
+                    }
+                })
+
+                collector.on('end', () =>{})
+            })
     }
 }

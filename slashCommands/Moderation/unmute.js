@@ -4,6 +4,7 @@ const ms = require('ms');
 const { LogsDatabase, GuildChannel} = require('../../models');
 const { commandUsed } = require('../../Functions/CommandUsage');
 const { errLog } = require('../../Functions/erroHandling');
+const { LogChannel } = require('../../Functions/logChannelFunctions');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -86,10 +87,12 @@ module.exports = {
                         Active: true,
                         "ActionLog.UnMuteEnanled": true
                     })
-                    if(logChannelData){
-                        const logChannel = guild.channels.cache.get(logChannelData.ActionLog.UnMuteChannel)
 
-                        if(logChannel){
+                    LogChannel('actionLog', guild).then(c =>{
+                        if(!c) return
+                        if(c === null) return
+
+                        else {
                             const informations = {
                                 color: "#45f766",
                                 author: {
@@ -112,11 +115,10 @@ module.exports = {
                                 footer: {
                                     text: `User ID: ${Member.user.id}`
                                 }
-
                             }
-                            logChannel.send({embeds: [informations]})
+                            c.send({embeds: [informations]})
                         }
-                    }
+                    }).catch(err => console.log(err))
                 }catch(err){
                   console.log(err)  
                 }

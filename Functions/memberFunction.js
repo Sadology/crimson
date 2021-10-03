@@ -23,4 +23,4 @@ class Member{
     }
 }
 
-module.exports = Member
+module.exports = {Member}

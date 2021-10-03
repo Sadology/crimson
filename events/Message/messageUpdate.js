@@ -4,6 +4,7 @@ const { errLog } = require('../../Functions/erroHandling');
 module.exports = {
 	event: 'messageUpdate',
 	once: false,
+	disabled: true,
 	run: async(oldMessage, newMessage) => {
 		
 		if(oldMessage.channel.type === 'dm') return;
@@ -44,8 +45,8 @@ module.exports = {
 			const Embed = new MessageEmbed()
 				.setAuthor(`${newMessage.author.tag} - Message Edited`, newMessage.author.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
 				.setDescription(`User ${newMessage.author} \`${newMessage.author.tag}\` in ${oldMessage.channel} \`${oldMessage.channel.name}\``)
-				.addField("Before", oldMessage.toString())
-				.addField("After", newMessage.toString())
+				.addField("Before", `${oldMessage.toString()}`)
+				.addField("After", `${newMessage.toString()}`)
 				.setTimestamp()
 				.setFooter(`User ID: ${oldMessage.author.id}`)
 				.setColor("#fcdb35")

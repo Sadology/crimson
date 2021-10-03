@@ -5,6 +5,7 @@ const { errLog } = require('../../Functions/erroHandling');
 module.exports = {
     event: "guildMemberUpdate",
     once: false,
+    disabled: true,
     run: async(oldMember, newMember, client)=> {
 
         const { guild } = oldMember;

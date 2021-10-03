@@ -4,6 +4,7 @@ const ms = require('ms');
 const { LogsDatabase, GuildChannel} = require('../../models');
 const { commandUsed } = require('../../Functions/CommandUsage');
 const { errLog } = require('../../Functions/erroHandling');
+const { LogChannel } = require('../../Functions/logChannelFunctions');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -150,15 +151,11 @@ module.exports = {
                         ActionDate: new Date(),
                     }).save().catch(err => errLog(err.stack.toString(), "text", "Mute", "Error in Ctreating Data"));
 
-                    const logChannelData = await GuildChannel.findOne({
-                        guildID: guild.id,
-                        Active: true,
-                        "ActionLog.MuteEnabled": true
-                    })
-                    if(logChannelData){
-                        const logChannel = guild.channels.cache.get(logChannelData.ActionLog.MuteChannel)
+                    LogChannel("actionLog", guild).then(c => {
+                        if(!c) return
+                        if(c === null) return
 
-                        if(logChannel){
+                        else {
                             const informations = {
                                 color: "#ff303e",
                                 author: {
@@ -190,16 +187,16 @@ module.exports = {
                                 footer: {
                                     text: `User ID: ${Member.user.id}`
                                 }
-
                             }
-                            const hasPermInChannel = logChannel
+
+                            const hasPermInChannel = c
                                 .permissionsFor(client.user)
                                 .has('SEND_MESSAGES', false);
                             if (hasPermInChannel) {
-                                logChannel.send({embeds: [informations]})
+                                c.send({embeds: [informations]})
                             }
                         }
-                    }
+                    }).catch(err => console.log(err))
                 }catch(err){
                     console.log(err)
                 }

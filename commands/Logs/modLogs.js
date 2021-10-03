@@ -3,7 +3,7 @@ const { LogsDatabase, GuildRole} = require('../../models');
 const moment = require('moment');
 const { errLog } = require('../../Functions/erroHandling');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js')
-const Member = require('../../Functions/MemberFunction');
+const {Member} = require('../../Functions/MemberFunction');
 module.exports = {
     name: 'logs',
     aliases: ['modlogs', 'modlog', 'log'],
@@ -87,16 +87,21 @@ module.exports = {
                             ].toString())
                         }
                         try {
+
                             if(res.length <= 5){
                                 return ({embeds: [Embed]})
-                            }else if (start + current.length >= res.length){
+                            }
+                            if (start + current.length >= res.length){
                                 return ({embeds: [Embed], components: [prev]})
-                            }else if(current.length == 0){
+                            }
+                            if(current.length == 0){
                                 return ({embeds: [Embed], components: [prev]})
-                            }else if(currentIndex !== 0){
+                            }                  
+                            if(currentIndex !== 0){
                                 return ({embeds: [Embed], components: [next, prev]})
-                            }else if (currentIndex + 10 <= res.length){
-                                return ({embeds: [Embed], components: [next]})
+                            }
+                            if (currentIndex + 5 <= res.length){
+                              return ({embeds: [Embed], components: [next]})
                             }
                         }catch(err) {
                             console.log(err)
@@ -167,16 +172,21 @@ module.exports = {
                                     `\nLogID    - ${current[i] && current[i].CaseID}\`\`\``
                                 ].toString())
                             }       
+
                             if(res.length <= 5){
                                 return ({embeds: [embed]})
-                            }else if (start + current.length >= res.length){
+                            }
+                            if (start + current.length >= res.length){
                                 return ({embeds: [embed], components: [prev]})
-                            }else if(current.length == 0){
+                            }
+                            if(current.length == 0){
                                 return ({embeds: [embed], components: [prev]})
-                            }else if(currentIndex !== 0){
+                            }                            
+                            if(currentIndex !== 0){
                                 return ({embeds: [embed], components: [next, prev]})
-                            }else if (currentIndex + 10 < res.length){
-                                return ({embeds: [embed], components: [next]})
+                            }
+                            if (currentIndex + 5 <= res.length){
+                              return ({embeds: [embed], components: [next]})
                             }
                         }
     

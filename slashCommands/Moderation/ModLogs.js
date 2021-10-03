@@ -76,7 +76,6 @@ module.exports = {
                         .setColor("#fffafa")
                         
                     for (i = 0; i < currentPage.length; i++){
-                        console.log(start, currentPage.length, i)
                         Embed.addField(`${start + i + 1} - [ ${currentPage[i] && currentPage[i].ActionType} ]`,[
                             `\`\`\`py\nUser     - ${currentPage[i] && currentPage[i].userName}`,
                             `\nReason   - ${currentPage[i] && currentPage[i].Reason}`,
