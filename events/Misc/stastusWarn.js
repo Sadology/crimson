@@ -3,7 +3,7 @@ const { ModStats } = require('../../models');
 const moment = require("moment");
 const ms = require('ms')
 module.exports = {
-    event: 'message',
+    event: 'messageCreate',
     once: false,
     run: async(message) =>{
         message.mentions.users.forEach(async (user) => {

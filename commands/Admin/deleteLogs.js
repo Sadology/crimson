@@ -56,10 +56,10 @@ module.exports = {
                 .setFooter('"Confirm" button to continue, "Cancel" to cancel')
 
             await message.channel.send({content: "Do you wish to delete this Log?", embeds: [Embed], components: [row]}).then(msg =>{
-                const filter = (button) => button.clicker.user.id === message.author.id;
-                const collector = msg.createMessageComponentCollector(filter, { time: 1000 * 60 });
+                const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 60 });
 
                 collector.on('collect',async b => {
+                    if(b.user.id !== message.author.id) return
                     if(b.customId === 'confirm'){
                         await LogsDatabase.findOneAndDelete({guildID: message.guild.id, CaseID: logID}, function(err, doc){
                             if(err) console.log(err)

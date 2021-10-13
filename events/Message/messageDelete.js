@@ -2,28 +2,28 @@ const Discord = require('discord.js');
 const { MessageEmbed } = require('discord.js');
 const { GuildChannel } = require('../../models');
 const { errLog } = require('../../Functions/erroHandling');
+const { LogChannel } = require('../../Functions/logChannelFunctions');
 module.exports = {
-    event: "MESSAGE_DELETE",
+    event: "messageDelete",
     once: false,
-	disabled: true,
-    run: async(message)=> {
-        if(message.channel.type === 'dm') return;
-		if(message.author.bot) return;
+    run: async(deletedMessage)=> {
+	try{
+        if(deletedMessage.channel.type === 'dm') return;
+		if(deletedMessage.author.bot) return;
 
-		if(!message.guild.me.permissions.has("VIEW_AUDIT_LOG", "ADMINISTRATOR")){
+		if(!deletedMessage.guild.me.permissions.has("VIEW_AUDIT_LOG", "ADMINISTRATOR")){
 			return false;
 		}
 
-		if(message.cleanContent.length >= 1000) return
-
+		if(deletedMessage.cleanContent.length >= 1000) return
 		await Discord.Util.delayFor(900);
 
-        LogChannel("banLog", guild).then(async c => {
+        LogChannel("messageLog", deletedMessage.guild).then(async c => {
             if(!c) return;
             if(c === null) return;
 
             else {
-				const fetchedLogs = await message.guild.fetchAuditLogs({
+				const fetchedLogs = await deletedMessage.guild.fetchAuditLogs({
 					limit: 1,
 					type: 'MESSAGE_DELETE'
 				  }).catch(() => ({
@@ -33,26 +33,17 @@ module.exports = {
 				const deleteLog = fetchedLogs.entries.first()
 				const { executor } = deleteLog
 	
-				const roleSet = Data.MessageLog.IgnoreRoles;
-				const chanSet = Data.MessageLog.IgnoreChannels;
-				const messageEx = await message.guild.members.fetch(executor.id);
-	
-				if(messageEx){
-					if(messageEx.roles.cache.some(r=>roleSet.includes(r.id))){
-						return false
-					}
-				}
-				let search = chanSet.find(i => message.channel.id.includes(i))
-				if(search){
-					return false
-				}
 				const Embed = new MessageEmbed()
-					.setAuthor(`${message.author.tag} - Message Deleted`, message.author.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
-					.setDescription(`**User** - ${message.author} \`${message.author.tag}\` \n**Channel** - ${message.channel} \`${message.channel.name}\` \n${message}`)
+					.setAuthor(`${deletedMessage.author.tag} - Message Deleted`, deletedMessage.author.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
+					.setDescription(`**User** - ${deletedMessage.author} \`${deletedMessage.author.tag}\` \n**Channel** - ${deletedMessage.channel} \`${deletedMessage.channel.name}\` \n${deletedMessage}`)
 					.setTimestamp()
-					.setFooter(`User ID: ${message.author.id}`)
+					.setFooter(`User ID: ${deletedMessage.author.id}`)
 					.setColor("#fa5757")
+				c.send({embeds: [Embed]})
 			}
 		})
+	}catch(err){
+		return console.log(err)
+	}
     }
 }

@@ -89,11 +89,10 @@ module.exports = {
                     .setColor(member.displayColor)
 
                 const MSG = await message.channel.send({content:`${member.user}`,embeds: [ Embed ], components: [row]})
-
-                const filter = (button) => button.clicker.user.id === message.author.id;
-                const collector = MSG.createMessageComponentCollector(filter, { time: 1000 * 60, max: 1 });
+                const collector = MSG.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 60 });
 
                 collector.on('collect',async b => {
+                    if(b.user.id !== message.author.id) return
                     if(b.customId === "Info"){
                         const EditedEmbed = new MessageEmbed()
                             .setAuthor(`${member.user.tag}`, member.user.displayAvatarURL({dynamic: true, type: 'png', size: 1024}))

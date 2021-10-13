@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
+const { MessageActionRow, MessageButton } = require('discord.js');
 const ms = require('ms');
 const { LogsDatabase, GuildChannel} = require('../../models');
 const { commandUsed } = require('../../Functions/CommandUsage');
@@ -23,112 +24,130 @@ module.exports = {
         interaction.deferReply()
         await new Promise(resolve => setTimeout(resolve, 1000))
 
-        if(!MemberID){
-            return interaction.editReply({embeds: [new Discord.MessageEmbed()
-                .setDescription("Please mention a user to check logs")
-                .setColor("RED")
-            ], ephemeral: true
-            })
+        const row = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setStyle("SUCCESS")
+                    .setLabel("Next")
+                    .setCustomId("NextPageModLog")
+            )
+            .addComponents(
+                new MessageButton()
+                    .setStyle("DANGER")
+                    .setLabel("Previous")
+                    .setCustomId("PreviousPageModLog")
+            )
+
+
+        function FindMember(Member){
+            if(Member){
+                const member = interaction.guild.members.cache.get(Member.id)
+                if(member){
+                    return fetchData(member)
+                }else {
+                    return fetchData(Member)
+                }
+            }else {
+                return interaction.editReply('Mention pls') 
+            }
         }
 
-        const CreateNextRow = new Discord.MessageActionRow()
-        let nextButton = CreateNextRow.addComponents(
-            new Discord.MessageButton()
-                .setStyle("PRIMARY")
-                .setLabel("Next")
-                .setCustomId("NextPageModLog")
-            )
-        const CreatePrevRow = new Discord.MessageActionRow()
-        let prevButton = CreatePrevRow.addComponents(
-            new Discord.MessageButton()
-                .setStyle("PRIMARY")
-                .setLabel("Previous")
-                .setCustomId("PreviousPageModLog")
-            )
-
-        let Member;
-        Member = interaction.guild.members.cache.get(MemberID.id);
-
-        async function DataConstructor(Member){
-            await LogsDatabase.find({
+        async function fetchData(Member){
+            let Data = await LogsDatabase.findOne({
                 guildID: interaction.guild.id,
-                userID: Member
-            }).sort([
-                ['ActionDate','ascending']
-            ]).exec(async(err, res) => {
-                if(err) return console.log(err);
+                userID: Member.user ? Member.user.id : Member
+            })
 
-                if(res.length == 0){
-                    return interaction.editReply({embeds: [
-                        new Discord.MessageEmbed()
-                            .setDescription("This user don't have any logs yet")
-                            .setColor("RED")
-                    ]})
+            if(Data){
+                return createData(Member, Data)
+            }else {
+                return interaction.editReply({embeds: [
+                    new Discord.MessageEmbed()
+                        .setDescription(`${Member.user ? Member.user.id : '<@'+Member+'>'} has No logs`)
+                        .setColor("RED")
+                ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+            }
+        }
+
+        async function createData(Member, Data){
+            if(Data.Action.length == 0){
+                return interaction.editReply({embeds: [
+                    new Discord.MessageEmbed()
+                        .setDescription(`${Member.user ? Member.user : '<@'+Member+'>'} has No logs`)
+                        .setColor("RED")
+                ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+            }
+            let arr = []
+            Data.Action.forEach(data => {
+                arr.push(data)
+            })
+
+            logFunction(Member, arr)
+        }
+
+        async function logFunction(Member, Data){
+            let currentIndex = 0
+            let MakeEmbed = start => {
+                const current = Data.slice(start, start + 5)
+
+                const Embed = new Discord.MessageEmbed()
+                    .setDescription(`${Member.user ? Member.user : '<@'+Member+'>'} Mod-Logs - \`[ ${Data.length} ]\``)
+                    .setFooter(`Logs ${start + 1} - ${start + current.length}/${Data.length}`)
+                    .setColor("#fffafa")
+
+                for (i = 0; i < current.length; i++){
+                    Embed.addField(`**${start + i + 1}**• [ ${current[i].Data.ActionType} ]`,[
+                        `\`\`\`py\nUser     - ${current[i].Data.userName}`,
+                        `\nReason   - ${current[i].Data.Reason}`,
+                        `\nMod      - ${current[i].Data.Moderator}`,
+                        `\nDuration - ${current[i].Data.Duration ? current[i].Data.Duration : "∞"}`, 
+                        `\nDate     - ${moment(current[i].Data.ActionDate).format('llll')}`,
+                        `\nLogID    - ${current[i].Data.CaseID}\`\`\``
+                    ].toString())
                 }
-
-                let currentIndex = 0
-                const MakeData = start =>{
-                    const currentPage = res.slice(start, start + 5);
-
-                    let Embed = new Discord.MessageEmbed()
-                        .setDescription(`<@${Member}> - Moderation Logs \`[${res.length}]\``)
-                        .setFooter(`${start + 1} - ${start + currentPage.length}/${res.length}`)
-                        .setColor("#fffafa")
-                        
-                    for (i = 0; i < currentPage.length; i++){
-                        Embed.addField(`${start + i + 1} - [ ${currentPage[i] && currentPage[i].ActionType} ]`,[
-                            `\`\`\`py\nUser     - ${currentPage[i] && currentPage[i].userName}`,
-                            `\nReason   - ${currentPage[i] && currentPage[i].Reason}`,
-                            `\nMod      - ${currentPage[i] && currentPage[i].Moderator}`,
-                            `\nDuration - ${currentPage[i] && currentPage[i].Duration ? currentPage[i] && currentPage[i].Duration : "∞"}`, 
-                            `\nDate     - ${moment(currentPage[i] && currentPage[i].ActionDate).format('llll')}`,
-                            `\nLogID    - ${currentPage[i] && currentPage[i].CaseID}\`\`\``
-                        ].toString())
-                    }
-
-                    if(res.length <= 5){
-                        return ({embeds: [Embed]})
-                    }else if (start + currentPage.length >= res.length){
-                        return ({embeds: [Embed], components: [prevButton]})
-                    }else if(currentPage.length == 0){
-                        return ({embeds: [Embed], components: [prevButton]})
-                    }else if(currentIndex !== 0){
-                        return ({embeds: [Embed], components: [nextButton, prevButton]})
-                    }else if (currentIndex + 10 < res.length){
-                        return ({embeds: [Embed], components: [nextButton]})
-                    }
+                
+                if(Data.length <= 5){
+                    return ({embeds: [Embed]})
+                }else if (start + current.length >= Data.length){
+                    row.components[0].setDisabled(true)
+                    row.components[1].setDisabled(false)
+                    return ({embeds: [Embed], components: [row]})
+                }else if(current.length == 0){
+                    row.components[0].setDisabled(true)
+                    row.components[1].setDisabled(false)
+                    return ({embeds: [Embed], components: [row]})
+                }else if(currentIndex !== 0){
+                    row.components[1].setDisabled(false)
+                    row.components[0].setDisabled(false)
+                    return ({embeds: [Embed], components: [row]})
+                }else if (currentIndex + 5 <= Data.length){
+                    row.components[1].setDisabled(true)
+                    row.components[0].setDisabled(false)
+                    return ({embeds: [Embed], components: [row]})
                 }
+            }
+            await interaction.editReply(MakeEmbed(0)).then(async msg => {
+                const filter = (button) => button.clicker.user.id === interaction.author.id;
+                const collector = msg.createMessageComponentCollector(filter, { time: 1000 * 60, errors: ['time'] });
 
-                await interaction.editReply(MakeData(0)).then(async inter => {
-                    const filter = (button) => button.clicker.user.id === interaction.user.id;
-                    const collector = interaction.channel.createMessageComponentCollector(filter, { time: 1000 * 120, errors: ['time'] });
-
-                    collector.on('collect',async b => {
-                        if(b.customId === 'NextPageModLog'){
-                            currentIndex += 5
-                            await b.update(MakeData(currentIndex))
-                        }
-                        if(b.customId === "PreviousPageModLog"){
-                            currentIndex -= 5
-                            await b.update(MakeData(currentIndex))
-                        }
-                    });
-                    collector.on("end", () =>{})
-                })  
+                collector.on('collect',async b => {
+                    if(b.customId === 'NextPageModLog'){
+                        currentIndex += 5
+                        await b.update(MakeEmbed(currentIndex))
+                    }
+                    if(b.customId === "PreviousPageModLog"){
+                        currentIndex -= 5
+                        await b.update(MakeEmbed(currentIndex))
+                    }
+                });
+                collector.on("end", () =>{
+                    // When the collector ends
+                })
             })
         }
-        if(Member){
-            try {
-                DataConstructor(Member.id)
-            }catch (err){
-                console.log(err)
-            }
-        }else if(!Member){
-            try {
-                DataConstructor(MemberID)
-            }catch(err){
-                console.log(err)
-            }
-        }
+
+        if(MemberID) {
+            FindMember(MemberID)
+        }else return
     }
 }

@@ -5,6 +5,10 @@ const client = new Discord.Client({
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MEMBERS,
     Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_BANS,
+    Intents.FLAGS.DIRECT_MESSAGES,
+    Intents.FLAGS.GUILD_VOICE_STATES,
+    Intents.FLAGS.GUILD_PRESENCES,
   ]
 });
 
@@ -51,7 +55,7 @@ readdirSync("./events/").forEach(dir => {
   }
 });
 
-const { config } = require('process');
+const { config, emit } = require('process');
 
 // CLIENT FUNCTION
 client.on('ready', async() => {

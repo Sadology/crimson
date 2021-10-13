@@ -27,19 +27,16 @@ module.exports = {
             }).then(m=>setTimeout(() =>m.delete(), 1000 * 10))
         }
 
-        const FindMembers = new Member(args[0], message);
-        message.guild.members.fetch()
-        const member = message.guild.members.cache.get(FindMembers.mentionedMember)
+        const GetMembers = new Member(args[0], message);
+        await message.guild.members.fetch()
 
-        const next = new MessageActionRow()
+        const row = new MessageActionRow()
             .addComponents(
                 new MessageButton()
                     .setStyle("SUCCESS")
                     .setLabel("Next")
                     .setCustomId("NextPageModLog")
             )
-
-        const prev = new MessageActionRow()
             .addComponents(
                 new MessageButton()
                     .setStyle("DANGER")
@@ -47,178 +44,116 @@ module.exports = {
                     .setCustomId("PreviousPageModLog")
             )
 
-        if(member){
-            try {
-                await LogsDatabase.find({
-                    guildID: message.guild.id,
-                    userID: member.user.id
-                }).sort([
-                    ['ActionDate','ascending']
-                ]).exec(async (err, res) => {
-                    if(err){
-                        console.log(err)
-                    }
-                    if(res.length == 0) {
-                        return message.channel.send({embeds: [new Discord.MessageEmbed()
-                            .setAuthor("Mod-Logs")
-                            .setDescription(`${member.user} doesn't have any logs`)
-                            .setColor("#fc5947")
-                        ]
-                        }).then(m=>setTimeout(() =>m.delete(), 1000 * 10))
-                    }
-                    
-                    let currentIndex = 0
-                    const generateEmbed = start => {
-                        const current = res.slice(start, start + 5)
 
-                        const Embed = new Discord.MessageEmbed()
-                            .setDescription(`${member.user} Mod-Logs - \`[${res.length}]\``)
-                            .setFooter(`Logs ${start + 1} - ${start + current.length}/${res.length}`)
-                            .setColor("#fffafa")
-
-                        for (i = 0; i < current.length; i++){
-                            Embed.addField(`**${start + i + 1}**• [ ${current[i] && current[i].ActionType} ]`,[
-                                `\`\`\`py\nUser     - ${current[i] && current[i].userName}`,
-                                `\nReason   - ${current[i] && current[i].Reason}`,
-                                `\nMod      - ${current[i] && current[i].Moderator}`,
-                                `\nDuration - ${current[i] && current[i].Duration ? current[i] && current[i].Duration : "∞"}`, 
-                                `\nDate     - ${moment(current[i] && current[i].ActionDate).format('llll')}`,
-                                `\nLogID    - ${current[i] && current[i].CaseID}\`\`\``
-                            ].toString())
-                        }
-                        try {
-
-                            if(res.length <= 5){
-                                return ({embeds: [Embed]})
-                            }
-                            if (start + current.length >= res.length){
-                                return ({embeds: [Embed], components: [prev]})
-                            }
-                            if(current.length == 0){
-                                return ({embeds: [Embed], components: [prev]})
-                            }                  
-                            if(currentIndex !== 0){
-                                return ({embeds: [Embed], components: [next, prev]})
-                            }
-                            if (currentIndex + 5 <= res.length){
-                              return ({embeds: [Embed], components: [next]})
-                            }
-                        }catch(err) {
-                            console.log(err)
-                        }
-                    }
-
-                    await message.channel.send(generateEmbed(0)).then(async msg => {
-
-                    const filter = (button) => button.clicker.user.id === message.author.id;
-                    const collector = msg.createMessageComponentCollector(filter, { time: 1000 * 60, errors: ['time'] });
-
-                    collector.on('collect',async b => {
-                        if(b.customId === 'NextPageModLog'){
-                            currentIndex += 5
-                            await b.update(generateEmbed(currentIndex))
-                        }
-                        if(b.customId === "PreviousPageModLog"){
-                            currentIndex -= 5
-                            await b.update(generateEmbed(currentIndex))
-                        }
-                    });
-                    collector.on("end", () =>{
-                        // When the collector ends
-                    })
-                    })
-                })
-            }catch(err){
-                errLog(err.stack.toString(), "text", "Mod-Log", "Error in Searching member");
-            }
-            }else if(!member){
-                try {
-                    let memberID = FindMembers.mentionedMember;
-                    await LogsDatabase.find({
-                        guildID: message.guild.id,
-                        userID: memberID
-                    }).sort([
-                        ['ActionDate','ascending']
-                    ]).exec(async(err, res) => {
-                        if(err){
-                            console.log(err)
-                        }
-
-                        if(res.length == 0) {
-                            return message.channel.send({embeds: [new Discord.MessageEmbed()
-                                .setAuthor("Mod-Logs")
-                                .setDescription(`${memberID} doesn't have any logs`)
-                                .setColor("#fc5947")
-                            ]
-                            }).then(m=>setTimeout(() =>m.delete(), 1000 * 10))
-                        }
-                        
-                        let currentIndex = 0
-                        const generateEmbed = start => {
-                            const current = res.slice(start, start + 5)
-    
-                            const embed = new Discord.MessageEmbed()
-                                .setDescription(`<@${memberID}> Mod-Logs - \`[${res.length}]\``)
-                                .setFooter(`Logs ${start + 1} - ${start + current.length}/${res.length}`)
-                                .setColor("#fffafa")
-    
-                            for (i = 0; i < current.length; i++){
-                                embed.addField(`**${start + i + 1}**• [ ${current[i] && current[i].ActionType} ]`,[
-                                    `\`\`\`py\nUser     - ${current[i] && current[i].userName}`,
-                                    `\nReason   - ${current[i] && current[i].Reason}`,
-                                    `\nMod      - ${current[i] && current[i].Moderator}`,
-                                    `\nDuration - ${current[i] && current[i].Duration ? current[i] && current[i].Duration : "∞"}`, 
-                                    `\nDate     - ${moment(current[i] && current[i].ActionDate).format('llll')}`,
-                                    `\nLogID    - ${current[i] && current[i].CaseID}\`\`\``
-                                ].toString())
-                            }       
-
-                            if(res.length <= 5){
-                                return ({embeds: [embed]})
-                            }
-                            if (start + current.length >= res.length){
-                                return ({embeds: [embed], components: [prev]})
-                            }
-                            if(current.length == 0){
-                                return ({embeds: [embed], components: [prev]})
-                            }                            
-                            if(currentIndex !== 0){
-                                return ({embeds: [embed], components: [next, prev]})
-                            }
-                            if (currentIndex + 5 <= res.length){
-                              return ({embeds: [embed], components: [next]})
-                            }
-                        }
-    
-                        await message.channel.send(generateEmbed(0)).then(async msg => {
-    
-                        const filter = (button) => button.clicker.user.id === message.author.id;
-                        const collector = msg.createMessageComponentCollector(filter, { time: 1000 * 60, errors: ['time'] });
-    
-                        collector.on('collect',async b => {
-                            if(b.customId === 'NextPageModLog'){
-                                currentIndex += 5
-                                await b.update(generateEmbed(currentIndex))
-                            }
-                            if(b.customId === "PreviousPageModLog"){
-                                currentIndex -= 5
-                                await b.update(generateEmbed(currentIndex))
-                            }
-                        });
-                        collector.on("end", () =>{
-    
-                        })
-                        })
-                    })
-                } catch (err){
-                    errLog(err.stack.toString(), "text", "Mod-Log", "Error in Searching member");
+        function FindMember(Member){
+            if(Member){
+                const member = message.guild.members.cache.get(Member)
+                if(member){
+                    return fetchData(member)
+                }else {
+                    return fetchData(Member)
                 }
             }else {
-                return message.channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`Couldn't find ${muteMember}`)
-                    .setColor("#fc5947")
-                ]
-                }).then(m=>setTimeout(() =>m.delete(), 1000 * 10))
+                return message.channel.send('Mention pls') 
             }
+        }
+
+        async function fetchData(Member){
+            let Data = await LogsDatabase.findOne({
+                guildID: message.guild.id,
+                userID: Member.user ? Member.user.id : Member
+            })
+
+            if(Data){
+                return createData(Member, Data)
+            }else {
+                return message.channel.send({embeds: [
+                    new Discord.MessageEmbed()
+                        .setDescription(`${Member.user ? Member.user.id : '<@'+Member+'>'} has No logs`)
+                        .setColor("RED")
+                ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+            }
+        }
+
+        async function createData(Member, Data){
+            if(Data.Action.length == 0){
+                return message.channel.send({embeds: [
+                    new Discord.MessageEmbed()
+                        .setDescription(`${Member.user ? Member.user : '<@'+Member+'>'} has No logs`)
+                        .setColor("RED")
+                ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+            }
+            let arr = []
+            Data.Action.forEach(data => {
+                arr.push(data)
+            })
+
+            logFunction(Member, arr)
+        }
+
+        async function logFunction(Member, Data){
+            let currentIndex = 0
+            let MakeEmbed = start => {
+                const current = Data.slice(start, start + 5)
+
+                const Embed = new Discord.MessageEmbed()
+                    .setDescription(`${Member.user ? Member.user : '<@'+Member+'>'} Mod-Logs - \`[ ${Data.length} ]\``)
+                    .setFooter(`Logs ${start + 1} - ${start + current.length}/${Data.length}`)
+                    .setColor("#fffafa")
+
+                for (i = 0; i < current.length; i++){
+                    Embed.addField(`**${start + i + 1}**• [ ${current[i].Data.ActionType} ]`,[
+                        `\`\`\`py\nUser     - ${current[i].Data.userName}`,
+                        `\nReason   - ${current[i].Data.Reason}`,
+                        `\nMod      - ${current[i].Data.Moderator}`,
+                        `\nDuration - ${current[i].Data.Duration ? current[i].Data.Duration : "∞"}`, 
+                        `\nDate     - ${moment(current[i].Data.ActionDate).format('llll')}`,
+                        `\nLogID    - ${current[i].Data.CaseID}\`\`\``
+                    ].toString())
+                }
+                
+                if(Data.length <= 5){
+                    return ({embeds: [Embed]})
+                }else if (start + current.length >= Data.length){
+                    row.components[0].setDisabled(true)
+                    row.components[1].setDisabled(false)
+                    return ({embeds: [Embed], components: [row]})
+                }else if(current.length == 0){
+                    row.components[0].setDisabled(true)
+                    row.components[1].setDisabled(false)
+                    return ({embeds: [Embed], components: [row]})
+                }else if(currentIndex !== 0){
+                    row.components[1].setDisabled(false)
+                    row.components[0].setDisabled(false)
+                    return ({embeds: [Embed], components: [row]})
+                }else if (currentIndex + 5 <= Data.length){
+                    row.components[1].setDisabled(true)
+                    row.components[0].setDisabled(false)
+                    return ({embeds: [Embed], components: [row]})
+                }
+            }
+            await message.channel.send(MakeEmbed(0)).then(async msg => {
+                const filter = (button) => button.clicker.user.id == message.author.id;
+                const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
+
+                collector.on('collect',async b => {
+                    if(b.user.id !== message.author.id) return
+                    if(b.customId === 'NextPageModLog'){
+                        currentIndex += 5
+                        await b.update(MakeEmbed(currentIndex))
+                    }
+                    if(b.customId === "PreviousPageModLog"){
+                        currentIndex -= 5
+                        await b.update(MakeEmbed(currentIndex))
+                    }
+                });
+                collector.on("end", () =>{
+                    // When the collector ends
+                })
+            })
+        }
+
+        FindMember(GetMembers.mentionedMember)
+        return
     }
 }

@@ -15,7 +15,7 @@ module.exports = {
             await message.delete();
         }
 
-        if(!message.member.permissions.has("MANAGE_MESSAGES")){
+        if(!message.member.permissions.has("BAN_MEMBERS")){
             return message.author.send('None of your role proccess to use this command')
         }
 
@@ -26,7 +26,7 @@ module.exports = {
                 name: `Command - BAN`,
                 icon_url: client.user.displayAvatarURL({dynamic: false, format: "png", size: 1024})
             },
-            description: `Ban a member from server if they are being too naughty 😛.\nBot can ban a member if they are not in server. 
+            description: `Ban a member from server.\nBot can ban a member if they are not in server. 
             \n**Usage:** \`${prefix}ban [ Member ] [ Reason ]\` \n**Example:** \`${prefix}ban @shadow~ Spamming too much\``,
             footer: {
                 text: "Bot require \"Ban_Members\" permission"
@@ -35,11 +35,8 @@ module.exports = {
         }
 
         if( !args.length ){
-            return message.channel.send({embeds: [ErrorEmbed]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+            return message.channel.send({embeds: [ErrorEmbed]}).then(m=>setTimeout(() => m.delete(), 1000 * 60))
         };
-
-        const Embed = new Discord.MessageEmbed()
-            .setAuthor("Commane - Ban", author.displayAvatarURL({dynamic: false, format: "png", size: 1024}))
 
         if(!args[0]){
             return message.channel.send({embeds: [
@@ -47,100 +44,133 @@ module.exports = {
                     .setDescription(`Please mention a member. \n\n**Usage:** ${prefix}ban [ user ] [ reason ]`)
             ]}).then(m=>setTimeout(() => m.delete(), 1000 * 20))
         }
-        const FindMembers = new Member(args[0], message);
+
+        const getMembers = new Member(args[0], message);
         await message.guild.members.fetch();
-        const member = message.guild.members.cache.get(FindMembers.mentionedMember);
-        const banReason = message.content.split(/\s+/).slice(2).join(" ");
+        const banReason = message.content.split(/\s+/).slice(2).join(" ") || "No reason Provided"
 
-        if(!member){
+        function findMember(Member){
             try {
-                let hackMember = FindMembers.mentionedMember
+                if(Member){
+                    const member = message.guild.members.cache.get(Member);
 
-                if(isNaN(hackMember)){
-                    return message.channel.send({embeds: [
-                        new Discord.MessageEmbed()
-                        .setDescription(`Please mention a valid user. \n\n**Usage:** ${prefix}ban [ user ] [ reason ]`)
-                        .setColor("RED")
-                    ]}).then(m=>setTimeout(() => m.delete(), 1000 * 20))
-                }
-
-                let banList = await message.guild.bans.fetch();
-                let bannedMember = banList.find(u => u.user.id === hackMember);
-
-                if(bannedMember){
-                    return message.reply({
-                        embeds: [new Discord.MessageEmbed()
-                            .setDescription(`<@${hackMember}> is already banned.`)
-                            .setColor("RED")
-                        ], ephemeral: true
-                    })
+                    if(member){
+                        MemberPermissionCheck(member);
+                    } else {
+                        HackBan(Member);
+                    }
                 }else {
-                    await message.guild.members.ban(hackMember, {reason: banReason ? banReason + ' | ' + `${hackMember}` + ' | ' + `${message.author.tag}` : `No reason provided | ${hackMember} | ${message.author.tag}`});
+                    return message.channel.send({embeds: [new Discord.MessageEmbed()
+                        .setDescription(`Please mention a valid member.`)
+                        .setColor("RED")
+                    ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+                }
+            }catch(err){
+                message.channel.send({embeds: [new Discord.MessageEmbed()
+                    .setDescription(err.message)
+                    .setColor("RED")
+                ]})
+                return console.log(err);
+            }
+
+        }
+
+        async function HackBan(Member){
+            let banList = await message.guild.bans.fetch();
+            let bannedMember = banList.find(u => u.user.id === Member);
+
+            if(bannedMember){
+                return message.channel.send({embeds: [new Discord.MessageEmbed()
+                    .setDescription(`<@${Member}> is already banned.`)
+                    .setColor("RED")
+                ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+            }else {
+                try {
+                    await message.guild.members.ban(Member, {reason: banReason + ' | ' + `${Member}` + ' | ' + `${message.author.tag}`});
                     commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Ban", 1, content );
 
                     return message.channel.send({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`<@${hackMember}> is Banned from the server | ${banReason ? banReason : 'No reason provivded'}`)
+                        .setDescription(`<@${Member}> is Banned from the server | ${banReason}`)
                         .setColor( "#45f766" )
                     ]
                     }).then(m=>setTimeout(() => m.delete(), 1000 * 20))
-                }
-            }catch(err){
-                console.log(err)
-            }
-        }else {
-            const authorHighestRole1 = message.member.roles.highest.position;
-            const mentionHighestRole1 = member.roles.highest.position;
-            const clientHighestRole = message.guild.members.resolve( client.user ).roles.highest.position;
+                } catch(err){
+                    message.channel.send({embeds: [new Discord.MessageEmbed()
+                        .setDescription(err.message)
+                        .setColor("RED")
+                    ]})
 
-            if(member.user.id === message.author.id){
-                Embed.setDescription(`You can't ban yourself`)
-                Embed.setColor( '#ff303e' )
-
-                return message.channel.send( {embeds: [Embed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-            }else if(member.user.id === client.user.id){
-                Embed.setDescription(`I can't ban myself -_-`)
-                Embed.setColor( '#ff303e' )
-
-                return message.channel.send( {embeds: [Embed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-            }else if (member.bannable === false){  
-
-                Embed.setDescription(`I can't ban a Mod/Admin 😔`)
-                Embed.setColor( '#ff303e' )
-
-                return message.channel.send( {embeds: [Embed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-            }else if (member.permissions.has("BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_CHANNELS", "MANAGE_ROLES", "MANAGE_MESSAGES", "MANAGE_GUILD", "ADMINISTRATOR", { checkAdmin: true, checkOwner: true })){
-                
-                Embed.setDescription(`I can't ban a Mod/Admin 😔`)
-                Embed.setColor( '#ff303e' )
-
-                return message.channel.send( {embeds: [Embed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-            }else if (mentionHighestRole1 >= authorHighestRole1) {
-
-                Embed.setDescription(`You can't Ban a member with higher or equal role as your`)
-                Embed.setColor( '#ff303e' )
-
-                return message.channel.send( {embeds: [Embed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-            }else if (mentionHighestRole1 >= clientHighestRole){
-
-                Embed.setDescription(`I can't Ban a member with higher or equal role as me`)
-                Embed.setColor( '#ff303e' )
-
-                return message.channel.send( {embeds: [Embed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-            }else {
-                try {
-                    await message.guild.members.ban(member.id, {reason: banReason ? banReason + ' | ' + `${member.user.id}` + ' | ' + `${message.author.tag}` : `No reason provided | ${member.user.id} | ${message.author.tag}`});
-                    commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Ban", 1, content );
-
-                    return message.channel.send({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`${member} is Banned from the server | ${banReason ? banReason : 'No reason provivded'}`)
-                        .setColor( "#45f766" )
-                    ]
-                    }).then(m=>setTimeout(() => m.delete(), 1000 * 10))
-                    
-                }catch(err){
-                    console.log(err)
+                    return console.log(err)
                 }
             }
         }
+
+        function MemberPermissionCheck(Member){
+            try {
+                const authorHighestRole1 = message.member.roles.highest.position;
+                const mentionHighestRole1 = Member.roles.highest.position;
+                const clientHighestRole = message.guild.members.resolve( client.user ).roles.highest.position;
+
+                const ErrorEmbed = new Discord.MessageEmbed()
+                    .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
+                    .setColor("RED")
+
+                if(Member.user.id === message.author.id){
+                    ErrorEmbed.setDescription(`Unfortunately you can't ban yourself.`)
+                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+
+                }else if(Member.user.id === client.user.id){
+                    ErrorEmbed.setDescription(`Please don't ban me 😔🙏`)
+                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+
+                }else if (Member.bannable === false){  
+                    ErrorEmbed.setDescription(`Can't ban a Mod/Admin.`)
+                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+
+                }else if (Member.permissions.has("BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_CHANNELS", "MANAGE_ROLES", "MANAGE_MESSAGES", "MANAGE_GUILD", "ADMINISTRATOR", { checkAdmin: true, checkOwner: true })){
+                    ErrorEmbed.setDescription(`Can't ban a Mod/Admin.`)
+                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+
+                }else if (mentionHighestRole1 >= authorHighestRole1) {
+                    ErrorEmbed.setDescription(`Can't ban member with higher or equal role as you.`)
+                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+
+                }else if (mentionHighestRole1 >= clientHighestRole){
+                    ErrorEmbed.setDescription(`Can't ban a member higher or equal role as me.`)
+                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+
+                }else {
+                    BanMember(Member)
+                }
+            } catch(err){
+                message.channel.send({embeds: [new Discord.MessageEmbed()
+                    .setDescription(err.message)
+                    .setColor("RED")
+                ]})
+                return console.log(err) 
+            }
+        }
+
+        async function BanMember(Member){
+            try {
+                await message.guild.members.ban(Member.id, {reason: banReason + ' | ' + `${Member.user.id}` + ' | ' + `${message.author.tag}`});
+                commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Ban", 1, content );
+
+                return message.channel.send({embeds: [new Discord.MessageEmbed()
+                    .setDescription(`${Member} is Banned from the server | ${banReason}`)
+                    .setColor( "#45f766" )
+                ]
+                }).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+                
+            }catch(err){
+                message.channel.send({embeds: [new Discord.MessageEmbed()
+                    .setDescription(err.message)
+                    .setColor("RED")
+                ]})
+                return console.log(err)
+            }
+        }
+
+        findMember(getMembers.mentionedMember)
     }
 }

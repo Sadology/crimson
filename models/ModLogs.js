@@ -16,6 +16,7 @@ const modLogSchema = mongoose.Schema({
     Duration: String,
     Expire: Date,
     ActionDate: Date,
+    Action: Array
 })
 
 module.exports = mongoose.model('Action-logs', modLogSchema);

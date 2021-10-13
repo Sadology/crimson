@@ -1,12 +1,12 @@
 const { MessageEmbed } = require('discord.js');
 const { GuildChannel } = require('../../models');
 const { errLog } = require('../../Functions/erroHandling');
+const { LogChannel } = require('../../Functions/logChannelFunctions');
 module.exports = {
 	event: 'messageUpdate',
 	once: false,
-	disabled: true,
 	run: async(oldMessage, newMessage) => {
-		
+	try{
 		if(oldMessage.channel.type === 'dm') return;
 		if(oldMessage.author.bot) return;
 
@@ -19,58 +19,36 @@ module.exports = {
 
 		const { guild } = oldMessage;
 
-		const Data = await GuildChannel.findOne({
-			guildID: guild.id,
-			Active: true,
-			"MessageLog.EditEnabled": true
-		});
+		LogChannel("messageLog", oldMessage.guild).then(async c => {
+            if(!c) return;
+            if(c === null) return;
 
-		if(Data) {
-
-			const roleSet = Data.MessageLog.IgnoreRoles;
-			const chanSet = Data.MessageLog.IgnoreChannels;
-			const messageEx = await guild.members.fetch(oldMessage.author.id);
-
-			if(messageEx){
-				if(messageEx.roles.cache.some(r=>roleSet.includes(r.id))){
-					return false
-				}
-			}
-			let search = chanSet.find(i => oldMessage.channel.id.includes(i))
-			if(search){
-				return false
-			};
-
-			const dataChannel = Data.MessageLog.MessageEdit;
-			const Embed = new MessageEmbed()
+            else {
+				const fetchedLogs = await oldMessage.guild.fetchAuditLogs({
+					limit: 1,
+					type: 'MESSAGE_UPDATE'
+				  }).catch(() => ({
+					entries: []
+				  }));
+				
+				const deleteLog = fetchedLogs.entries.first()
+				const { executor } = deleteLog
+	
+				const Embed = new MessageEmbed()
 				.setAuthor(`${newMessage.author.tag} - Message Edited`, newMessage.author.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
 				.setDescription(`User ${newMessage.author} \`${newMessage.author.tag}\` in ${oldMessage.channel} \`${oldMessage.channel.name}\``)
-				.addField("Before", `${oldMessage.toString()}`)
-				.addField("After", `${newMessage.toString()}`)
+				.addField("Before", `${oldMessage}`.toString())
+				.addField("After", `${newMessage}`.toString())
 				.setTimestamp()
 				.setFooter(`User ID: ${oldMessage.author.id}`)
 				.setColor("#fcdb35")
 
-				if(dataChannel){
-					const LogChannel = oldMessage.guild.channels.cache.find(c => c.id === dataChannel)
-					if(LogChannel){
-						try {
-							if(!oldMessage.guild.me.permissionsIn(LogChannel).has("VIEW_CHANNEL", "SEND_MESSAGES")){
-								return
-							}
-							LogChannel.send({embeds: [Embed]})
-						} catch (err) {
-							errLog(err.stack.toString(), "text", "MessageUpdate", "Error in sending data");
-						}
-					}else {
-						return;
-					}
-				}else {
-					return;
-				};
-		}else {
-			return;
-		}
+				c.send({embeds: [Embed]})
+			}
+		})
+	}catch(err){
+		return console.log(err)
+	}
 
 	}
 };

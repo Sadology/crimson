@@ -21,7 +21,7 @@ module.exports = (client, message) =>{
                 const memberID = member.get(userID)
 
                 const muteRole = guild.roles.cache.find(role =>{
-                   return role.name === "Muted"
+                   return role.name == "Muted" || role.name == "muted"
                 })
                 if( !memberID ){
                   await LogsDatabase.findOneAndUpdate({
@@ -53,7 +53,7 @@ module.exports = (client, message) =>{
                         const informations = {
                             color: "#45f766",
                             author: {
-                                name: `Unmute - ${memberID.user.userName}`,
+                                name: `Unmute - ${memberID.user.tag}`,
                                 icon_url: memberID.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
                             },
                             fields: [
@@ -122,14 +122,14 @@ module.exports = (client, message) =>{
 
         if(muteEvade){
             const muteRole = guild.roles.cache.find(role =>{
-                return role.name === "Muted"
+                return role.name == "Muted" || role.name == "muted"
             })
 
             if(muteRole){
                 try{
                     member.roles.add(muteRole.id)
 
-                    await new LogsDatabase({
+                    const Data = {
                         CaseID: genCaseID,
                         guildID: guild.id,
                         guildName: guild.name,
@@ -139,12 +139,27 @@ module.exports = (client, message) =>{
                         Reason: "[ Sadbot mute evade. Auto muted ]",
                         Moderator: client.user.tag,
                         ModeratorID: client.user.id,
-                        Duration:"∞",
+                        Duration: "∞",
                         ActionDate: new Date(),
-                    }).save()
+                    }
+            
+                    await LogsDatabase.findOneAndUpdate({
+                        guildID: guild.id,
+                        userID: member.id
+                    },{
+                        guildName: guild.name,
+                        $push: {
+                            [`Action`]: {
+                                Data
+                            }
+                        }
+                    },{
+                        upsert: true,
+                    })
                 }catch(err){
                     console.log(err)
                 }
+
                 LogChannel('actionLog', guild).then(c =>{
                     if(!c) return;
                     if(c === null) return;
@@ -153,7 +168,7 @@ module.exports = (client, message) =>{
                         const informations = {
                             color: "#ff303e",
                             author: {
-                                name: `Unmute - ${memberID.user.username}`,
+                                name: `Auto Mute - ${member.user.username}`,
                                 icon_url: member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
                             },
                             fields: [

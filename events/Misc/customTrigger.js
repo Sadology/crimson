@@ -3,7 +3,7 @@ const { errLog } = require('../../Functions/erroHandling');
 const { CustomCommand, Guild } = require('../../models');
 
 module.exports = {
-    event: 'message',
+    event: 'messageCreate',
     once: false,
     run: async(message, client) =>{
 

@@ -106,10 +106,11 @@ module.exports = {
                     await message.channel.send(generateEmbed(0)).then(async msg => {
 
                     const filter = (button) => button.clicker.user.id === message.author.id;
-                    const collector = msg.createMessageComponentCollector(filter, { time: 1000 * 60, errors: ['time'] });
+                    const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
 
                     collector.on('collect',async b => {
                         try{
+                            if(b.user.id !== message.author.id) return
                             if(b.customId === 'NextPageAdminLog'){
                                 currentIndex += 5
                                 await b.update(generateEmbed(currentIndex))

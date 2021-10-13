@@ -16,197 +16,314 @@ module.exports = {
                 .setRequired(true))
         .addStringOption(option => 
             option.setName("duration")
-                .setDescription("Duration of the mute")
-                .setRequired(true))
+                .setDescription("Duration of the mute"))
         .addStringOption(option => 
             option.setName("reason")
                 .setDescription("Reason for mute")),
     permission: ["MANAGE_MESSAGES",],
     run: async(client, interaction) =>{
-        const { options, guild } = interaction;
-
-        let TutEmbed = new Discord.MessageEmbed()
+        const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')
-        if(User){
-            const Member = interaction.guild.members.cache.get(User.id);
+
+        if(!interaction.member.permissions.has("MANAGE_MESSAGES")){
+            return interaction.reply('None of your role proccess to use this command')
+        }
+
+        if(!interaction.guild.me.permissions.has(["MANAGE_ROLES", "ADMINISTRATOR"])){
+            return interaction.reply({embeds: [
+                new Discord.MessageEmbed()
+                    .setDescription("I don't have \"Manage_Roles\" permission to add Muted role.")
+                    .setColor("RED")
+            ]})
+        }
+        
+        function caseID() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            
+            for (var i = 0; i < 10; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            
+            return text;
+        }
+        let caseId;
+        caseId = caseID();
+
+        const Data = {
+            CaseID: caseId,
+            guildID: interaction.guild.id,
+            guildName: interaction.guild.name,
+            userID: null,
+            userName: null,
+            ActionType: "Mute",
+            Reason: "",
+            Moderator: interaction.user.tag,
+            ModeratorID: interaction.user.id,
+            Duration: null,
+            ActionDate: new Date(),
+        }
+
+        let Expire;
+        let MemberError = new Discord.MessageEmbed()
+            .setAuthor(interaction.user.tag, interaction.user.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
+            .setDescription(`Coudn't find the member. Please mention a valid member.`)
+            .setColor("RED")
+
+        function GuildMember(Member){
+            if (Member){
+                const member = interaction.guild.members.cache.get(Member.id);
+                if(member){
+                    checkMemberPermission(member);
+                }else {
+                    return interaction.reply({embeds: [MemberError], ephemeral: true})
+                }
+            }else {
+                return interaction.reply({embeds: [MemberError], ephemeral: true})
+            }
+        }
+
+        function checkMemberPermission(Member){
             if(Member){
-                try {
-                    const duration = options.getString('duration')
-                    const timeex = /[\d*]/g;
-                    if(!duration.match(timeex)){
-                        return interaction.reply({embeds: [new Discord.MessageEmbed()
-                            .setDescription("Please provide a duration for mute \n**Usage**: `/mute [ member ] [ duration ]`")
+                const userHighestRole = interaction.guild.members.resolve( client.user ).roles.highest.position;
+                const mentionHighestRole = Member.roles.highest.position;
+
+                if(Member.id === interaction.user.id){
+                    return interaction.reply({embeds: [MemberError]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
+                }else if(Member.permissions.has("MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_GUILD", "ADMINISTRATOR", { checkAdmin: true, checkOwner: true })){
+                    return interaction.reply({embeds: [
+                        new Discord.MessageEmbed()
+                            .setAuthor(interaction.user.tag, interaction.user.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
+                            .setDescription("Can't mute an Admin/Moderator.")
                             .setColor("RED")
-                        ], ephermal: true
+                    ], ephemeral: true})
+                }else if(mentionHighestRole >= userHighestRole) {
+                    return interaction.reply({embeds: [
+                        new Discord.MessageEmbed()
+                            .setAuthor(interaction.user.tag, interaction.user.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
+                            .setDescription("Can't mute a member higher or equal role as me.")
+                            .setColor("RED")
+                    ], ephemeral: true})
+                }else {
+                    Data['userID'] = Member.user.id
+                    Data['userName'] = Member.user.tag
+                    return PreviousMuteCheck(Member)
+                }
+            }
+        }
+
+        function PreviousMuteCheck(Member){
+            FindData(Member).then( value => {
+                if(value === true){
+                    let NotMuted = new Discord.MessageEmbed()
+                    .setAuthor(interaction.user.tag, interaction.user.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
+                    .setDescription(`<@${Member.user.id}> is already muted`)
+                    .setColor("RED")
+
+                    return interaction.reply({embeds: [NotMuted], ephemeral: true})
+                }else if(value === false){
+                    DurationMaker()
+                    findMuteRole(Member)
+                }
+            })
+        }
+
+        async function FindData(Member){
+            const previosMute = await LogsDatabase.findOne({
+                userID: Member.user.id,
+                guildID: interaction.guild.id,
+                Muted: true
+            })
+
+            if(previosMute){
+                return true
+            }else {
+                return false
+            }
+        }
+
+        function DurationMaker(){
+            const duration = options.getString('duration')
+            if(!duration) return
+
+            const timeex = /[\d*]/g;
+            if(!duration.match(timeex)){
+                return
+            }else if(!duration.match(/^\d/)){
+                return
+            }else {
+                let muteLength = ms( duration );
+                const durationFormat = ms(muteLength, { long: true })
+                const muteDuration = new Date();
+                muteDuration.setMilliseconds(muteDuration.getMilliseconds() + muteLength);
+
+                Expire = muteDuration
+                Data['Duration'] = durationFormat
+            }
+        }
+
+        async function findMuteRole(Member){
+            const muteRole = await interaction.guild.roles.cache.find(r => r.name === 'Muted') || await interaction.guild.roles.cache.find(r => r.name === 'muted')
+            if( !muteRole ){
+                if(guild.me.permissions.has("MANAGE_ROLES", "ADMINISTRATOR")){
+                    try {
+                        await interaction.guild.roles.create({
+                                name: 'Muted',
+                                color: '#000000',
+                                permissions: [],
+                                reason: 'sadBot mute role creation'
                         })
+                        let permToChange = await interaction.guild.roles.cache.find(r => r.name === 'Muted')
+                        if(guild.me.permissions.has("MANAGE_CHANNELS", "ADMINISTRATOR")){
+                            await guild.channels.cache.forEach(channel => {
+                                channel.permissionOverwrites.set([
+                                    {
+                                        id: permToChange.id,
+                                        deny : ['SEND_MESSAGES', 'ADD_REACTIONS', 'VIEW_CHANNEL'],
+                                    }
+                                ], "Muted role overWrites")
+                            })
+                        }else {
+                            let successEmbed = new Discord.MessageEmbed()
+                                .setDescription("Missing permission to create ovrride for **Muted** role. | Require **MANAGE CHANNELS** permission to deny **Send Message** permission for Muted roles")
+                                .setColor("#ff303e")
+                            return interaction.reply({embeds: [successEmbed], ephemeral: true})
+                        }
+                        MuteMember(Member, permToChange) 
+                    }catch(err){
+                        errLog(err.stack.toString(), "text", "Mute", "Error in creating Muted role");
+                    }
+                }else {
+                    return interaction.reply({embeds: [new Discord.MessageEmbed()
+                        .setDescription("Missing permission to create **Muted** role. | Please provide permission or create a role called **Muted**")
+                        .setColor("#ff303e")
+                    ]
+                    })
+                }
+            }else {
+               MuteMember(Member, muteRole) 
+            }
+        }
+
+        async function MuteMember(Member, muteRole){
+            const muteReason = options.getString('reason') || 'No reason provided';
+
+            if(Member.roles.cache.has(muteRole.id)){
+                await Member.roles.remove(muteRole.id)
+                await Member.roles.add(muteRole.id)
+
+                let successEmbed = new Discord.MessageEmbed()
+                    .setDescription(`${Member.user} is now Muted | ${muteReason}`)
+                    .setColor("#45f766")
+                interaction.reply({embeds: [successEmbed], ephemeral: true})
+                Data['Reason'] = muteReason
+            }else {
+                Member.roles.add(muteRole.id)
+                let successEmbed = new Discord.MessageEmbed()
+                    .setDescription(`${Member.user} is now Muted | ${muteReason}`)
+                    .setColor("#45f766")
+                interaction.reply({embeds: [successEmbed], ephemeral: true})
+                Data['Reason'] = muteReason
+            }
+            CreateLog(Member)
+            sendLog(Member)
+            commandUsed( guild.id, guild.name, interaction.user.id, interaction.user.tag, "Mute", 1, content );
+        }
+
+        async function CreateLog(Member){
+            try {
+                await LogsDatabase.findOneAndUpdate({
+                    guildID: interaction.guild.id,
+                    userID: Member.user.id
+                },{
+                    guildName: interaction.guild.name,
+                    Muted: true,
+                    Expire: Expire,
+                    $push: {
+                        [`Action`]: {
+                            Data
+                        }
+                    }
+                },{
+                    upsert: true,
+                })
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        async function sendLog(Member){
+            let count = await LogsDatabase.findOne({
+                guildID: interaction.guild.id, 
+                userID: Member.user.id
+            })
+
+            LogChannel('actionLog', guild).then(c => {
+                if(!c) return;
+                if(c === null) return;
+
+                else {
+                    const informations = {
+                        color: "#ff303e",
+                        author: {
+                            name: `Mute Detection - ${caseId}`,
+                            icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                        },
+                        fields: [
+                            {
+                                name: "User",
+                                value: `\`\`\`${Member.user.tag}\`\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "Moderator",
+                                value: `\`\`\`${interaction.user.tag}\`\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "Duration",
+                                value: `\`\`\`${Data['Duration'] === null ? "∞" : Data['Duration']}\`\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "Reason",
+                                value: `\`\`\`${Data['Reason']}\`\`\``,
+                            },
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `User ID: ${Member.user.id}`
+                        }
+
+                    }
+                    const hasPermInChannel = c
+                        .permissionsFor(client.user)
+                        .has('SEND_MESSAGES', false);
+                    if (hasPermInChannel) {
+                        c.send({embeds: [informations]})
                     }
 
-                    let muteLength = ms( duration );
-                    const durationFormat = ms(muteLength, { long: true })
-                    const muteDuration = new Date();
-                    muteDuration.setMilliseconds(muteDuration.getMilliseconds() + muteLength);
-
-                    const muteRole = await interaction.guild.roles.cache.find(r => r.name === 'Muted')
-                    if( !muteRole ){
-                        if(guild.me.permissions.has("MANAGE_ROLES", "ADMINISTRATOR")){
-                                await interaction.guild.roles.create({
-                                        name: 'Muted',
-                                        color: '#000000',
-                                        permissions: [],
-                                        reason: 'sadBot mute role creation'
-                                })
-                                if(guild.me.permissions.has("MANAGE_CHANNELS", "ADMINISTRATOR")){
-                                    await guild.channels.cache.forEach(channel => {
-                                        channel.permissionOverwrites.set([
-                                            {
-                                                id: muteRole.id,
-                                                deny : ['SEND_MESSAGES', 'ADD_REACTIONS', 'VIEW_CHANNEL'],
-                                            }
-                                        ], "Muted role overWrites")
-                                    })
-                                }else {
-                                    let successEmbed = new Discord.MessageEmbed()
-                                        .setDescription("Missing permission to create ovrride for **Muted** role. | Require **MANAGE CHANNELS** permission to block sending interactions for Muted roles")
-                                        .setColor("RED")
-                                    return interaction.reply({embeds: [successEmbed], ephermal: true
-                                    })
-                                }
-                        }else {
-                            return interaction.reply({embeds: [new Discord.MessageEmbed()
-                                .setDescription("Missing permission to create **Muted** role. | Please provide permission or create a role called **Muted**")
+                    if(count.Action){
+                        if(count.Action.length >= 5){
+                        if (hasPermInChannel) {
+                            c.send({embeds: [new Discord.MessageEmbed()
+                                .setAuthor(`${Member.user.tag}`, Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
+                                .setDescription(`${Member.user} reached ${count.Action.length} logs`)
+                                .addField("User", `\`\`\`${Member.user.tag}\`\`\``.toString(), true)
+                                .addField("Total logs", `\`\`\`${count.Action.length}\`\`\``.toString(), true)
                                 .setColor("RED")
-                            ], ephermal: true
+                            ]}).then(m =>{
+                                m.react("✅")
                             })
                         }
                     }
-
-                    const authorHighestRole = guild.members.resolve( client.user ).roles.highest.position;
-                    const mentionHighestRole = Member.roles.highest.position;
-
-                    if(mentionHighestRole >= authorHighestRole) {
-                        TutEmbed.setDescription( `Can't mute a Member with higher role than me` )
-                        TutEmbed.setColor( 'RED' )
-            
-                        return await interaction.reply({ embeds: [TutEmbed], ephermal: true })
-                    }
-                    const Reason = options.getString('reason') || 'No reason provided'
-
-                    if(Member.roles.cache.has(muteRole.id)){
-                        if(!guild.me.permissions.has(["MANAGE_ROLES"])){
-                            return interaction.reply({embeds: [new Discord.MessageEmbed()
-                                .setDescription("I don't have permission to \"Add Roles\" to member")
-                                .setColor('RED')
-                            ], ephermal: true
-                            });
-                        }
-
-                        await Member.roles.remove(muteRole.id)
-                        await Member.roles.add(muteRole.id)
-                        let successEmbed = new Discord.MessageEmbed()
-                            .setDescription(`${Member.user.tag} is now Muted | ${Reason}`)
-                            .setColor("GREEN")
-                        interaction.reply({embeds: [successEmbed], ephermal: true})
-                    } else{
-                        if(!guild.me.permissions.has(["MANAGE_ROLES"])){
-                            let failed = new Discord.MessageEmbed()
-                                .setDescription("I don't have permission to \"Add Roles\" to member")
-                                .setColor('RED')
-                            return interaction.reply({embeds: [failed]});
-                        }
-
-                        Member.roles.add(muteRole.id)
-                        let successEmbed = new Discord.MessageEmbed()
-                            .setDescription(`${Member.user.tag} is now Muted | ${Reason}`)
-                            .setColor("GREEN")
-                        interaction.reply({embeds: [successEmbed], ephermal: true})
                     }
 
-                    function caseID() {
-                        var text = "";
-                        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-                      
-                        for (var i = 0; i < 10; i++)
-                          text += possible.charAt(Math.floor(Math.random() * possible.length));
-                      
-                        return text;
-                    }
-                    commandUsed( guild.id, guild.name, interaction.user.id, interaction.user.tag, "Mute", 1, `/mute ${Member} ${duration} ${Reason}` );
-
-                    let caseIDNo = "";
-                    caseIDNo = caseID();
-            
-                    await new LogsDatabase({
-                        CaseID: caseIDNo,
-                        guildID: guild.id,
-                        guildName: guild.name,
-                        userID: Member.user.id,
-                        userName: Member.user.tag,
-                        ActionType: "Mute",
-                        Reason: Reason,
-                        Moderator: interaction.user.tag,
-                        ModeratorID: interaction.user.id,
-                        Muted: true,
-                        Duration: durationFormat,
-                        Expire: muteDuration,
-                        ActionDate: new Date(),
-                    }).save().catch(err => errLog(err.stack.toString(), "text", "Mute", "Error in Ctreating Data"));
-
-                    LogChannel("actionLog", guild).then(c => {
-                        if(!c) return
-                        if(c === null) return
-
-                        else {
-                            const informations = {
-                                color: "#ff303e",
-                                author: {
-                                    name: `Mute Detection - ${caseIDNo}`,
-                                    icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
-                                },
-                                fields: [
-                                    {
-                                        name: "User",
-                                        value: `\`\`\`${Member.user.tag}\`\`\``,
-                                        inline: true
-                                    },
-                                    {
-                                        name: "Moderator",
-                                        value: `\`\`\`${interaction.user.tag}\`\`\``,
-                                        inline: true
-                                    },
-                                    {
-                                        name: "Duration",
-                                        value: `\`\`\`${durationFormat}\`\`\``,
-                                        inline: true
-                                    },
-                                    {
-                                        name: "Reason",
-                                        value: `\`\`\`${Reason}\`\`\``,
-                                    },
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `User ID: ${Member.user.id}`
-                                }
-                            }
-
-                            const hasPermInChannel = c
-                                .permissionsFor(client.user)
-                                .has('SEND_MESSAGES', false);
-                            if (hasPermInChannel) {
-                                c.send({embeds: [informations]})
-                            }
-                        }
-                    }).catch(err => console.log(err))
-                }catch(err){
-                    console.log(err)
                 }
-            }else {
-                interaction.reply({embeds: [
-                    new Discord.MessageEmbed()
-                        .setDescription("Coudn't find any member. Please mention a valid member")
-                        .setColor("RED")
-                ], ephermal: true})
-            }
+            }).catch(err => console.log(err));
+        }
+
+        if(User){
+            GuildMember(User)
         }
     }
 }

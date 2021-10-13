@@ -44,9 +44,28 @@ module.exports = {
         if(db){
             async function saveToDatabase(option, channel, boolean){
                 try {
+                    let previousData = await GuildChannel.findOne({
+                        guildID: interaction.guild.id,
+                        Active: true,
+                        [`Data.name`]: option
+                    })
+
+                    if(previousData){
+                        await GuildChannel.findOneAndUpdate({
+                            guildID: interaction.guild.id,
+                            Active: true,
+                            [`Data.name`]: option
+                        },{
+                            $pull: {
+                               Data: {
+                                   name: option
+                               }
+                            },
+                        }, {upsert: true})
+                    }
                     await GuildChannel.findOneAndUpdate({
                         guildID: interaction.guild.id,
-                        Active: true
+                        Active: true,
                     },{
                         guildName: interaction.guild.name,
                         $push: {
@@ -60,7 +79,11 @@ module.exports = {
                         upsert: true,
                     })
                 } catch (err) {
-                    console.log(err)
+                    interaction.channel.send({embeds: [new Discord.MessageEmbed()
+                        .setDescription(err.message)
+                        .setColor("RED")
+                    ]})
+                    return console.log(err)
                 }
             }
 
