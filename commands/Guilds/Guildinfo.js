@@ -29,18 +29,6 @@ module.exports = {
                 .setLabel("Roles")
                 .setStyle("PRIMARY")
             )
-            .addComponents(
-                new MessageButton()
-                .setCustomId('serverEmojis')
-                .setLabel("Emojis")
-                .setStyle("PRIMARY")
-            )
-            .addComponents(
-                new MessageButton()
-                .setCustomId('serverStickers')
-                .setLabel("Stickers")
-                .setStyle("PRIMARY")
-            )
 
         const Channels = message.guild.channels.cache
         const Roles = message.guild.roles.cache
@@ -90,26 +78,15 @@ module.exports = {
             message.channel.send({embeds: [serverInfo], components: [row]}).then(msg =>{
                 const filter = (button) => button.clicker.user.id === message.author.id
 
-                const collector = msg.createMessageComponentCollector(filter, { time: 1000 * 120, errors: ['time'] });
+                const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
 
                 collector.on('collect', (b) =>{
+                    if(b.user.id !== message.author.id) return
                     if(b.customId === 'serverRoles'){
                         let rolesEmbed = new Discord.MessageEmbed()
                             .setDescription(`Server Roles \`[${message.guild.roles.cache.size}]\` \n${Roles}`)
                             .setColor("#fffafa")
                             b.update({embeds: [rolesEmbed], components: []})
-                    }else if(b.customId === 'serverEmojis'){
-                        let EmojiEmbed = new Discord.MessageEmbed()
-                        .setAuthor(`Server Emojis [${message.guild.emojis.cache.size}]`)
-                        .setDescription(`${Emojis}`)
-                        .setColor("#fffafa")
-                        b.update({embeds: [EmojiEmbed], components: []})
-                    }else if(b.customId === 'serverStickers'){
-                        let stickersEmbed = new Discord.MessageEmbed()
-                        .setAuthor(`Server Stickers [${message.guild.stickers.cache.size}]`)
-                        .setDescription(`${Stickers}`)
-                        .setColor("#fffafa")
-                        b.update({embeds: [stickersEmbed], components: []})
                     }
                 })
 
