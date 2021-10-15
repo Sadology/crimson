@@ -9,24 +9,6 @@ const serverSchema = mongoose.Schema({
     Enabled: Boolean,
     msgID: String
   },
-  MessageLog: {
-    MessageDelete: String,
-    DeleteEnabled: Boolean,
-    MessageEdit: String,
-    EditEnabled: Boolean,
-    IgnoreChannels: Array,
-    IgnoreRoles: Array
-  },
-  ActionLog: {
-    MuteChannel: String,
-    MuteEnabled: Boolean,
-    UnMuteChannel: String,
-    UnMuteEnanled: Boolean
-  },
-  BanLog: {
-    BanLogChannel: String,
-    BanLogEnabled: Boolean
-  },
   Announce: {
     JOIN: String,
     JoinEnable: Boolean,
@@ -43,11 +25,11 @@ const serverSchema = mongoose.Schema({
     UserChannel: String,
     UserEnabled: Boolean,
   },
-  Ticket: {
-    TicketChannel: String,
-    TicketEnabled: Boolean,
-  },
-  Data: Array
+  Data: Array,
+  customMessage: {
+    JoinedMsg: Array,
+    LeftMsg: Array
+  }
 })
 
 module.exports = mongoose.model('Guild-Channels', serverSchema);

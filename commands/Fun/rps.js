@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const {Member} = require('../../Functions/MemberFunction');
 const { MessageActionRow, MessageButton } = require('discord.js');
 module.exports = {
     name: 'rps',

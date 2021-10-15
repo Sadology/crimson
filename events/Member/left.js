@@ -2,34 +2,22 @@ const Discord = require('discord.js');
 const { GuildChannel } = require('../../models')
 const { LogChannel } = require('../../Functions/logChannelFunctions')
 module.exports = {
-    event: "guildMemberAdd",
+    event: "guildMemberRemove",
     once: false,
     run: async(member)=> {
-
         const { guild } = member;
             const welcomeArray = [
-                `${member.user.username} just landed`, 
-                `${member.user.username} entered the arena`, 
-                `${member.user.username} Just joined, heres some cookies 🍪`,
-                `Woah ${member.user.username} just joined!`,
-                `${member.user.username} joined, let's start the party`,
-                `Hey ${member.user.username} 👋, welcome to ${guild.name}`,
-                `${member.user.username} Joined the party, let's drop on the chat 😂`,
-                `Is it a bird or is it a cat, nah its just ${member.user.username}`,
-                `Hey our friend ${member.user.username} joined the server. Let's go for mining`,
-                `POG, look ${member.user.username} just joined the server`,
-                `Hey ${member.user.username}, i warmly welcome you`,
-                `konnichiwa ${member.user.username}, welcome to the server.`,
-                `welcome ${member.user.username}, we hope you brought pizza`,
-                `${member.user.username} just hopped intro the server`,
-                `A wild ${member.user.username} just appearede`,
-                `Everyone welcome ${member.user.username}`,
-                `${member.user.username} joined the server to light up the dark cave and lead us the way`,
-                `Rockstar release gta 6 or not, i'm happy with that ${member.user.username} joined the server :D`,
-                `Welcome ${member.user.username}`,
-                `Hoppity poppity ${member.user.username} just landed on our property`,
-                `Hey ${member.user.username}! Enjoy your time in the server.`,
-                `🤖 Beep boop, boop beep? ${member.user.username}`
+                `${member.user.username} just left us ;-;`, 
+                `${member.user.username} has dropped.`, 
+                `${member.user.username} has fallen`,
+                `Woah ${member.user.username} has stepped down!`,
+                `${member.user.username} just left the server`,
+                `Hey ${member.user.username} 👋, farewell mate`,
+                `${member.user.username} feel free to meet us again.`,
+                `i'm literally crying cause ${member.user.username} just left the server.`,
+                `Never gonna give you up ${member.user.username}. Never gonna let you down ${member.user.username}`,
+                `Sign ${member.user.username} left, i'm all alone now.`,
+                `Let's meet up underneath the sakura tree again ${member.user.username}`,
             ]
 
             let fetchData = await GuildChannel.findOne({
@@ -51,13 +39,14 @@ module.exports = {
 
             let randomMessages = [];
             if(fetchData.customMessage){
-                if(fetchData.customMessage.JoinedMsg.length){
-                    let arrData = fetchData.customMessage.JoinedMsg
+                if(fetchData.customMessage.LeftMsg.length){
+                    let arrData = fetchData.customMessage.LeftMsg
                     arrData.forEach(data => {
                         randomMessages.push(data)
                     })
                 }
             }
+
 
             const randomMsg = welcomeArray[Math.floor(Math.random() * welcomeArray.length)];
             const databaseMsg = randomMessages[Math.floor(Math.random() * randomMessages.length)];
@@ -71,12 +60,12 @@ module.exports = {
                 .replace(/{server}/g, `${guild.name}`)
                 .replace(/{server.id}/g, `${guild.id}`)
             }
-            LogChannel("joinedLog", guild).then((c) => {
+            LogChannel("leftLog", guild).then((c) => {
                 if(!c) return;
                 if(c === null) return;
     
                 else {
-                    if(fetchData.customMessage.JoinedMsg.length){
+                    if(fetchData.customMessage.LeftMsg.length){
                         Embed.setDescription(`${variable(databaseMsg)}`)
                         c.send({embeds: [Embed]})
                     }else {
