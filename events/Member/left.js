@@ -16,7 +16,7 @@ module.exports = {
                 `${member.user.username} feel free to meet us again.`,
                 `i'm literally crying cause ${member.user.username} just left the server.`,
                 `Never gonna give you up ${member.user.username}. Never gonna let you down ${member.user.username}`,
-                `Sign ${member.user.username} left, i'm all alone now.`,
+                `Sigh ${member.user.username} left, i'm all alone now.`,
                 `Let's meet up underneath the sakura tree again ${member.user.username}`,
             ]
 
@@ -60,17 +60,26 @@ module.exports = {
                 .replace(/{server}/g, `${guild.name}`)
                 .replace(/{server.id}/g, `${guild.id}`)
             }
-            LogChannel("leftLog", guild).then((c) => {
+            LogChannel("leftLog", guild).then(async (c) => {
                 if(!c) return;
                 if(c === null) return;
-    
+
+                const hooks = await c.fetchWebhooks();
+                const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
+
+                if(!webHook){
+                    c.createWebhook("sadbot", {
+                        avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+                    })
+                }
+
                 else {
                     if(fetchData.customMessage.LeftMsg.length){
                         Embed.setDescription(`${variable(databaseMsg)}`)
-                        c.send({embeds: [Embed]})
+                        webHook.send({embeds: [Embed]})
                     }else {
                         Embed.setDescription(`\`\`\`${randomMsg}\`\`\``)
-                        c.send({embeds: [Embed]})
+                        webHook.send({embeds: [Embed]})
                     }
                 }
             })

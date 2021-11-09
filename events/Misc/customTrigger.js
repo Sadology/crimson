@@ -1,185 +1,173 @@
 const Discord = require('discord.js');
 const { errLog } = require('../../Functions/erroHandling');
 const { CustomCommand, Guild } = require('../../models');
+const timeOut = new Map()
 
 module.exports = {
     event: 'messageCreate',
     once: false,
     run: async(message, client) =>{
+        if(message.author.bot) return;
 
-        let settings = await Guild.findOne({guildID: message.guild.id})
-        const prefix = settings ? settings.prefix : client.config.default_prefix
+        let Permission;
+        let Mention;
+        let Delete;
+        let Embed;
+        let Image;
 
-        let contentValue = message.content.split(" ")[0]
-        let cmds = contentValue.slice(prefix.length)
+        async function checkPrefix(message){
+            let settings = await Guild.findOne({
+                guildID: message.guild.id
+            }).catch(err => {return console.log(err)})
 
-        const Data = await CustomCommand.findOne({
-            guildID: message.guild.id,
-            [`Data.name`]: cmds
-        })
+            const prefix = settings ? settings.prefix : client.config.default_prefix
 
-        if(!message.content.startsWith(prefix)){
-            return
-        }
-
-        const Member = message.mentions.users.first();
-
-        function variable(Array) {
-            return Array
-            .replace(/{author}/g, `${message.author}`)
-            .replace(/{author.id}/g, `${message.author.id}`)
-            .replace(/{author.tag}/g, `${message.author.tag}`)
-            .replace(/{author.name}/g, `${message.author.username}`)
-            .replace(/{channel}/g, `${message.channel}`)
-            .replace(/{channel.name}/g, `${message.channel.name}`)
-            .replace(/{channel.id}/g, `${message.channel.id}`)
-            .replace(/{server}/g, `${message.guild.name}`)
-            .replace(/{server.id}/g, `${message.guild.id}`)
-        }
-
-        if(Data){
-            let obj = {
-                delete: Data.Data.deleteC ? Data.Data.deleteC : false,
-                mention: Data.Data.mention ? Data.Data.mention : false,
-                content: Data.Data.content ? Data.Data.content : "",
-                embed: Data.Data.embed ? Data.Data.embed : false,
-                desc: Data.Data.description ? Data.Data.description : "",
-                author: Data.Data.author ? Data.Data.author : "",
-                title: Data.Data.title ? Data.Data.title : "",
-                image: Data.Data.image ? Data.Data.image : "",
-                color: Data.Data.color ? Data.Data.color : message.guild.me.displayColor,
-                roles: Data.Data.permission ? Data.Data.permission : [],
-                footer: Data.Data.footer ? Data.Data.footer : "",
+            if(!message.content.startsWith(prefix)){
+                return
             }
+            checkContent(prefix, message)
+        }
 
-            try{
-                if(message.member.roles.cache.some(r=>obj["roles"].includes(r.id))){
+        function checkContent(prefix, message) {
+            let contentValue = message.content.split(" ")[0]
+            let cmds = contentValue.slice(prefix.length)
 
-                    let image = obj["image"];
-                    if(!obj["image"].startsWith('https') || !obj["image"].startsWith('http')){
-                        image = null
-                    }
+            checkData(cmds, message)
+        }
 
-                    let NewColor
-                    if(obj["color"] == null){
-                        NewColor = message.guild.me.displayColor
-                    }else {
-                        NewColor = obj['color'] ? obj['color'] : message.guild.me.displayColor
-                    }
-        
-                    const userEmbed = {
-                        color: NewColor,
-                        author: {
-                            name: variable(obj["author"])
-                        },
-                        description: variable(obj["desc"]),
-                        image: {
-                            url: image
-                        },
-                        title: variable(obj["title"]),
-                        footer: {
-                            text: variable(obj['footer'])
-                        }
-                    }
-        
-                    if(obj["mention"] === false){
-                        if(obj["embed"] === false){
-                            message.channel.send({content: variable(obj["content"])})
-                            if(obj["delete"] === true){
-                                message.delete()
-                            }
-                        }else {
-                            if(obj['content'].match(/{empty}/g)){
-                                message.channel.send({embeds: [userEmbed]})
-                                if(obj["delete"] === true){
-                                    message.delete()
-                                }
-                            }else if(obj["content"] == null || obj["content"] == ""){
-                                message.channel.send({embeds: [userEmbed]})
-                                if(obj["delete"] === true){
-                                    message.delete()
-                                }
-                            }else {
-                                message.channel.send({content: variable(obj["content"]),embeds: [userEmbed]})
-                                if(obj["delete"] === true){
-                                    message.delete()
-                                }
-                            }
-
-                        }
-                    }else if(Data.Data.mention === true){
-                        if(Member){
-                            function memberVariable(Array) {
-                                return Array
-                                .replace(/{member}/g, `${Member}`)
-                                .replace(/{member.id}/g, `${Member.id}`)
-                                .replace(/{member.tag}/g, `${Member.tag}`)
-                                .replace(/{member.name}/g, `${Member.username}`)
-                                .replace(/{author}/g, `${message.author}`)
-                                .replace(/{author.id}/g, `${message.author.id}`)
-                                .replace(/{author.tag}/g, `${message.author.tag}`)
-                                .replace(/{author.name}/g, `${message.author.username}`)
-                                .replace(/{channel}/g, `${message.channel}`)
-                                .replace(/{channel.name}/g, `${message.channel.name}`)
-                                .replace(/{channel.id}/g, `${message.channel.id}`)
-                                .replace(/{server}/g, `${message.guild.name}`)
-                                .replace(/{server.id}/g, `${message.guild.id}`)
-                            }
-
-                            let image = obj["image"];
-                            if(!obj["image"].startsWith('https') || !obj["image"].startsWith('http')){
-                                image = null
-                            }
-                            let NewColor
-                            if(obj["color"] == null){
-                                NewColor = message.guild.me.displayColor
-                            }else {
-                                NewColor = obj['color'] ? obj['color'] : message.guild.me.displayColor
-                            }
-                            const mentionEmbed = {
-                                color: NewColor,
-                                author: {
-                                    name: memberVariable(obj["author"])
-                                },
-                                description: memberVariable(obj["desc"]),
-                                image: {
-                                    url: image
-                                },
-                                title: memberVariable(obj["title"]),
-                                footer: {
-                                    text: memberVariable(obj['footer'])
-                                }
-                            }
-    
-                            if(obj["embed"] === false){
-                                message.channel.send(memberVariable(obj["content"]))
-                                if(obj["delete"] === true){
-                                    message.delete()
-                                }
-                            }else {
-                                if(obj['content'].match(/{empty}/g)){
-                                    message.channel.send({embeds: [mentionEmbed]})
-                                    if(obj["delete"] === true){
-                                        message.delete()
-                                    }
-                                }else if(obj["content"] == null || obj["content"] == ""){
-                                    message.channel.send({embeds: [userEmbed]})
-                                    if(obj["delete"] === true){
-                                        message.delete()
-                                    }
-                                }else {
-                                    message.channel.send({content: variable(obj["content"]), embeds: [mentionEmbed]})
-                                    if(obj["delete"] === true){
-                                        message.delete()
-                                    }
-                                }
-                            }
-                        }else return false;
-                    }
-                }else return
-            }catch(err){
-                errLog(err.stack.toString(), "text", "Role-Added", "Error in custom trigger");
+        async function checkData(data, message) {
+            const Data = await CustomCommand.findOne({
+                guildID: message.guild.id,
+                [`Data.Name`]: data
+            })
+            if(Data){
+                objectCreate(...Data.Data)
             }
         }
+
+        function objectCreate(Data) {
+            let structure = {
+                Delete: Data.DeleteCmd,
+                Mention: Data.Mention,
+                Content: Data.Content,
+                Embed: Data.Embed,
+                Description: Data.Description,
+                Author: Data.Author,
+                Title: Data.Title,
+                Image: Data.Image,
+                Color: Data.Color,
+                Perm: Data.Permission,
+                Footer: Data.Footer,
+            }
+            validPerms(structure.Perm)
+            Mention = structure.Mention;
+            Delete = structure.Delete;
+            Embed = structure.Embed
+
+            if(structure.Image.length){
+                imageDeconstruct(structure.Image)
+            }
+
+            if(Embed == true){
+                EmbededMessage(structure)
+            }else {
+                flatMessage(structure)
+            }
+        }
+
+        function validPerms(data) {
+            if(!message.member.roles.cache.some(r=> data.includes(r.id))){
+                Permission = false
+            }else {
+                Permission = true
+            }
+        }
+
+        function EmbededMessage(Data) {
+            if(Permission == false) return
+            let Member = message.mentions.users.first();
+            if(Delete == true) message.delete();
+
+            if(Mention == true && !Member) return
+
+            let Embed = {
+                author: {
+                    name: Variable(Data.Author, Member)
+                },
+                description: Variable(Data.Description),
+                Color: Data.Color ? Data.Color : message.guild.me.displayColor,
+                title: Variable(Data.Title, Member),
+                image: {
+                    url: Image
+                },
+                footer: {
+                    text: Variable(Data.Footer, Member)
+                }
+            }
+
+            if(Data.Content == null || Data.Content == `{empty}`){
+                return message.channel.send({embeds: [Embed]})
+            }else {
+                return message.channel.send({content: Variable(Data.Content, Member),embeds: [Embed]})
+            }
+
+        }
+
+        function flatMessage(Data) {
+            if(Permission == false) return
+            let Member = message.mentions.users.first();
+            if(Delete == true) message.delete();
+
+            if(Mention == true && !Member) return
+
+            if(Image){
+                if(Data.Content == null || Data.Content == `{empty}`){
+                    return
+                }else {
+                    return message.channel.send({content: Variable(Data.Content, Member)+`\n${Image}`})
+                }
+            }else {
+                return message.channel.send({content: Variable(Data.Content)})
+            }
+        }
+
+        function imageDeconstruct(Data){
+            Image = Data[Math.floor(Math.random() * Data.length)]
+        }
+
+        function Variable(Array, Member) {
+            if(Member){
+                return Array
+                .replace(/{member}/g, `${Member}`)
+                .replace(/{member.id}/g, `${Member.id}`)
+                .replace(/{member.tag}/g, `${Member.tag}`)
+                .replace(/{member.name}/g, `${Member.username}`)
+                .replace(/{author}/g, `${message.author}`)
+                .replace(/{author.id}/g, `${message.author.id}`)
+                .replace(/{author.tag}/g, `${message.author.tag}`)
+                .replace(/{author.name}/g, `${message.author.username}`)
+                .replace(/{channel}/g, `${message.channel}`)
+                .replace(/{channel.name}/g, `${message.channel.name}`)
+                .replace(/{channel.id}/g, `${message.channel.id}`)
+                .replace(/{server}/g, `${message.guild.name}`)
+                .replace(/{server.id}/g, `${message.guild.id}`)
+                .replace(/{empty}/g, '')
+            }else {
+                return Array
+                .replace(/{author}/g, `${message.author}`)
+                .replace(/{author.id}/g, `${message.author.id}`)
+                .replace(/{author.tag}/g, `${message.author.tag}`)
+                .replace(/{author.name}/g, `${message.author.username}`)
+                .replace(/{channel}/g, `${message.channel}`)
+                .replace(/{channel.name}/g, `${message.channel.name}`)
+                .replace(/{channel.id}/g, `${message.channel.id}`)
+                .replace(/{server}/g, `${message.guild.name}`)
+                .replace(/{server.id}/g, `${message.guild.id}`)
+                .replace(/{empty}/g, '')
+            }
+        }
+
+        checkPrefix(message)
+        return
     }
 }

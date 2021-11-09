@@ -50,7 +50,7 @@ module.exports = {
                 },
                 {
                     name: `Reason for Ban`,
-                    value: `\`\`\`${reason.toString() || 'No reason provided'}\`\`\``,
+                    value: `\`\`\`${reason ? reason : 'No reason provided'}\`\`\``.toString(),
                     inline: false
                 }
             ],
@@ -95,13 +95,21 @@ module.exports = {
         }
         CreateLog(target)
 
-        LogChannel('banLog', Guild.guild).then(c => {
+        LogChannel('banLog', Guild.guild).then(async c => {
             if(!c) return;
             if(c === null) return;
 
-            else {
-                c.send({embeds: [banEmbed]})
+            const hooks = await c.fetchWebhooks();
+            const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
+
+            if(!webHook){
+                c.createWebhook("sadbot", {
+                    avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+                })
             }
+
+            webHook.send({embeds: [banEmbed]})
+
         }).catch(err => console.log(err));
     }catch(err){
         return console.log(err)

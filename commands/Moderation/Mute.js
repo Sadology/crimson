@@ -1,11 +1,9 @@
 const Discord = require('discord.js');
-const { Permissions } = require('discord.js')
 const ms = require('ms');
-const { LogsDatabase, GuildChannel, GuildRole } = require('../../models');
+const { LogsDatabase } = require('../../models');
 const { commandUsed } = require('../../Functions/CommandUsage');
-const { errLog } = require('../../Functions/erroHandling');
 const {Member} = require('../../Functions/memberFunction');
-const { LogChannel } = require('../../Functions/logChannelFunctions');
+const { saveData, sendLogData } = require('../../Functions/functions');
 
 module.exports = {
     name: 'mute',
@@ -44,33 +42,19 @@ module.exports = {
         const FindMembers = new Member(args[0], message);
         await message.guild.members.fetch()
         
-        function caseID() {
-            var text = "";
-            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            
-            for (var i = 0; i < 10; i++)
-                text += possible.charAt(Math.floor(Math.random() * possible.length));
-            
-            return text;
-        }
-        let caseId;
-        caseId = caseID();
-
         const Data = {
-            CaseID: caseId,
-            guildID: message.guild.id,
+            guildID: message.guild.id, 
             guildName: message.guild.name,
-            userID: null,
+            userID: null, 
             userName: null,
-            ActionType: "Mute",
-            Reason: "",
-            Moderator: author.tag,
-            ModeratorID: author.id,
-            Duration: null,
-            ActionDate: new Date(),
+            actionType: "Mute", 
+            actionReason: null,
+            Expire: null,
+            actionLength: null,
+            moderator: message.author.tag,
+            moderatorID: message.author.id,
         }
 
-        let Expire;
         let MemberError = new Discord.MessageEmbed()
             .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
             .setDescription(`Coudn't find the member. Please mention a valid member.`)
@@ -165,8 +149,8 @@ module.exports = {
                 const muteDuration = new Date();
                 muteDuration.setMilliseconds(muteDuration.getMilliseconds() + muteLength);
 
-                Expire = muteDuration
-                Data['Duration'] = durationFormat
+                Data['Expire'] = muteDuration
+                Data['actionLength'] = durationFormat
             }
         }
 
@@ -200,7 +184,11 @@ module.exports = {
                         }
                         MuteMember(Member, permToChange) 
                     }catch(err){
-                        errLog(err.stack.toString(), "text", "Mute", "Error in creating Muted role");
+                        console.log(err)
+                        return message.channel.send({embed: [new Discord.MessageEmbed()
+                            .setDescription(err.message)
+                            .setColor("RED")
+                        ]})
                     }
                 }else {
                     return channel.send({embeds: [new Discord.MessageEmbed()
@@ -231,113 +219,29 @@ module.exports = {
                     .setDescription(`${Member.user} is now Muted | ${muteReason}`)
                     .setColor("#45f766")
                 channel.send({embeds: [successEmbed]}).then(m =>setTimeout(() => m.delete(), 1000 * 30))
-                Data['Reason'] = muteReason
+                Data['actionReason'] = muteReason
             }else {
                 Member.roles.add(muteRole.id)
                 let successEmbed = new Discord.MessageEmbed()
                     .setDescription(`${Member.user} is now Muted | ${muteReason}`)
                     .setColor("#45f766")
                 channel.send({embeds: [successEmbed]}).then(m =>setTimeout(() => m.delete(), 1000 * 30))
-                Data['Reason'] = muteReason
+                Data['actionReason'] = muteReason
             }
             CreateLog(Member)
-            sendLog(Member)
             commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Mute", 1, content );
         }
 
         async function CreateLog(Member){
             try {
-                await LogsDatabase.findOneAndUpdate({
-                    guildID: message.guild.id,
-                    userID: Member.user.id
-                },{
-                    guildName: message.guild.name,
-                    Muted: true,
-                    Expire: Expire,
-                    $push: {
-                        [`Action`]: {
-                            Data
-                        }
-                    }
-                },{
-                    upsert: true,
+                saveData({
+                    ...Data,
                 })
+                sendLogData({data: Data, client: client, Member: Member, guild: guild})
             } catch (err) {
                 console.log(err)
             }
         }
-
-        async function sendLog(Member){
-            let count = await LogsDatabase.findOne({
-                guildID: message.guild.id, 
-                userID: Member.user.id
-            })
-
-            LogChannel('actionLog', guild).then(c => {
-                if(!c) return;
-                if(c === null) return;
-
-                else {
-                    const informations = {
-                        color: "#ff303e",
-                        author: {
-                            name: `Mute Detection - ${caseId}`,
-                            icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
-                        },
-                        fields: [
-                            {
-                                name: "User",
-                                value: `\`\`\`${Member.user.tag}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Moderator",
-                                value: `\`\`\`${message.author.tag}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Duration",
-                                value: `\`\`\`${Data['Duration'] === null ? "∞" : Data['Duration']}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Reason",
-                                value: `\`\`\`${Data['Reason']}\`\`\``,
-                            },
-                        ],
-                        timestamp: new Date(),
-                        footer: {
-                            text: `User ID: ${Member.user.id}`
-                        }
-
-                    }
-                    const hasPermInChannel = c
-                        .permissionsFor(client.user)
-                        .has('SEND_MESSAGES', false);
-                    if (hasPermInChannel) {
-                        c.send({embeds: [informations]})
-                    }
-
-                    if(count.Action){
-                        if(count.Action.length >= 5){
-                        if (hasPermInChannel) {
-                            c.send({embeds: [new Discord.MessageEmbed()
-                                .setAuthor(`${Member.user.tag}`, Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
-                                .setDescription(`${Member.user} reached ${count.Action.length} logs`)
-                                .addField("User", `\`\`\`${Member.user.tag}\`\`\``.toString(), true)
-                                .addField("Total logs", `\`\`\`${count.Action.length}\`\`\``.toString(), true)
-                                .setColor("RED")
-                            ]}).then(m =>{
-                                m.react("✅")
-                            })
-                        }
-                    }
-                    }
-
-                }
-            }).catch(err => console.log(err));
-        }
-
         GuildMember(FindMembers.mentionedMember)
     }
 }

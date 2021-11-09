@@ -1,8 +1,7 @@
 const Discord = require('discord.js');
 const { LogsDatabase } = require('../../models');
-const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js');
+const { MessageButton, MessageActionRow } = require('discord.js');
 const moment = require('moment');
-const { errLog } = require('../../Functions/erroHandling');
 module.exports = {
     name: 'admin-log',
     aliases: ["adminlog"],
@@ -48,36 +47,32 @@ module.exports = {
         )
 
         switch(cmd){
+            case "infraction":
             case "action":
                 async function fetchData(){
-                    let Data = await LogsDatabase.findOne({
+                    let Data = await LogsDatabase.find({
                         guildID: message.guild.id,
+                    }).sort([
+                        ['Action','ascending']
+                    ]).exec((err, res) => {
+                        if(err) return console.log(err);
+                        if(res.length === 0 ){
+                            return message.channel.send({embeds: [
+                                new Discord.MessageEmbed()
+                                    .setDescription(`This server has no Mod-log history.`)
+                                    .setColor("RED")
+                            ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+                        }else {
+                            return createData(res)
+                        }
                     })
-
-                    if(Data){
-                        return createData(Data)
-                    }else {
-                        return message.channel.send({embeds: [
-                            new Discord.MessageEmbed()
-                                .setDescription(`This server has no Mod-log history.`)
-                                .setColor("RED")
-                        ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
-                    }
                 }
 
                 async function createData(Data){
-                    if(Data.Action.length == 0){
-                        return message.channel.send({embeds: [
-                            new Discord.MessageEmbed()
-                                .setDescription(`This server has no Mod-log history.`)
-                                .setColor("RED")
-                        ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
-                    }
                     let arr = []
-                    Data.Action.forEach(data => {
-                        arr.push(data)
-                    })
-
+                    for (i=0; i < Data.length; i++){
+                        arr.push(...Data[i].Action)
+                    }
                     logFunction(arr)
                 }
 
@@ -85,20 +80,19 @@ module.exports = {
                     let currentIndex = 0
                     let MakeEmbed = start => {
                         const current = Data.slice(start, start + 5)
-
                         const Embed = new Discord.MessageEmbed()
                             .setDescription(`${message.guild.name} Mod-Logs - \`[ ${Data.length} ]\``)
                             .setFooter(`Logs ${start + 1} - ${start + current.length}/${Data.length}`)
                             .setColor("#fffafa")
 
                         for (i = 0; i < current.length; i++){
-                            Embed.addField(`**${start + i + 1}**• [ ${current[i].Data.ActionType} ]`,[
-                                `\`\`\`py\nUser     - ${current[i].Data.userName}`,
-                                `\nReason   - ${current[i].Data.Reason}`,
-                                `\nMod      - ${current[i].Data.Moderator}`,
-                                `\nDuration - ${current[i].Data.Duration ? current[i].Data.Duration : "∞"}`, 
-                                `\nDate     - ${moment(current[i].Data.ActionDate).format('llll')}`,
-                                `\nLogID    - ${current[i].Data.CaseID}\`\`\``
+                            Embed.addField(`**${start + i + 1}**• [ ${current[i].actionType} ]`,[
+                                `\`\`\`py\nUser     - ${current[i].userName}`,
+                                `\nReason   - ${current[i].actionReason}`,
+                                `\nMod      - ${current[i].moderator}`,
+                                `\nDuration - ${current[i].actionLength ? current[i].actionLength : "∞"}`, 
+                                `\nDate     - ${moment(current[i].actionDate).format('llll')}`,
+                                `\nLogID    - ${current[i].caseID}\`\`\``
                             ].toString())
                         }
                         
@@ -123,8 +117,7 @@ module.exports = {
                         }
                     }
                     await message.channel.send(MakeEmbed(0)).then(async msg => {
-                        const filter = (button) => button.clicker.user.id == message.author.id;
-                        const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
+                        const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 60 * 5});
 
                         collector.on('collect',async b => {
                             if(b.user.id !== message.author.id) return
@@ -137,8 +130,11 @@ module.exports = {
                                 await b.update(MakeEmbed(currentIndex))
                             }
                         });
-                        collector.on("end", () =>{
+                        collector.on("end", async() =>{
                             // When the collector ends
+                            row.components[0].setDisabled(true)
+                            row.components[1].setDisabled(true)
+                            await msg.edit({components: [row]})
                         })
                     })
                 }

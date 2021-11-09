@@ -5,7 +5,7 @@ const { CustomCommand } = require('../../models');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('command-edit')
+        .setName('custom-cmd-edit')
         .setDescription('Edit a custom command.')
         .addStringOption(option =>
             option.setName('command-name')
@@ -14,15 +14,15 @@ module.exports = {
         .addStringOption(option =>
             option.setName('name')
             .setDescription("Name of your command."))
+        .addStringOption(option =>
+            option.setName('content')
+            .setDescription("Content message of the command."))
         .addBooleanOption(option =>
             option.setName("embed")
             .setDescription("Send the command in embed"))
         .addStringOption(option => 
             option.setName('permissions')
             .setDescription('Role permission to use the command. separate each roles with [,]'))
-        .addStringOption(option =>
-            option.setName('content')
-            .setDescription("Content message of the command."))
         .addBooleanOption(option =>
             option.setName("delete")
             .setDescription("Delete the command when executed."))
@@ -49,224 +49,308 @@ module.exports = {
             .setDescription("Set a footer for embed")),
     permission: ["ADMINISTRATOR"],
     run: async(client, interaction) =>{
-        const { options, guild } = interaction;
+        interaction.deferReply()
+        await new Promise(resolve => setTimeout(resolve, 1000))
 
-        const cmdName = options.getString('command-name');
-        const fetchedData = await CustomCommand.findOne({ 
-            guildID: interaction.guild.id,
-            [`Data.name`] : cmdName
-        }) 
-        if(!fetchedData){
-            return await interaction.reply({ content: 'Something went wrong', components: [] , embeds: [new Discord.MessageEmbed().setDescription(`No command found by this name ${cmdName}`).setColor("RED")], ephermal: true})
-        }
+        try{
+            const { options, guild } = interaction;
+            const cmdName = options.getString('command-name')
+            const Name = options.getString('name');
+            const Embed = options.getBoolean('embed');
+            const Perms = options.getString('permissions');
+            const Content = options.getString('content');
+            const deleteCmds = options.getBoolean('delete');
+            const Mention = options.getBoolean('mention');
+            const Author = options.getString('author');
+            const Description = options.getString('description');
+            const Title = options.getString('title');
+            const Color = options.getString('color');
+            const Image = options.getString('image');
+            const Footer = options.getString('footer');
 
-        const Name = options.getString('name');
-        const Embed = options.getBoolean('embed');
-        const Perms = options.getString('permissions');
-        const Content = options.getString('content');
-        const deleteCmds = options.getBoolean('delete');
-        const mention = options.getBoolean('mention');
+            const oldData = await CustomCommand.findOne({
+                guildID: interaction.guild.id,
+                [`Data.Name`]: cmdName
+            })
 
-        const newData = {
-            name: fetchedData.Data.name,
-            content: fetchedData.Data.content,
-            deleteC: fetchedData.Data.deleteC,
-            mention: fetchedData.Data.mention,
-            embed: fetchedData.Data.embed,
-            permission: fetchedData.Data.permission,
-            author: fetchedData.Data.author,
-            description: fetchedData.Data.description,
-            title: fetchedData.Data.title,
-            image: fetchedData.Data.image,
-            footer: fetchedData.Data.footer,
-            color: fetchedData.Data.color
-        }
-        if(Name){
-            newData['name'] = Name.replace(/\s+/g, '')
-        }
-        if(Content){
-           let wordLimit = Content.split(" ")
-            if(wordLimit.length >= 500){
-                return interaction.reply({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`Content can't exceed more than 500 words`)
-                    .setColor("RED")
-                ], ephermal: true})
+            if(!oldData){
+                return interaction.editReply({embeds: [
+                    new Discord.MessageEmbed()
+                        .setDescription("No command exist by this name")
+                        .setColor("RED")
+                    ]
+                })
             }
-            newData['content'] = Content
-        }
-        if(Embed){
-            newData['embed'] = Embed
-        }
-        
-        if(deleteCmds){
-            newData['deleteC'] = deleteCmds
-        }
+            editCmd(...oldData.Data)
 
-        if(mention){
-            newData['mention'] = mention
-        }
-        const author = options.getString('author');
-        const description = options.getString('description');
-        const title = options.getString('title');
-        const color = options.getString('color');
-        const image = options.getString('image');
-        const footer = options.getString('footer');
-
-        if(description){
-            let descLimit = description.split(" ")
-
-            if(descLimit.length >= 1000){
-                return interaction.reply({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`Description can't exceed more than 1000 words`)
+            function editCmd(data) {
+                const Data = {
+                    Name: data.Name,
+                    Content: data.Content,
+                    Embed: data.Embed,
+                    DeleteCmd: data.DeleteCmd,
+                    Mention: data.Mention,
+                    Description: data.Description,
+                    Author: data.Author,
+                    Title: data.Title,
+                    Image: data.Image,
+                    Color: data.Color,
+                    Footer: data.Footer,
+                    Permission: data.Permission,
+                }
+                const errorEmbed = new Discord.MessageEmbed()
                     .setColor("RED")
-                ], ephermal: true})
-            }
-            newData["description"] = description;
-        }
-        if(author){
-            let authorLimit = author.split(" ")
+                let somethingWrong;
 
-            if(authorLimit.length >= 50){
-                return interaction.reply({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`Author can't exceed more than 20 words`)
-                    .setColor("RED")
-                ], ephermal: true})
-            }
-            newData["author"] = author;
-        }
-        if(title){
-            let titleLimit = title.split(" ")
+                name(Name)
+                content(Content)
+                embed(Embed)
+                mention(Mention)
+                del(deleteCmds)
+                permission(Perms)
+                description(Description)
+                author(Author)
+                title(Title)
+                color(Color)
+                image(Image)
+                footer(Footer)
 
-            if(titleLimit.length >= 50){
-                return interaction.reply({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`Title can't exceed more than 50 words`)
-                    .setColor("RED")
-                ], ephermal: true})
-            }
-            newData["title"] = title;
-        }
-        if(footer){
-            let footerLimit = footer.split(" ")
+                if(Data.Description !== null || 
+                    Data.Author !== null || 
+                    Data.Title !== null ||
+                    Data.Footer !== null && Data.Embed == false){
+                        Data.Embed = true
+                }
 
-            if(footerLimit.length >= 50){
-                return interaction.reply({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`Footer can't exceed more than 50 words`)
-                    .setColor("RED")
-                ], ephermal: true})
-            }
-            newData["footer"] = footer;
-        }
+                if(somethingWrong == true) return
+                let DataEmbed = new Discord.MessageEmbed()
+                    .setDescription(
+                        `**Name:** ${Data.Name}
+                        \n**Content:** ${Data.Content}
+                        \n**Delete-cmd:** ${Data.DeleteCmd}
+                        \n**Mention:** ${Data.Mention}
+                        \n**Embed:** ${Data.Embed}
+                        \n**Description:** ${Data.Description}
+                        \n**Author:** ${Data.Author}
+                        \n**Title:** ${Data.Title}
+                        \n**Image:** ${Data.Image == null ? `[URL](https://youtu.be/dQw4w9WgXcQ)`: Data.Image})
+                        \n**Footer:** ${Data.Footer}
+                        \n**Color:** ${Data.Color}
+                        \n**Permission:** ${Data.Permission}
+                        `
+                    )
+                .setColor("#f5fff8")
 
-        if(color){
-            newData["color"] = color;
-        }
-        if(image){
-            newData["image"] = image;
-        }
+                const row = new Discord.MessageActionRow()
+                .addComponents(
+                    new Discord.MessageButton()
+                        .setCustomId('YesButtonEdit')
+                        .setLabel('Confirm')
+                        .setStyle('SUCCESS'),
+                    )
+                .addComponents(
+                    new Discord.MessageButton()
+                        .setCustomId('NoButtonEdit')
+                        .setLabel('Cancel')
+                        .setStyle('DANGER'),
+                    );
 
-        rolesString = []
-        if(Perms){
-            const errArr = [];
-            let element = Perms.split(/,\s+/)
-            items = element.map(function (el) {
-                return el.trim();
-            });
+                interaction.editReply({content: "Do you wish to save this command? (confirm/cancel)",embeds: [DataEmbed], components: [row]})
+                const collector = interaction.channel.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 60 });
+                collector.on('collect', async i => {
+                    if(i.user.id !== interaction.user.id) return
+                    if (i.customId === 'YesButtonEdit') {
+                        await CustomCommand.findOneAndUpdate({
+                            guildID: interaction.guild.id,
+                            [`Data.Name`]: Data.Name
+                        }, {
+                            $pull: {
+                                Data: {
+                                    Name: Data.Name
+                                }
+                            }
+                        }, {upsert: true}).catch(err => console.log(err))
 
-            items.forEach(async role => {
-                searchRoles = guild.roles.cache.find(r => r.id == role.replace( '<@&' , '' ).replace( '>' , '' )) || 
-                guild.roles.cache.find(r => r.name.toLowerCase() == role.toLowerCase()) || 
-                guild.roles.cache.find(r => r.id == role);
+                        await CustomCommand.findOneAndUpdate({
+                            guildID: interaction.guild.id,
+                        }, {
+                            $push: {
+                                Data: {
+                                    ...Data
+                                }
+                            }
+                        }, {upsert: true}).catch(err => console.log(err))
+                        await i.update({ content: 'Saved to database', components: [] });
+                        collector.stop();
+                    }else if(i.customId === 'NoButtonEdit'){
+                        await i.update({ content: 'Canceled the command', components: []});
+                        collector.stop();
+                    }
+                });
+                
+                collector.on('end', collected => {});
 
-                if(searchRoles){
-                    newData["permission"].push(searchRoles.id);
-                    rolesString.push(searchRoles.toString())
+                function name(name) {
+                    if(name){
+                        let filterName = name.replace(/\s+/g, '')
 
-                }else if(typeof searchRoles === "undefined"){
-                    async function add(value) {
-                        if (errArr.indexOf(value) === -1) {
-                            errArr.push(value);
+                        Data.Name = filterName.toLowerCase()
+                    }
+                }
+                function content(content) {
+                    if(content){
+                        let wordLimit = content.split(" ")        
+                        if(wordLimit.length >= 500){
+                            errorEmbed.setDescription(`Content can't exceed more than 500 words`)
+                            interaction.editReply({embeds: [errorEmbed], ephermal: true})
+                            return somethingWrong = true
+                        }
+
+                        Data.Content = content
+                    }
+                }
+                function embed(embed) {
+                    if(embed == false){
+                        Data.Embed = false
+                    }else if(embed == true){
+                        Data.Embed = true
+                    }else {
+                        return
+                    }
+                }
+
+                function mention(mention) {
+                    if(mention == false){
+                        Data.Mention = false
+                    }else if(mention == true){
+                        Data.Mention = true
+                    }else {
+                        return
+                    }
+                }
+                function del(del) {
+                    if(del == false){
+                        Data.DeleteCmd = false
+                    }else if(del == true){
+                        Data.DeleteCmd = true
+                    }else {
+                        return
+                    }
+                }
+
+                function permission(params) {
+                    if(params){
+                        let divide = params.split(/,\s+/)
+                        let elements = divide.map(function (el) {
+                            return el.trim();
+                        });
+                        let RolesArr = []
+                        let undefinesRole = []
+                        elements.forEach(items => {
+                            let guildRoles = guild.roles.cache.find(r => r.id == items.replace( '<@&' , '' ).replace( '>' , '' )) || 
+                            guild.roles.cache.find(r => r.name.toLowerCase() == items.toLowerCase()) || 
+                            guild.roles.cache.find(r => r.id == items);
+
+                            if(guildRoles){
+                                RolesArr.push(guildRoles.id)
+                            }else if(typeof guildRoles === "undefined"){
+                                function add(value) {
+                                    if (undefinesRole.indexOf(value) === -1) {
+                                        undefinesRole.push(value);
+                                    }
+                                }
+                                add(items)
+                            }
+                        })
+
+                        if(undefinesRole.length){
+                            errorEmbed.setDescription(`Can't find this following roles: \n${undefinesRole}`)
+                            interaction.editReply({embeds: [errorEmbed]})
+                            return somethingWrong = true
+                        }else {
+                            Data.Permission = RolesArr
                         }
                     }
-                    add(role)
                 }
-            });
-            if(errArr.length){
-                return interaction.reply({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`Couldnt find following roles: \n${errArr}`)
-                    .setColor("RED")
-                ], ephermal: true})
-            }
+                function description(desc) {
+                    if(desc){
+                        let wordLimit = desc.split(" ")        
+                        if(wordLimit.length >= 200){
+                            errorEmbed.setDescription(`Description can't exceed more than 200 words`)
+                            interaction.editReply({embeds: [errorEmbed], ephermal: true})
+                            return somethingWrong = true
+                        }
+
+                        Data.Description = desc
+                    }
+                }
+                function author(author) {
+                    if(author){
+                        let wordLimit = author.split(" ")        
+                        if(wordLimit.length >= 50){
+                            errorEmbed.setDescription(`Author can't exceed more than 50 words`)
+                            interaction.editReply({embeds: [errorEmbed], ephermal: true})
+                            return somethingWrong = true
+                        }
+
+                        Data.Author = author
+                    }
+                }
+                function title(title) {
+                    if(title){
+                        let wordLimit = title.split(" ")        
+                        if(wordLimit.length >= 50){
+                            errorEmbed.setDescription(`Title can't exceed more than 50 words`)
+                            interaction.editReply({embeds: [errorEmbed], ephermal: true})
+                            return somethingWrong = true
+                        }
+
+                        Data.Title = title
+                    }
+                }
+                function image(link) {
+                    if(link){
+                        if(!link.includes('https://')){
+                            errorEmbed.setDescription(`Please pass a valid link for the image. \nMake sure to use Gif addess instead of Gif link`)
+                            interaction.editReply({embeds: [errorEmbed], ephermal: true})
+                            return somethingWrong = true
+                        }else {
+                            let LinksArr = [];
+                            let multiLinks = link.split(/,\s+/);
+                            multiLinks.forEach(l => {
+                                LinksArr.push(l)
+                            })
+
+                            Data.Image = LinksArr
+                        }
+                    }
+                }
+                function color(color) {
+                    if(color){
+                        if(!color.startsWith('#')){
+                            errorEmbed.setDescription(`This is not a valid color. \n\`Tip: Google search "color picker"\``)
+                            interaction.editReply({embeds: [errorEmbed], ephermal: true}) 
+                            return somethingWrong = true
+                        }else {
+                            Data.Color = color
+                        }
+                    }
+                }
+                function footer(footer) {
+                    if(footer){
+                        let wordLimit = footer.split(" ")        
+                        if(wordLimit.length >= 20){
+                            errorEmbed.setDescription(`Author can't exceed more than 20 words`)
+                            interaction.editReply({embeds: [errorEmbed], ephermal: true})
+                            return somethingWrong = true
+                        }
+
+                        Data.Footer = footer
+                    }
+                }
         }
-
-        let rolesArr = []
-        newData.permission.forEach(role =>{
-            findTheRoles = interaction.guild.roles.cache.find(r => r.id == role)
-
-            if(findTheRoles){
-                rolesArr.push(findTheRoles.toString())
-            }
-        })
-
-        let messageEmbed = new Discord.MessageEmbed()
-            .setAuthor("Custom-command: Create")
-            .setDescription(`**Name:** ${newData.name ? newData.name : "None"}
-            **Content:** ${newData.content ? newData.content : "None"}
-            **Delete:** ${newData.deleteC ? newData.deleteC : "None"}
-            **Mention:** ${newData.mention ? newData.mention : "None"}
-            **Embed:** ${newData.embed ? newData.embed : "None"}`)
-            .addField('Permissions', rolesArr.toString())
-            .setColor("WHITE")   
-            .addField("Embed Properties", [
-                `**Author:** ${newData.author ? newData.author : "None"}`,
-                `\n**Description:** ${newData.description ? newData.description : "None"}`,
-                `\n**Title:** ${newData.title ? newData.title : "None"}`,
-                `\n**Color:** ${newData.color ? newData.color : "None"}`,
-                `\n**Image:** [Image URL](${newData.image ? newData.image : "https://youtu.be/dQw4w9WgXcQ"})`,
-                `\n**Footer:** ${newData.footer ? newData.image : "None"}`,
-            ].toString())
-
-        const row = new Discord.MessageActionRow()
-        .addComponents(
-            new Discord.MessageButton()
-                .setCustomId('affirmativeButtonEdit')
-                .setLabel('Confirm')
-                .setStyle('SUCCESS'),
-            )
-        .addComponents(
-            new Discord.MessageButton()
-                .setCustomId('negativeButtonEdit')
-                .setLabel('Cancel')
-                .setStyle('DANGER'),
-            );
-
-        interaction.reply({content: "Do you wish to save this new edited command?",embeds: [messageEmbed], components: [row]})
-
-        const filter = i => i.user.id === interaction.user.id;
-        const collector = interaction.channel.createMessageComponentCollector({ filter, time: 1000 * 60 });
-
-        collector.on('collect', async i => {
-            if (i.customId === 'affirmativeButtonEdit') {
-                const cmdsData = await CustomCommand.findOne({ 
-                    guildID: interaction.guild.id,
-                    [`Data.name`] : cmdName
-                }) 
-                if(!cmdsData){
-                    return await i.update({ content: 'Something went wrong', components: [] , embeds: [new Discord.MessageEmbed().setDescription(`Couldn't find any command by name ${cmdName}`).setColor("RED")], ephermal: true})
-                }else {
-                    await CustomCommand.findOneAndUpdate({
-                        guildID: interaction.guild.id,
-                        ['Data.name']: cmdName
-                    }, {
-                        guildName: interaction.guild.name,
-                        Data: newData
-                    })
-                }
-                return await i.update({ content: 'All good', components: [] , embeds: [new Discord.MessageEmbed().setDescription("Updated the command").setColor("GREEN")]});
-            }else if(i.customId === 'negativeButtonEdit'){
-                return await i.update({ content: 'Done', components: [] , embeds: [new Discord.MessageEmbed().setDescription("Canceled command edit").setColor("GREEN")]});
-            }
-        });
-        
-        collector.on('end', collected => {});
+        }catch(err){
+             console.log(err)
+        }
     }
 }

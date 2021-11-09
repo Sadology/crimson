@@ -1,7 +1,5 @@
 const Discord = require('discord.js');
-const { LogsDatabase, GuildChannel, GuildRole } = require('../../models');
-const { commandUsed } = require('../../Functions/CommandUsage');
-const { errLog } = require('../../Functions/erroHandling');
+const { LogsDatabase } = require('../../models');
 const {Member} = require('../../Functions/memberFunction');
 const { LogChannel } = require('../../Functions/logChannelFunctions');
 
@@ -28,15 +26,18 @@ module.exports = {
         if(!message.member.permissions.has("MANAGE_MESSAGES")){
             return message.author.send('None of your role proccess to use this command')
         }
-        const { author, content, guild, channel } = message;
+        const { author, guild,  } = message;
         
-        const TutEmbed = new Discord.MessageEmbed().setAuthor( "Command - UNMUTE", author.displayAvatarURL({dynamic: false, format: "png", size: 1024}) )
 
         if( !args.length ){
-            TutEmbed.setDescription( `Mutes someone to pause them from chatting or speaking \n**Usage**: ${prefix}mute [ Member ] [ duration ] [ reason ] \n**Example:** \n${prefix}mute @shadow~ 20m for Spamming \n${prefix}mute @shadow~ 3h Deserve it!` )
-            TutEmbed.setFooter( "Bot require \"MANAGE_ROLES\" permission to add \"Muted\" role" )
-            TutEmbed.setColor( "#fffafa" )
-            return message.channel.send( {embeds: [TutEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 30));
+            return message.channel.send({
+                embeds: [
+                    new Discord.MessageEmbed()
+                    .setDescription( `Unmute a muted person \n**Usage**: ${prefix}unmute [ Member ] \n**Example:** \n${prefix}unmute @shadow~` )
+                    .setFooter( "Bot require \"MANAGE_ROLES\" permission to add \"Muted\" role" )
+                    .setColor( "#fffafa" )
+                ]
+            }).then(m=>setTimeout(() => m.delete(), 1000 * 30));
         }
         
         const FindMembers = new Member(args[0], message);

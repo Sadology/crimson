@@ -5,9 +5,8 @@ const profilesSchema = mongoose.Schema({
     guildName: String,
     userID: String,
     userName: String,
-    AFK: Boolean,
-    AFKTIME: Date,
-    Balance: Number
+    Balance: Number,
+    Story: Array
 })
 
 module.exports = mongoose.model('Profiles', profilesSchema);

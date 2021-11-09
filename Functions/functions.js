@@ -1,67 +1,208 @@
-const mongoose = require('mongoose');
-const { Guild } = require('../models');
+const { LogsDatabase } = require('../models');
+const { LogChannel } = require('../Functions/logChannelFunctions');
 
-module.exports = client => {
+async function saveData({
+    guildID, 
+    guildName,
+    userID, 
+    userName,
+    actionType, 
+    actionReason, 
+    Expire,
+    actionLength,
+    moderator,
+    moderatorID
+}) {
+    function caseID() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      
+        for (var i = 0; i < 10; i++)
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+      
+        return text;
+    }
 
-    client.getGuild = async (guild) => {
-        let data = await Guild.findOne({ guildID: guild.id });
-        if (data) return data;
-        else return client.config.default_settings;
-    };
+    let genCaseID = ""
+    genCaseID = caseID()
+    
+    let Data = {
+        userID, 
+        userName,
+        caseID: genCaseID, 
+        actionType, 
+        actionReason,
+        actionLength,
+        moderator,
+        moderatorID,
+        actionDate: new Date()
+    }
 
-    client.updateGuild = async (guild, settings) => {
-        let data = await client.getGuild(guild);
-
-        if (typeof data !== 'object') data = {};
-        for (const key in settings) {
-            if (data[key] !== settings[key]) data[key] = settings[key];
-            else return;
+    await LogsDatabase.findOneAndUpdate({
+        guildID: guildID,
+        userID: userID
+    }, {
+        guildName: guildName,
+        Muted: true,
+        Expire: Expire,
+        $push: {
+            [`Action`]: {
+                ...Data
+            }
         }
+    },{
+        upsert: true,
+    })
+}
 
-        console.log(`Guild "${data.guildName}" updated settings: ${Object.keys(settings)}`);
-        return await data.updateOne(settings);
-    };
+function sendLogData({data, client, Member, guild}){
+    console.log(data)
+    switch(data.actionType){
+        case "Mute":
+            LogChannel('actionLog', guild).then(c => {
+                if(!c) return;
+                if(c === null) return;
 
-    client.createGuild = async (settings) => {
-        let defaults = Object.assign({ _id: mongoose.Types.ObjectId() }, client.config.default_settings);
-        let merged = Object.assign(defaults, settings);
+                else {
+                    const informations = {
+                        color: "#ff303e",
+                        author: {
+                            name: `Mute Detection`,
+                            icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                        },
+                        fields: [
+                            {
+                                name: "User",
+                                value: `\`\`\`${Member.user.tag}\`\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "Moderator",
+                                value: `\`\`\`${data.moderator}\`\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "Duration",
+                                value: `\`\`\`${data.actionLength === null ? "∞" : data.actionLength}\`\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "Reason",
+                                value: `\`\`\`${data.actionReason == null ? "No reason provided" : data.actionReason}\`\`\``,
+                            },
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `User ID: ${Member.user.id}`
+                        }
+                    }
 
-        const newGuild = await new Guild(merged);
-        return newGuild.save()
-            .then(console.log(`Default settings saved for guild "${merged.guildName}" (${merged.guildID})`));
-    };
-    client.createProfile = async profile => {
-        const merged = Object.assign({ _id: mongoose.Types.ObjectId() }, profile);
+                    let hasPermInChannel = c
+                    .permissionsFor(client.user)
+                    .has('SEND_MESSAGES', false);
+                    if (hasPermInChannel) {
+                        c.send({embeds: [informations]})
+                    }
+                }
+            }).catch(err => {return console.log(err)});
+        break;
+    }
+}
 
-        const newProfile = await new Profile(merged);
-        return newProfile.save()
-            .then(console.log(`New profile saved for user "${merged.username}" (${merged.userID})`));
-    };
+function sendMoreLogData({data, dataType, Member ,client, guild}){
+    switch(dataType){
+        case "unmute":
+            LogChannel('actionLog', guild).then(c =>{
+                if(!c) return;
+                if(c === null) return;
 
-    client.getProfile = async user => {
-        const data = await Profile.findOne({ userID: user.id });
-        if (data) return data;
-        else return;
-    };
+                else {
+                    const informations = {
+                        color: "#45f766",
+                        author: {
+                            name: `Unmute - ${Member.user.tag}`,
+                            icon_url: Member.user.displayAvatarURL({
+                                dynamic: false, 
+                                type: "png", 
+                                size: 1024
+                            })
+                        },
+                        fields: [
+                            {
+                                name: "User",
+                                value: `\`\`\`${Member.user.tag}\`\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "Moderator",
+                                value: `\`\`\`${Member.user.tag}\`\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "Reason",
+                                value: `\`\`\`[ AUTO ]\`\`\``,
+                            },
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `User ID: ${Member.user.id}`
+                        }
 
-    client.updateProfile = async (user, data) => {
-        let profile = await client.getProfile(user);
+                    }
+                    let hasPermInChannel = c
+                    .permissionsFor(client.user)
+                    .has('SEND_MESSAGES', false);
+                    if (hasPermInChannel) {
+                        c.send({embeds: [informations]})
+                    }
+                }
+            })
+        break;
 
-        if (typeof profile !== 'object') profile = {};
-        for (const key in data) {
-            if (profile[key] !== data[key]) profile[key] = data[key];
-            else return;
-        }
+        case 'muteEvade':
+            LogChannel('actionLog', guild).then(c =>{
+                if(!c) return;
+                if(c === null) return;
 
-        console.log(`Profile "${profile.username}" (${profile.userID}) updated: ${Object.keys(data)}`);
-        return await profile.updateOne(profile); 
-    };
+                else {
+                    const informations = {
+                        color: "#ff303e",
+                        author: {
+                            name: `Auto Mute - ${Member.user.username}`,
+                            icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                        },
+                        fields: [
+                            {
+                                name: "User",
+                                value: `\`\`\`${Member.user.tag}\`\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "Moderator",
+                                value: `\`\`\`${client.user.tag}\`\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "Reason",
+                                value: `\`\`\`Mute evade detection [ Auto muted ]\`\`\``,
+                            },
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `User ID: ${Member.user.id}`
+                        }
 
-    client.clean = text => {
-        if (typeof(text) === "string") {
-            return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
-        } else {
-            return text;
-        }
-    };
-};
+                    }
+                    const hasPermInChannel = c
+                    .permissionsFor(client.user)
+                    .has('SEND_MESSAGES', false);
+                    if (hasPermInChannel) {
+                        c.send({embeds: [informations]})
+                    }
+                }
+            })
+        break;
+    }
+}
+
+module.exports = { saveData, sendLogData, sendMoreLogData }

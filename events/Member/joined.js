@@ -71,18 +71,25 @@ module.exports = {
                 .replace(/{server}/g, `${guild.name}`)
                 .replace(/{server.id}/g, `${guild.id}`)
             }
-            LogChannel("joinedLog", guild).then((c) => {
+            LogChannel("joinedLog", guild).then(async (c) => {
                 if(!c) return;
                 if(c === null) return;
-    
-                else {
-                    if(fetchData.customMessage.JoinedMsg.length){
-                        Embed.setDescription(`${variable(databaseMsg)}`)
-                        c.send({embeds: [Embed]})
-                    }else {
-                        Embed.setDescription(`\`\`\`${randomMsg}\`\`\``)
-                        c.send({embeds: [Embed]})
-                    }
+
+    			const hooks = await c.fetchWebhooks();
+                const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
+
+                if(!webHook){
+                    c.createWebhook("sadbot", {
+                        avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+                    })
+                }
+
+                if(fetchData.customMessage.JoinedMsg.length){
+                    Embed.setDescription(`${variable(databaseMsg)}`)
+                    webHook.send({embeds: [Embed]})
+                }else {
+                    Embed.setDescription(`\`\`\`${randomMsg}\`\`\``)
+                    webHook.send({embeds: [Embed]})
                 }
             })
     }

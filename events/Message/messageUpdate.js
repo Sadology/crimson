@@ -5,7 +5,7 @@ const { LogChannel } = require('../../Functions/logChannelFunctions');
 module.exports = {
 	event: 'messageUpdate',
 	once: false,
-	run: async(oldMessage, newMessage) => {
+	run: async(oldMessage, newMessage, client) => {
 	try{
 		if(oldMessage.channel.type === 'dm') return;
 		if(oldMessage.author.bot) return;
@@ -23,32 +23,38 @@ module.exports = {
             if(!c) return;
             if(c === null) return;
 
-            else {
-				const fetchedLogs = await oldMessage.guild.fetchAuditLogs({
-					limit: 1,
-					type: 'MESSAGE_UPDATE'
-				  }).catch(() => ({
-					entries: []
-				  }));
-				
-				const deleteLog = fetchedLogs.entries.first()
-				const { executor } = deleteLog
-	
-				const Embed = new MessageEmbed()
-				.setAuthor(`${newMessage.author.tag} - Message Edited`, newMessage.author.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
-				.setDescription(`User ${newMessage.author} \`${newMessage.author.tag}\` in ${oldMessage.channel} \`${oldMessage.channel.name}\``)
-				.addField("Before", `${oldMessage}`.toString())
-				.addField("After", `${newMessage}`.toString())
-				.setTimestamp()
-				.setFooter(`User ID: ${oldMessage.author.id}`)
-				.setColor("#fcdb35")
+			const hooks = await c.fetchWebhooks();
+            const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
 
-				c.send({embeds: [Embed]})
-			}
+            if(!webHook){
+                c.createWebhook("sadbot", {
+                    avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+                })
+            }
+
+			const fetchedLogs = await oldMessage.guild.fetchAuditLogs({
+				limit: 1,
+				type: 'MESSAGE_UPDATE'
+				}).catch(() => ({
+				entries: []
+				}));
+			
+			const deleteLog = fetchedLogs.entries.first()
+			const { executor } = deleteLog
+
+			const Embed = new MessageEmbed()
+			.setAuthor(`${newMessage.author.tag} - Message Edited`, newMessage.author.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
+			.setDescription(`User ${newMessage.author} \`${newMessage.author.tag}\` in ${oldMessage.channel} \`${oldMessage.channel.name}\``)
+			.addField("Before", `${oldMessage}`.toString())
+			.addField("After", `${newMessage}`.toString())
+			.setTimestamp()
+			.setFooter(`User ID: ${oldMessage.author.id}`)
+			.setColor("#fcdb35")
+
+			webHook.send({embeds: [Embed]})
 		})
 	}catch(err){
 		return console.log(err)
 	}
-
 	}
 };

@@ -11,21 +11,18 @@ const client = new Discord.Client({
     Intents.FLAGS.GUILD_PRESENCES,
   ]
 });
-
 require('dotenv').config();
-
 const fs = require('fs');
 const { readdirSync } = require("fs");
 const { Guild } = require('./models');
 
 client.queue = new Map();
-require('./Functions/functions')(client);
-client.config = require('./config.json');
 client.mongoose = require('./Functions/mongo');
-
 client.commands = new Discord.Collection();
 client.aliases = new Discord.Collection();
 client.slash = new Discord.Collection();
+
+let config = require('./config.json');
 
 fs.readdir("./handlers/", (err, files) => {
   if (err) return console.error(err);
@@ -54,8 +51,6 @@ readdirSync("./events/").forEach(dir => {
     }
   }
 });
-
-const { config, emit } = require('process');
 
 // CLIENT FUNCTION
 client.on('ready', async() => {
@@ -100,10 +95,9 @@ client.on('messageCreate', async message =>{
   
   let settings = await Guild.findOne({guildID: message.guild.id})
 
-  const prefix = settings ? settings.prefix : client.config.default_prefix
+  const prefix = settings ? settings.prefix : config.default_prefix
   if(!message.content.startsWith(prefix)) return
   if(!prefix) return
-
     if (!message.member)
       message.member = await message.guild.fetchMember(message);
     let args = message.content

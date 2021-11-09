@@ -1,0 +1,18 @@
+[
+    {
+        "Q": ["how are you", "hows going", "hows it going"],
+        "A": ["Im fine and you?"]
+    }, 
+    {
+        "Q": ["im great", "im good", "good"],
+        "A": ["Good to hear that :)", "great", "awrsome", ":)"]
+    },
+    {
+        "Q": ["whats up"],
+        "A": ["Sky", "nothing much", "just crying in shadows basement"]
+    },
+    {
+        "Q": ["guess my age"],
+        "A": []
+    }
+]

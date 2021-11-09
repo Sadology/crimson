@@ -45,7 +45,7 @@ module.exports = {
             )
 
 
-        function FindMember(Member){
+        function FindMember(Member){ 
             if(Member){
                 const member = message.guild.members.cache.get(Member)
                 if(member){
@@ -54,7 +54,11 @@ module.exports = {
                     return fetchData(Member)
                 }
             }else {
-                return message.channel.send('Mention pls') 
+                return message.channel.send({embeds: [
+                    new Discord.MessageEmbed()
+                        .setDescription(`Please mention a valid member \n\n**Usage:** ${prefix}logs [ user ]`)
+                        .setColor("RED")
+                ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
             }
         }
 
@@ -102,13 +106,13 @@ module.exports = {
                     .setColor("#fffafa")
 
                 for (i = 0; i < current.length; i++){
-                    Embed.addField(`**${start + i + 1}**• [ ${current[i].Data.ActionType} ]`,[
-                        `\`\`\`py\nUser     - ${current[i].Data.userName}`,
-                        `\nReason   - ${current[i].Data.Reason}`,
-                        `\nMod      - ${current[i].Data.Moderator}`,
-                        `\nDuration - ${current[i].Data.Duration ? current[i].Data.Duration : "∞"}`, 
-                        `\nDate     - ${moment(current[i].Data.ActionDate).format('llll')}`,
-                        `\nLogID    - ${current[i].Data.CaseID}\`\`\``
+                    Embed.addField(`**${start + i + 1}**• [ ${current[i].actionType} ]`,[
+                        `\`\`\`py\nUser     - ${current[i].userName}`,
+                        `\nReason   - ${current[i].actionReason}`,
+                        `\nMod      - ${current[i].moderator}`,
+                        `\nDuration - ${current[i].actionLength ? current[i].actionLength : "∞"}`, 
+                        `\nDate     - ${moment(current[i].actionDate).format('llll')}`,
+                        `\nLogID    - ${current[i].caseID}\`\`\``
                     ].toString())
                 }
                 
@@ -134,7 +138,7 @@ module.exports = {
             }
             await message.channel.send(MakeEmbed(0)).then(async msg => {
                 const filter = (button) => button.clicker.user.id == message.author.id;
-                const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
+                const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 60 * 5 });
 
                 collector.on('collect',async b => {
                     if(b.user.id !== message.author.id) return
@@ -147,8 +151,11 @@ module.exports = {
                         await b.update(MakeEmbed(currentIndex))
                     }
                 });
-                collector.on("end", () =>{
+                collector.on("end", async() =>{
                     // When the collector ends
+                    row.components[0].setDisabled(true)
+                    row.components[1].setDisabled(true)
+                    await msg.edit({components: [row]})
                 })
             })
         }

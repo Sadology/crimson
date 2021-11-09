@@ -44,13 +44,20 @@ module.exports = {
                 text: `${target.id}`
             }
         }
-        LogChannel('banLog', Guild.guild).then(c => {
+        LogChannel('banLog', Guild.guild).then(async c => {
             if(!c) return;
             if(c === null) return;
 
-            else {
-                c.send({embeds: [unbanEmbed]})
+            const hooks = await c.fetchWebhooks();
+            const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
+
+            if(!webHook){
+                c.createWebhook("sadbot", {
+                    avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+                })
             }
+
+            webHook.send({embeds: [unbanEmbed]})
         }).catch(err => console.log(err));
     }catch(err){
         return console.log(err)

@@ -5,7 +5,7 @@ const { CustomCommand } = require('../../models');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('custom-command')
+        .setName('custom-cmd')
         .setDescription('Help, list and info of custom commands')
         .addStringOption(option =>
             option.setName('options')
