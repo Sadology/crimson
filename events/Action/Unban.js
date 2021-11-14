@@ -4,7 +4,7 @@ const { LogChannel } = require('../../Functions/logChannelFunctions');
 module.exports = {
     event: "guildBanRemove",
     once: false,
-    run: async(Guild)=> {
+    run: async(Guild, client)=> {
     try{ 
         const fetchedLogs = await Guild.guild.fetchAuditLogs({
             limit: 1,

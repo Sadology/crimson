@@ -4,7 +4,7 @@ const { LogChannel } = require('../../Functions/logChannelFunctions')
 module.exports = {
     event: "guildMemberAdd",
     once: false,
-    run: async(member)=> {
+    run: async(member, client)=> {
 
         const { guild } = member;
             const welcomeArray = [

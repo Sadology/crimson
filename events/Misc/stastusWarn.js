@@ -5,7 +5,7 @@ const ms = require('ms')
 module.exports = {
     event: 'messageCreate',
     once: false,
-    run: async(message) =>{
+    run: async(message, client) =>{
         message.mentions.users.forEach(async (user) => {
             const DB = await ModStats.findOne({
                     guildID: message.guild.id,
