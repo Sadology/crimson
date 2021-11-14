@@ -1,7 +1,4 @@
 const Discord = require('discord.js');
-const { GuildRole, GuildChannel } = require('../../models')
-const { commandUsed } = require('../../Functions/CommandUsage')
-const {Member} = require('../../Functions/MemberFunction');
 module.exports = {
     name: 'purge',
     aliases: ['purne'],
@@ -13,7 +10,7 @@ module.exports = {
     run: async(client, message, args,prefix) =>{
         await message.delete()
         const { channel } = message;
-
+        
         if(!message.member.permissions.has("MANAGE_MESSAGES")){
             return message.author.send('None of your role proccess to use this command')
         }
