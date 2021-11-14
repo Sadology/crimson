@@ -58,6 +58,8 @@ module.exports = {
 
                 if(!data){
                     sendData(c)
+                }else if(!data.Stories){
+                    sendData(c)
                 }else {
                     let oldData = await Profiles.findOne({
                         guildID: interaction.guild.id,

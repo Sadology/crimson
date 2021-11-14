@@ -24,6 +24,13 @@ module.exports = {
                 .setCustomId("cancelResetLog")
         )   
 
+        if(!args.length || !args[0]){
+            return message.channel.send({embeds: [
+                new Discord.MessageEmbed()
+                    .setDescription(`Please mention a valid member \n\n**Usage:** ${prefix}reset-log [ user ]`)
+                    .setColor("RED")
+            ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+        }
         const FindMembers = new Member(args[0], message);
         await message.guild.members.fetch()
         
