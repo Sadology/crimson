@@ -5,8 +5,20 @@ const profilesSchema = mongoose.Schema({
     guildName: String,
     userID: String,
     userName: String,
-    Balance: Number,
-    Story: Array
+    Stories: Date,
+    ModerationStats: {
+        Recent: String,
+        Mute: Number,
+        Purge: Number,
+        Ban: Number,
+        kick: Number,
+        Total: Number
+    },
+    Status: {
+        Active: Boolean,
+        MSG: String,
+        Time: Date
+    }
 })
 
 module.exports = mongoose.model('Profiles', profilesSchema);

@@ -1,9 +1,8 @@
 const Discord = require('discord.js');
 const ms = require('ms');
 const { LogsDatabase } = require('../../models');
-const { commandUsed } = require('../../Functions/CommandUsage');
 const {Member} = require('../../Functions/memberFunction');
-const { saveData, sendLogData } = require('../../Functions/functions');
+const { saveData, sendLogData, ModStatus } = require('../../Functions/functions');
 
 module.exports = {
     name: 'mute',
@@ -229,7 +228,6 @@ module.exports = {
                 Data['actionReason'] = muteReason
             }
             CreateLog(Member)
-            commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Mute", 1, content );
         }
 
         async function CreateLog(Member){
@@ -238,8 +236,9 @@ module.exports = {
                     ...Data,
                 })
                 sendLogData({data: Data, client: client, Member: Member, guild: guild})
+                ModStatus({type: "Mute", guild: message.guild, member: message.author, content: content})
             } catch (err) {
-                console.log(err)
+                return console.log(err)
             }
         }
         GuildMember(FindMembers.mentionedMember)

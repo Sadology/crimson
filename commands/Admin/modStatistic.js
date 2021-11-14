@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
-const { ModStats } = require('../../models')
+const { Profiles } = require('../../models');
+const { Member } = require('../../Functions/MemberFunction');
 module.exports = {
     name: 'mod-stats',
     aliases: ["modstats"],
@@ -10,63 +11,69 @@ module.exports = {
     
     run: async(client, message, args,prefix) =>{
         await message.delete();
-
         if(!message.member.permissions.has("ADMINISTRATOR")){
             return message.author.send('None of your role proccess to use this command')
         }
 
-        const findMember = message.content.split(/\s+/)[1];
-        const member = findMember.replace('<@', '').replace('>', '').replace('!', '').trim();
+        const fetchMember = new Member(args[0], message)
+        await message.guild.members.fetch()
 
-        const regexx = /[\d+]/g
-        if(!args[0].match( regexx )){
-            return message.channel.send({embeds: [new Discord.MessageEmbed()
-                .setAuthor(`${message.author.tag}`, message.author.displayAvatarURL({dynamic: false, size: 1024, type: "png"}))
-                .setColor("#fc5947")
-                .setDescription(`Please mention a valid Member.`)
-            ]
-            }).then(m=>setTimeout(() => m.delete(), 1000 * 10))
+        function findMember(Member) {
+            if(!Member){
+                return message.channel.send({
+                    embeds: [
+                        new Discord.MessageEmbed()
+                            .setDescription("Please mention a moderator to check their statistics")
+                            .setColor("RED")
+                    ]
+                })
+            }
+
+            const member = message.guild.members.cache.get(Member)
+            if(member){
+                return fetchData(member)
+            }else {
+                return fetchData(Member)
+            }
         }
 
-        const errorEmbed = {
-            author: {name: "Command - Mod Statictic"},
-            description: `Mention a moderator to check their stats \n\n**Usage:** \`${prefix}modstats [ user ]\` \n**Example:** \`${prefix}modstats @shadow~\``,
-            color: "#fc5947"
-        };
+        async function fetchData(Member) {
+            const Data = await Profiles.findOne({
+                guildID: message.guild.id,
+                userID: Member.user ? Member.user.id : Member
+            })
 
-        const regex = /[\d]/g;
-        if(member.match(regex)){
-            const Moderator = message.guild.members.cache.get(member)
-
-            if(Moderator){
-                const DB = await ModStats.findOne({
-                    guildID: message.guild.id,
-                    userID: Moderator.user.id
+            if(!Data.ModerationStats){
+                return message.channel.send({
+                    embeds: [
+                        new Discord.MessageEmbed()
+                            .setDescription("User doesn't have any moderation history")
+                            .setColor("RED")
+                    ]
                 })
-        
-                if(!DB){
-                    return message.channel.send({embeds: [
-                        errorEmbed
-                    ]})
-                }else {
-                    const Embed = new Discord.MessageEmbed()
-                        .setAuthor(`${Moderator.user.tag} - Moderation activities`, Moderator.user.displayAvatarURL({dynamic: true, size: 1024, type: 'png'}))
-                        .addField("Recent command used", `\`\`\`${DB.Recent ? DB.Recent : "None"}\`\`\``)
-                        .addField("Mute", `\`\`\`${DB.Mute.toString() ? DB.Mute.toString() : "0"}\`\`\``, true)
-                        .addField("Warn", `\`\`\`${DB.Warn.toString() ? DB.Warn.toString() : "0"}\`\`\``, true)
-                        .addField("Message Purgeed", `\`\`\`${DB.Purge.toString() ? DB.Purge.toString(): "0"}\`\`\``,true)
-                        .addField("Message Cleaned", `\`\`\`${DB.Clean.toString() ? DB.Clean.toString() : "0"}\`\`\``,true)
-                        .addField("Kick", `\`\`\`${DB.Kick.toString() ? DB.Kick.toString() : "0"}\`\`\``,true)
-                        .addField("Ban", `\`\`\`${DB.Ban.toString() ? DB.Ban.toString() : "0"}\`\`\``,true)
-                        .addField("Total Command", `\`\`\`${DB.Command.toString() ? DB.Command.toString() : "0"}\`\`\``,true)
-                        .addField("Status", `\`\`\`${DB.Status.Active ? DB.Status.Active : "False"}\`\`\``,true)
-                        .setColor("#fffafa")
-        
-                    await message.channel.send({embeds: [Embed]})
-                }
-            }else {
-                message.channel.send({embeds: [errorEmbed]})
             }
-        }  
+
+            values(Data.ModerationStats, Member)
+        }
+
+        function values(Data, Member) {
+            let Embed = new Discord.MessageEmbed()
+                .setAuthor("Moderation Statistics")
+                .setDescription(`${Data.Recent ? Data.Recent : "0"}`)
+                .setColor("WHITE")
+                let values = Object.keys(Data)
+                values.shift()
+                values.forEach((keys, index) => {
+                    let item = Data[keys]
+                    if(item == undefined){
+                        item = "0"
+                    }
+                    Embed.addField(`${keys}`,`\`\`\`${item}\`\`\``, true)
+                })
+            return message.channel.send({
+                embeds: [Embed]
+            })
+        }
+        findMember(fetchMember.mentionedMember)
     }
 }

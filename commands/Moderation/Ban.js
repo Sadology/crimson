@@ -1,7 +1,5 @@
 const Discord = require('discord.js');
 const { commandUsed } = require('../../Functions/CommandUsage');
-const { permission } = require('../../Functions/CommandPerms');
-const { GuildRole } = require('../../models');
 const {Member} = require('../../Functions/MemberFunction');
 module.exports = {
     name: 'ban',
@@ -154,8 +152,6 @@ module.exports = {
         async function BanMember(Member){
             try {
                 await message.guild.members.ban(Member.id, {reason: banReason + ' | ' + `${Member.user.id}` + ' | ' + `${message.author.tag}`});
-                commandUsed( guild.id, guild.name, message.author.id, message.author.tag, "Ban", 1, content );
-
                 return message.channel.send({embeds: [new Discord.MessageEmbed()
                     .setDescription(`${Member} is Banned from the server | ${banReason}`)
                     .setColor( "#45f766" )

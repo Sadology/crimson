@@ -1,17 +1,11 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const wait = require('util').promisify(setTimeout);
 const Discord = require('discord.js');
-const { GuildChannel } = require('../../models/');
+const { GuildChannel, Profiles } = require('../../models/');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('my-story')
         .setDescription('create your own story')
-        .addStringOption(option => 
-            option.setName('options')
-            .addChoice('create', 'createStory')
-            .addChoice('delete', 'deleteStory')
-            .setDescription('create or delete an exisiting story.')
-            .setRequired(true))
         .addStringOption(option => 
             option.setName('message')
             .setDescription('Post sweet messages :)'))
@@ -19,42 +13,131 @@ module.exports = {
             option.setName('image-link')
             .setDescription('You can add a image on your story.')),
     run: async(client, interaction) =>{
-        const { options } = interaction;
-        
-        const message = options.getString('message');
-        const image = options.getString('image-link');
+        try {
+            const { options } = interaction;
+            const message = options.getString('message');
+            const image = options.getString('image-link');
 
-        findLogChannel()
-        async function findLogChannel() {
-            let ifLogChannel = await GuildChannel.findOne({
-                guildID: interaction.guild.id,
-                Active: true,
-                [`Data.name`]: "myStoryLog"
-            })
-
-            if(!ifLogChannel){
-                return interaction.reply("This server doesn't have My Story plugin enabled")
-            }
-
-            let data = ifLogChannel.Data.find(i => i.name == "myStoryLog")
-            let c = interaction.guild.channels.cache.get(data.channel);
-
-            const hooks = await c.fetchWebhooks();
-            const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
-
-            if(!webHook){
-                c.createWebhook("sadbot", {
-                    avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+            if(!message && !image){
+                interaction.reply({
+                    embeds: [new Discord.MessageEmbed()
+                        .setDescription("Sorry you can't send an empty story.")
+                        .setColor("RED")
+                    ], ephemeral: true
                 })
             }
+            findLogChannel()
+            async function findLogChannel() {
+                let ifLogChannel = await GuildChannel.findOne({
+                    guildID: interaction.guild.id,
+                    Active: true,
+                    [`Data.name`]: "myStoryLog"
+                });
 
-            webHook.send({
-                username: interaction.user.username,
-                avatarURL: interaction.user.avatarURL({dynamic: false, size: 1024, type: 'png'}),
-                content: message
-            })
+                if(!ifLogChannel){
+                    return interaction.reply({embeds: [
+                        new Discord.MessageEmbed()
+                            .setDescription(`This server doesn't have story plugin enabled.`)
+                            .setColor("RED")
+                        ], ephemeral: true
+                    })
+                }
 
-            interaction.reply("Done")
+                let data = ifLogChannel.Data.find(i => i.name == "myStoryLog");
+                let c = interaction.guild.channels.cache.get(data.channel);
+
+                checkCooldown(c)
+            }
+
+            async function checkCooldown(c) {
+                const now = new Date()
+                let data = await Profiles.findOne({
+                    guildID: interaction.guild.id,
+                    userID: interaction.user.id,
+                })
+
+                if(!data){
+                    sendData(c)
+                }else {
+                    let oldData = await Profiles.findOne({
+                        guildID: interaction.guild.id,
+                        userID: interaction.user.id,
+                        Stories: {
+                            $lt: now
+                        }
+                    })
+                    if(!oldData){
+                        return interaction.reply({
+                            embeds: [new Discord.MessageEmbed()
+                                .setDescription("Sorry you already posted a story. Try again in an hour")
+                                .setColor("RED")
+                            ], ephemeral: true
+                        })
+                    }else {
+                        sendData(c)
+                    }
+                }
+            }
+
+            async function sendData(c) {
+                const hooks = await c.fetchWebhooks();
+                const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
+
+                if(!webHook){
+                    c.createWebhook("sadbot", {
+                        avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+                    })
+                }
+
+                let Embed = new Discord.MessageEmbed()
+                    .setAuthor(`${interaction.user.tag}'s story`, interaction.user.displayAvatarURL({dynamic: true, size: 1024, type: "png"}))
+                    .setColor(interaction.member.displayColor)
+                    if(message){
+                        Embed.setDescription(message)
+                    }
+                    if(image){
+                        if(!image.startsWith("https://") && !image.endsWith(".png" || ".jpg" || ".gif")){
+                            return interaction.reply({
+                                embeds: [new Discord.MessageEmbed()
+                                    .setDescription("This is not a correct link, please provide a valid link.")
+                                    .setColor("RED")
+                                ], ephemeral: true
+                            })
+                        }else {
+                            Embed.setImage(image)
+                        }
+                    }
+
+                webHook.send({
+                    username: interaction.user.username,
+                    avatarURL: interaction.user.avatarURL({dynamic: false, size: 1024, type: 'png'}),
+                    embeds: [Embed]
+                }).then(m => {
+                    m.react("♥")
+                })
+
+                interaction.reply({embeds: [
+                    new Discord.MessageEmbed()
+                        .setDescription(`Your story has been posted in ${c}`)
+                        .setColor("GREEN")
+                    ], ephemeral: true
+                })
+                setCooldown()
+            }
+
+            async function setCooldown() {
+                const muteDuration = new Date();
+                muteDuration.setMilliseconds(muteDuration.getMilliseconds() + 3600000);
+
+                await Profiles.findOneAndUpdate({
+                    guildID: interaction.guild.id,
+                    userID: interaction.user.id,
+                }, {
+                    Stories: muteDuration
+                }, {upsert: true})
+            }
+        }catch(err){
+            return console.log(err)
         }
     }
 }

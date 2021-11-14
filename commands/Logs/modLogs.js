@@ -153,9 +153,11 @@ module.exports = {
                 });
                 collector.on("end", async() =>{
                     // When the collector ends
-                    row.components[0].setDisabled(true)
-                    row.components[1].setDisabled(true)
-                    await msg.edit({components: [row]})
+                    if(currentIndex !== 0){
+                        row.components[0].setDisabled(true)
+                        row.components[1].setDisabled(true)
+                        await msg.edit({components: [row]})
+                    }
                 })
             })
         }

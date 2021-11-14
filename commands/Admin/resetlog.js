@@ -1,132 +1,117 @@
-// const Discord = require('discord.js');
-// const { Guild } = require('../../models');
-// const { LogsDatabase }= require('../../models');
-// const { MessageButton } = require('discord-buttons');
-// const { errLog } = require('../../Functions/erroHandling');
+const Discord = require('discord.js');
+const { LogsDatabase }= require('../../models');
+const {Member} = require('../../Functions/memberFunction');
+const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js')
 
-// module.exports = {
-//     name: 'reset-log',
+module.exports = {
+    name: 'reset-log',
+    run: async(client, message, args,prefix) =>{
+        if(!message.member.permissions.has("ADMINISTRATOR")){
+            return message.author.send('None of your role proccess to use this command')
+        }
 
-//     run: async(client, message, args,prefix) =>{
+        const row = new MessageActionRow()
+        .addComponents(
+            new MessageButton()
+                .setStyle("DANGER")
+                .setLabel("Confirm")
+                .setCustomId("confirmResetLog")
+        )
+        .addComponents(
+            new MessageButton()
+                .setStyle("SUCCESS")
+                .setLabel("Cancel")
+                .setCustomId("cancelResetLog")
+        )   
 
-//         if (!message.member.permissions.has("ADMINISTRATOR")){
-//             return
-//         }
-
-//         const confirm = new MessageButton()
-//             .setStyle("red")
-//             .setLabel("Confirm")
-//             .setID("resetConfirm")
-
-//         const Cancel = new MessageButton()
-//             .setStyle("green")
-//             .setLabel("Cancel")
-//             .setID("resetCancel")
-
-//         if( !args.length ){
-//             return message.channel.send({embeds: [new Discord.MessageEmbed()
-//                 .setAuthor(`Command - Reset-Log`, message.author.displayAvatarURL({dynamic: false, size: 1024, type: "png"}))
-//                 .setColor("#fffafa")
-//                 .setDescription(`Deletes every log data of the mentioned member *(currently only works for those who are in the server)* \n**Example**: \`${prefix}reset-log [ Member ]\``)
-//             ]
-//             }).then(m=>m.delete({timeout: 1000 * 10}))
-//         }
-
-//         const regexx = /[\d+]/g
-//         if(!args[0].match( regexx )){
-//             try {
-//                 return message.channel.send({embed: new Discord.MessageEmbed()
-//                     .setAuthor(`Command - Reset-Log`, message.author.displayAvatarURL({dynamic: false, size: 1024, type: "png"}))
-//                     .setColor('#ff303e')
-//                     .setDescription(`Please mention a valid Member`)
-//                 }).then(m=>m.delete({timeout: 1000 * 10}))
-//             } catch (err) {
-//                 errLog(err.stack.toString(), "text", "Reset-Log", "Error in finding Member ID");
-//             }
-//         }
-//         const TutEmbed = new Discord.MessageEmbed()
-//             .setAuthor("Command - Reset-Log", message.author.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
-//         const regex = /[\d]/g;
-//         const findMember = message.content.split(/\s+/)[1];
-//         const member = findMember.replace('<@', '').replace('>', '').replace('!', '').trim();
-
-//         if(member.match(regex)){
-//             try {
-//                 if(await message.guild.members.fetch(member)){
-//                     const Member = await message.guild.members.fetch(member)
-            
-//                     if(!member){
-//                         TutEmbed.setDescription( `Invalid user | Couldn't find the user` )
-            
-//                         TutEmbed.setColor( "#ff303e" )
-//                         return message.channel.send( TutEmbed ).then(m =>m.delete({ timeout: 1000 * 10 }))
-//                     }else {
-//                         const Embed = new Discord.MessageEmbed()
-//                             .setAuthor('Command - Reset=Log')
-//                             .setDescription(`<:sadAlert:855894860880281600> | ${Member.user} logs will get permanently deleted from database. Do you Wish to continue?`)
-//                             .setColor('#f25044')
-
-//                         let MSG = await message.channel.send(`<:sadAlert:855894860880281600> | ${Member.user}'s Logs will get deleted from database. Do you wish to continue?`,{embed: Embed, button: [confirm, Cancel]})
-
-//                         const filter = (button) => button.clicker.user.id === message.author.id;
-//                         const collector = MSG.createButtonCollector(filter, { time: 1000 * 60, max: 1 });
-
-//                         collector.on('collect',async b => {
-//                             b.defer()
-//                             if(b.id === 'resetConfirm'){
-//                                 try{
-//                                     await LogsDatabase.deleteMany({
-//                                         guildID: message.guild.id, 
-//                                         userID: Member.id}, 
-//                                     function(err, doc){
-//                                         if(err) {
-//                                             errLog(err.stack.toString(), "text", "Reset-Log", "Error in Deleteting Logs");
-//                                         }
-//                                     })
-                    
-//                                     return MSG.edit({embed: new Discord.MessageEmbed()
-//                                         .setAuthor(`Command - Reset-Log` , Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
-//                                         .setDescription(`Logs Reset | ${Member.user}`)
-//                                         .setColor("#66ff6b")
-//                                         .setFooter("Once a data has been delete, there's no way to retrieve it")
-//                                         .setThumbnail("https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/sign-check-icon.png")
-//                                     })
-//                                 } catch (err){
-//                                     errLog(err.stack.toString(), "text", "Reset-Log", "Error in deleting logs");
-//                                 }
-//                             }
-//                             if(b.id === "resetCancel"){
-//                                 try {
-//                                     MSG.edit({embed: new Discord.MessageEmbed()
-//                                         .setAuthor(`Command - Reset-Log`,  message.author.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
-//                                         .setDescription(`Command Canceled`)
-//                                         .setColor("#66ff6b")
-//                                     })
-//                                     return
-//                                 } catch (err) {
-//                                     errLog(err.stack.toString(), "text", "Reset-Log", "Error in cancelling command");
-//                                 }
-//                             }
-//                         });
-//                         collector.on("end", () =>{
-
-//                         })
-
-//                     }
-//                 }else {
-//                     TutEmbed.setDescription( `Invalid user | Couldn't find the user` )
-            
-//                     TutEmbed.setColor( "#ff303e" )
-//                     return message.channel.send( TutEmbed ).then(m =>m.delete({ timeout: 1000 * 10 }))
-//                 }
-//             } catch (err){
-//                 errLog(err.stack.toString(), "text", "Mute", "Error in finding Member");
-//             }
-//         }else {
-//             TutEmbed.setDescription( `Invalid user | Couldn't find the user` )
+        const FindMembers = new Member(args[0], message);
+        await message.guild.members.fetch()
         
-//             TutEmbed.setColor( "#ff303e" )
-//             return message.channel.send( TutEmbed ).then(m =>m.delete({ timeout: 1000 * 10 }))
-//         }
-//     }
-// }
+        function GuildMember(Member){
+            if(Member){
+                const member = message.guild.members.cache.get(Member)
+                if(member){
+                    return fetchData(member)
+                }else {
+                    return fetchData(Member)
+                }
+            }else {
+                return message.channel.send({embeds: [
+                    new Discord.MessageEmbed()
+                        .setDescription(`Please mention a valid member \n\n**Usage:** ${prefix}reset-log [ user ]`)
+                        .setColor("RED")
+                ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+            }
+        }
+
+        async function fetchData(Member){
+            let Data = await LogsDatabase.findOne({
+                guildID: message.guild.id,
+                userID: Member.user ? Member.user.id : Member
+            }).catch(err => {return console.log(err)})
+            if(!Data){
+                return message.channel.send({embeds: [
+                    new Discord.MessageEmbed()
+                        .setDescription(`User doesn't have any logs yet.`)
+                        .setColor("RED")
+                ], ephemeral: true}) 
+            }else {
+                confirmation(Member)
+            }
+        }
+
+        function confirmation (member){
+            message.channel.send({ content: "You you wish to reset all log? (yes/no)",embeds: [
+                new Discord.MessageEmbed()
+                    .setDescription(`Data will be permanently deleted from server and you can't recover it later.`)
+                    .setColor("RED")
+            ], components: [row]}).then(async msg => {
+                const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
+                collector.on('collect', async b => {
+                    if(b.user.id !== message.author.id) return
+                    if(b.customId === 'confirmResetLog'){
+                        DeleteData(member).then(async () =>{
+                            row.components[0].setDisabled(true)
+                            row.components[1].setDisabled(true)
+                            await b.update({content: "All data has been deleted", components: [row]})
+
+                        })
+                        .catch(err => {return console.log(err)})
+                        collector.stop();
+                    }
+                    if(b.customId === "cancelResetLog"){
+                        row.components[0].setDisabled(true)
+                        row.components[1].setDisabled(true)
+                        await b.update({content: "Canceled the command (timeout)", components: [row]})
+
+                        collector.stop();
+                    }
+                });
+                collector.on("end", (b) =>{
+                    // When the collector ends
+                    row.components[0].setDisabled(true)
+                    row.components[1].setDisabled(true)
+                    msg.edit({content: "Canceled the command", components: [row]})
+
+                })
+            })
+        }
+
+        async function DeleteData(member) {
+            await LogsDatabase.findOneAndDelete({
+                guildID: message.guild.id,
+                userID: member.user ? member.user.id : member
+            }).catch(err => {return console.log(err)})
+        }
+
+        if(!args.length || !args[0]) return message.reply({
+            embeds: [
+                new Discord.MessageEmbed()
+                    .setDescription(`Please mention a member to reset log \n\n**Usage:** \`${prefix}reset-log @shadow~\``)
+                    .setColor("WHITE")
+            ]
+        })
+
+        GuildMember(FindMembers.mentionedMember)
+    }
+}

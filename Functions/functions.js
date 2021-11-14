@@ -1,5 +1,6 @@
 const { LogsDatabase } = require('../models');
 const { LogChannel } = require('../Functions/logChannelFunctions');
+const { Profiles } = require('../models')
 
 async function saveData({
     guildID, 
@@ -56,7 +57,6 @@ async function saveData({
 }
 
 function sendLogData({data, client, Member, guild}){
-    console.log(data)
     switch(data.actionType){
         case "Mute":
             LogChannel('actionLog', guild).then(c => {
@@ -135,7 +135,7 @@ function sendMoreLogData({data, dataType, Member ,client, guild}){
                             },
                             {
                                 name: "Moderator",
-                                value: `\`\`\`${Member.user.tag}\`\`\``,
+                                value: `\`\`\`${client.user.tag}\`\`\``,
                                 inline: true
                             },
                             {
@@ -205,4 +205,20 @@ function sendMoreLogData({data, dataType, Member ,client, guild}){
     }
 }
 
-module.exports = { saveData, sendLogData, sendMoreLogData }
+async function ModStatus({type, guild, member, content}) {
+    await Profiles.findOneAndUpdate({
+        guildID: guild.id,
+        userID: member.id
+    }, {
+        guildName: guild.name,
+        userName: member.tag,
+        [`ModerationStats.Recent`]: content,
+        $inc: {
+            [`ModerationStats.${[type]}`]: 1,
+            [`ModerationStats.Total`]: 1
+        }
+    }, {
+        upsert: true,
+    })
+}
+module.exports = { saveData, sendLogData, sendMoreLogData, ModStatus }

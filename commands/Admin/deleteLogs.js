@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js')
-const { Guild } = require('../../models');
 const { LogsDatabase }= require('../../models')
 const moment = require('moment');
 module.exports = {
@@ -10,7 +9,6 @@ module.exports = {
     permissions: ["ADMINISTRATOR"],
     usage: "delete-log [ log ID ]",
     category: "Administrator",
-    
     run: async(client, message, args,prefix) =>{
 
         if(!message.member.permissions.has("ADMINISTRATOR")){
