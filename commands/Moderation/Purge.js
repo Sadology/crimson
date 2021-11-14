@@ -222,5 +222,6 @@ module.exports = {
         }
 
         deleteMessage()
+        ModStatus({type: "Purge", guild: message.guild, member: message.author, content: message.content})
     }
 };

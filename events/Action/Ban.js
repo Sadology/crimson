@@ -1,6 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const { GuildChannel, LogsDatabase } = require('../../models');
 const { LogChannel } = require('../../Functions/logChannelFunctions');
+const { ModStatus } = require('../../Functions/functions')
 module.exports = {
     event: "guildBanAdd",
     once: false,
@@ -94,7 +95,7 @@ module.exports = {
             }
         }
         CreateLog(target)
-
+        ModStatus({type: "Ban", guild: Guild.guild, member: executor, content: reason})
         LogChannel('banLog', Guild.guild).then(async c => {
             if(!c) return;
             if(c === null) return;
