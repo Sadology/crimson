@@ -1,8 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { log } = require('console');
-const wait = require('util').promisify(setTimeout);
 const Discord = require('discord.js');
-const { GuildRole } = require('../../models')
 
 module.exports = {
     data: new SlashCommandBuilder()

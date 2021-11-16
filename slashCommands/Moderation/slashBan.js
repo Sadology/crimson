@@ -1,11 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
-const ms = require('ms');
-const { LogsDatabase, GuildChannel} = require('../../models');
-const { commandUsed } = require('../../Functions/CommandUsage');
-const { errLog } = require('../../Functions/erroHandling');
-const { LogChannel } = require('../../Functions/logChannelFunctions');
-const e = require('express');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -73,8 +67,6 @@ module.exports = {
             }else {
                 try {
                     await interaction.guild.members.ban(Member, {reason: banReason + ' | ' + `${Member.id}` + ' | ' + `${interaction.user.tag}`});
-                    commandUsed( guild.id, guild.name, interaction.user.id, interaction.user.tag, "Ban", 1, `/ban ${Member} ${banReason}` );
-
                     return interaction.editReply({embeds: [new Discord.MessageEmbed()
                         .setDescription(`${Member} is Banned from the server | ${banReason}`)
                         .setColor( "#45f766" )
@@ -140,8 +132,6 @@ module.exports = {
         async function BanMember(Member){
             try {
                 await interaction.guild.members.ban(Member.id, {reason: banReason + ' | ' + `${Member.user.id}` + ' | ' + `${interaction.user.tag}`});
-                commandUsed( guild.id, guild.name, interaction.user.id, interaction.user.tag, "Ban", 1, `/ban ${Member.user.tag} ${banReason}` );
-
                 return interaction.editReply({embeds: [new Discord.MessageEmbed()
                     .setDescription(`${Member.user} is Banned from the server | ${banReason}`)
                     .setColor( "#45f766" )

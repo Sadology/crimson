@@ -2,8 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
 const ms = require('ms');
 const { LogsDatabase } = require('../../models');
-const { commandUsed } = require('../../Functions/CommandUsage');
-const { saveData, sendLogData } = require('../../Functions/functions');
+const { saveData, sendLogData, ModStatus } = require('../../Functions/functions');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -210,7 +209,6 @@ module.exports = {
                 Data['actionReason'] = muteReason
             }
             CreateLog(Member)
-            commandUsed( guild.id, guild.name, interaction.user.id, interaction.user.tag, "Mute", 1, content );
         }
 
         async function CreateLog(Member){
@@ -219,6 +217,7 @@ module.exports = {
                     ...Data,
                 })
                 sendLogData({data: Data, client: client, Member: Member, guild: guild})
+                ModStatus({type: "Mute", guild: interaction.guild, member: interaction.user, content: `/mute ${Member}`})
             } catch (err) {
                 console.log(err)
             }

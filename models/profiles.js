@@ -6,6 +6,7 @@ const profilesSchema = mongoose.Schema({
     userID: String,
     userName: String,
     Stories: Date,
+    Cookies: Number,
     ModerationStats: {
         Recent: String,
         Mute: Number,

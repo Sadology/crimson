@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const { GuildChannel, LogsDatabase } = require('../../models');
 const { LogChannel } = require('../../Functions/logChannelFunctions');
-const { ModStatus } = require('../../Functions/functions')
+const { saveData, sendLogData, ModStatus } = require('../../Functions/functions');;
 module.exports = {
     event: "guildBanAdd",
     once: false,
@@ -14,25 +14,14 @@ module.exports = {
 
         const BanLog = fetchedLogs.entries.first()
         if(!BanLog){
-            return console.log(`${member.id} was banned from ${guild.name} but couldn't find any informations`)
+            return console.log(`${member.id} was banned from ${Guild.name} but couldn't find any informations`)
         }
 
         const { executor, target, reason } = BanLog
-
-        function makeid() {
-            var text = "";
-            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        
-            for (var i = 0; i < 10; i++)
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        
-            return text;
-        }
-
         const banEmbed = {
             color: "#fc5947",
             author: {
-                name: `BAN DETECTION - ${target.tag}`,
+                name: `Ban Detection - ${target.tag}`,
                 icon_url: target.displayAvatarURL({
                     dynamic: true , 
                     type: 'png'
@@ -61,41 +50,28 @@ module.exports = {
             }
         }
         const Data = {
-            CaseID: makeid(),
-            guildID: Guild.guild.id,
+            guildID: Guild.guild.id, 
             guildName: Guild.guild.name,
-            userID: target.id,
+            userID: target.id, 
             userName: target.tag,
-            ActionType: "Ban",
-            Reason: reason || "No Reason Provided",
-            Moderator: executor.tag,
-            ModeratorID: executor.id,
-            Banned: true,
-            Duration: "∞",
-            ActionDate: new Date(),
+            actionType: "Ban", 
+            actionReason: reason ? reason : 'No reason provided',
+            moderator: executor.tag,
+            moderatorID: executor.id,
         }
 
         async function CreateLog(Member){
             try {
-                await LogsDatabase.findOneAndUpdate({
-                    guildID: Guild.guild.id,
-                    userID: Member.id
-                },{
-                    guildName: Guild.guild.name,
-                    $push: {
-                        [`Action`]: {
-                            Data
-                        }
-                    }
-                },{
-                    upsert: true,
+                saveData({
+                    ...Data,
                 })
+                //sendLogData({data: Data, client: client, Member: Member, guild: guild})
+                ModStatus({type: "Ban", guild: Guild.guild, member: executor, content: "Banned " + ` ${target.tag}`})
             } catch (err) {
-                console.log(err)
+                return console.log(err)
             }
         }
         CreateLog(target)
-        ModStatus({type: "Ban", guild: Guild.guild, member: executor, content: reason})
         LogChannel('banLog', Guild.guild).then(async c => {
             if(!c) return;
             if(c === null) return;
@@ -104,7 +80,7 @@ module.exports = {
             const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
 
             if(!webHook){
-                c.createWebhook("sadbot", {
+                return c.createWebhook("sadbot", {
                     avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
                 })
             }
