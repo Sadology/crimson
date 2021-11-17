@@ -2,11 +2,10 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const wait = require('util').promisify(setTimeout);
 const Discord = require('discord.js');
 const { Profiles } = require('../../models');
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('profile')
-        .setDescription('Give your friends some sweet cookies 🍪')
+        .setDescription('Check your profile')
         .addUserOption(option => 
             option.setName('member')
             .setDescription('check another users profile.')),

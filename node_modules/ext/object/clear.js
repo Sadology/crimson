@@ -1,15 +1,15 @@
 "use strict";
 
-var ensureValue = require("type/value/ensure");
+var ensureObject = require("type/object/ensure")
+  , ensure       = require("type/ensure");
 
 var objPropertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 
 module.exports = function (object) {
-	object = Object(ensureValue(object));
-	var result = [];
+	ensure(["object", object, ensureObject]);
 	for (var key in object) {
 		if (!objPropertyIsEnumerable.call(object, key)) continue;
-		result.push([key, object[key]]);
+		delete object[key];
 	}
-	return result;
+	return object;
 };

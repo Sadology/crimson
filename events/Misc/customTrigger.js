@@ -7,6 +7,7 @@ module.exports = {
     event: 'messageCreate',
     once: false,
     run: async(message, client) =>{
+    try {
         if(message.author.bot) return;
 
         let Permission;
@@ -76,10 +77,11 @@ module.exports = {
         }
 
         function validPerms(data) {
+            if(!data) return Permission = true
             if(!message.member.roles.cache.some(r=> data.includes(r.id))){
-                Permission = false
+                return Permission = false
             }else {
-                Permission = true
+                return Permission = true
             }
         }
 
@@ -137,6 +139,7 @@ module.exports = {
 
         function Variable(Array, Member) {
             if(Member){
+                if(Array == null) return
                 return Array
                 .replace(/{member}/g, `${Member}`)
                 .replace(/{member.id}/g, `${Member.id}`)
@@ -153,6 +156,7 @@ module.exports = {
                 .replace(/{server.id}/g, `${message.guild.id}`)
                 .replace(/{empty}/g, '')
             }else {
+                if(Array == null) return
                 return Array
                 .replace(/{author}/g, `${message.author}`)
                 .replace(/{author.id}/g, `${message.author.id}`)
@@ -169,5 +173,8 @@ module.exports = {
 
         checkPrefix(message)
         return
+    }catch(err) {
+        return console.log(err)
+    }
     }
 }
