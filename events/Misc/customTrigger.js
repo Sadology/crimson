@@ -132,7 +132,7 @@ module.exports = {
                     return message.channel.send({content: Variable(Data.Content, Member)+`\n${Image}`})
                 }
             }else {
-                return message.channel.send({content: Variable(Data.Content)})
+                return message.channel.send({content: Variable(Data.Content, Member)})
             }
         }
 
