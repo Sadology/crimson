@@ -42,7 +42,8 @@ module.exports = {
                 [`Data.Name`]: data
             })
             if(Data){
-                objectCreate(...Data.Data)
+                let datas = Data.Data.find(i => i.Name == data) 
+                objectCreate(datas)
             }
         }
 
@@ -65,8 +66,10 @@ module.exports = {
             Delete = structure.Delete;
             Embed = structure.Embed
 
-            if(structure.Image.length){
-                imageDeconstruct(structure.Image)
+            if(structure.Image){
+                if(structure.Image.length){
+                    imageDeconstruct(structure.Image)
+                }
             }
 
             if(Embed == true){
