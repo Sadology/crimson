@@ -97,7 +97,7 @@ module.exports = {
                     name: Variable(Data.Author, Member)
                 },
                 description: Variable(Data.Description),
-                Color: Data.Color ? Data.Color : message.guild.me.displayColor,
+                color: Data.Color ? Data.Color : message.guild.me.displayColor,
                 title: Variable(Data.Title, Member),
                 image: {
                     url: Image
