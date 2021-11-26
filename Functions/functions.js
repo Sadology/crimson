@@ -221,4 +221,10 @@ async function ModStatus({type, guild, member, content}) {
         upsert: true,
     })
 }
+
+class LogSend{
+    constructor(){
+        
+    }
+}
 module.exports = { saveData, sendLogData, sendMoreLogData, ModStatus }

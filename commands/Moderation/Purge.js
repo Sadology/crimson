@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const { ModStatus } = require('../../Functions/functions')
 module.exports = {
     name: 'purge',
     aliases: ['purne'],

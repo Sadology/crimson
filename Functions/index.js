@@ -1,4 +1,5 @@
+const { LogCreate  } = require('./ActionClasses')
 module.exports = {
-    LogCreate: require('./ActionClasses'),
+    LogCreate,
     commandCreate: require('./CommandObject'),
 };

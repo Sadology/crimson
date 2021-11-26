@@ -6,8 +6,10 @@ module.exports = {
     event: 'messageCreate',
     once: false,
     run: async(message, client) =>{
+    try {
         message.mentions.users.forEach(async (user) => {
             if (message.author.bot) return false;
+            if(message.deleted == true) return
             if (
                 message.content.includes('@here') ||
                 message.content.includes('@everyone')
@@ -44,9 +46,12 @@ module.exports = {
                     session.set(message.guild.id);
                     setTimeout(() => {
                     session.delete(message.guild.id);
-                    }, 1000 * 15);
+                    }, 1000 * 20);
                 }
             }
         });
+    }catch(err){
+        return console.log(err)
+    }
     }
 }

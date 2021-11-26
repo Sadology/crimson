@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { Intents } = require('discord.js');
+const { Client ,Intents } = require('discord.js');
 const client = new Discord.Client({
   intents: [
     Intents.FLAGS.GUILDS,
@@ -47,7 +47,7 @@ readdirSync("./events/").forEach(dir => {
     try {
         emitter[once ? 'once' : 'on'](event, (...args) => eventFunction.run(...args, client));
     } catch (error) {
-        console.error(error.stack);
+      return console.error(error.stack);
     }
   }
 });
@@ -82,7 +82,11 @@ client.on('interactionCreate', async(interation) =>{
         return interation.reply({embeds: [errorEmbed], ephemeral: true})
       }
     }
-    slashCmd.run(client, interation)
+    try {
+      slashCmd.run(client, interation)
+    }catch(err) {
+      return console.log(err)
+    }
   }catch(err){
     console.error(err)
   }
@@ -114,9 +118,13 @@ client.on('messageCreate', async message =>{
         .permissionsFor(client.user)
         .has('SEND_MESSAGES', false);
       if (!hasPermissionInChannel) {
-          return
+        return
       }
-      command.run(client, message, args, prefix, cmd);
+      try {
+        command.run(client, message, args, prefix, cmd);
+      }catch(err) {
+        console.log(err)
+      }
     }
 })
 

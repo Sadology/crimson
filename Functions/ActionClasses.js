@@ -74,4 +74,4 @@ class LogCreate{
         return this;
     }
 }
-module.exports = LogCreate
+module.exports = {LogCreate}

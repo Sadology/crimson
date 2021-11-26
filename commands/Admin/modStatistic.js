@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const { Profiles } = require('../../models');
 const { Member } = require('../../Functions/MemberFunction');
+const moment = require('moment');
 module.exports = {
     name: 'mod-stats',
     aliases: ["modstats"],
@@ -10,7 +11,7 @@ module.exports = {
     category: "Administrator",
     
     run: async(client, message, args,prefix) =>{
-        await message.delete();
+        //await message.delete();
         if(!message.member.permissions.has("ADMINISTRATOR")){
             return message.author.send('None of your role proccess to use this command')
         }
@@ -38,38 +39,52 @@ module.exports = {
         }
 
         async function fetchData(Member) {
-            const Data = await Profiles.findOne({
+            await Profiles.findOne({
                 guildID: message.guild.id,
                 userID: Member.user ? Member.user.id : Member
             })
-
-            if(!Data.ModerationStats){
-                return message.channel.send({
-                    embeds: [
-                        new Discord.MessageEmbed()
-                            .setDescription("User doesn't have any moderation history")
-                            .setColor("RED")
-                    ]
-                })
-            }
-
-            values(Data.ModerationStats, Member)
+            .then(res => {
+                if(!res || Object.keys(res.ModerationStats).length === 0){
+                    return message.channel.send({
+                        embeds: [
+                            new Discord.MessageEmbed()
+                                .setDescription("User doesn't have any moderation history")
+                                .setColor("RED")
+                        ]
+                    })
+                }else {
+                    return values(res.ModerationStats ,Member)
+                }
+            })
+            .catch(err => {
+                return console.log(err)
+            })
         }
 
         function values(Data, Member) {
             let Embed = new Discord.MessageEmbed()
-                .setAuthor("Moderation Statistics")
-                .setDescription(`${Data.Recent ? Data.Recent : "0"}`)
+                .setAuthor(`${Member.user ? Member.user.tag : Member}'s - Moderation Statistics`)
+                .setDescription(`${Data.Recent ? Data.Recent : "None"}`)
                 .setColor("WHITE")
                 let values = Object.keys(Data)
                 values.shift()
-                values.forEach((keys, index) => {
+                values.forEach((keys) => {
                     let item = Data[keys]
                     if(item == undefined){
                         item = "0"
                     }
                     Embed.addField(`${keys}`,`\`\`\`${item}\`\`\``, true)
                 })
+                let Time
+                // if(Object.keys(timeData.OnlineTime).length){
+                //     if(timeData.OnlineTime.LastOnline == null) {
+                //         Time = moment(timeData.OnlineTime.OnlineSince).format("lll") + ' - ' +moment(timeData.OnlineTime.OnlineSince, "YYYYMMDD").fromNow()
+                //         Embed.addField("Online Since", `\`\`\`${Time}\`\`\``)
+                //     }else if(timeData.OnlineTime.OnlineSince == null) {
+                //         Time = moment(timeData.OnlineTime.LastOnline).format("lll") + ' - ' +moment(timeData.OnlineTime.LastOnline, "YYYYMMDD").fromNow()
+                //         Embed.addField("Last Online", `\`\`\`${Time}\`\`\``)
+                //     }
+                // }
             return message.channel.send({
                 embeds: [Embed]
             })

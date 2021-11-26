@@ -19,6 +19,11 @@ const profilesSchema = mongoose.Schema({
         Active: Boolean,
         MSG: String,
         Time: Date
+    },
+    OnlineTime: {
+        LastOnline: Date,
+        OnlineSince: Date,
+        TotalHours: Number,
     }
 })
 
