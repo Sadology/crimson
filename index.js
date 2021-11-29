@@ -85,10 +85,24 @@ client.on('interactionCreate', async(interation) =>{
     try {
       slashCmd.run(client, interation)
     }catch(err) {
+      interation.channel.send({
+        embeds: [
+          new Discord.MessageEmbed()
+          .setDescription(err.message)
+          .setColor("RED")
+        ]
+      })
       return console.log(err)
     }
   }catch(err){
-    console.error(err)
+    interation.channel.send({
+      embeds: [
+        new Discord.MessageEmbed()
+        .setDescription(err.message)
+        .setColor("RED")
+      ]
+    })
+    return console.log(err)
   }
 
 })
@@ -123,7 +137,14 @@ client.on('messageCreate', async message =>{
       try {
         command.run(client, message, args, prefix, cmd);
       }catch(err) {
-        console.log(err)
+        message.channel.send({
+          embeds: [
+            new Discord.MessageEmbed()
+            .setDescription(err.message)
+            .setColor("RED")
+          ]
+        })
+        return console.log(err)
       }
     }
 })

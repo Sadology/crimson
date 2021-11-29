@@ -29,7 +29,7 @@ module.exports = {
         )
 
         const choice = [ 'rock', 'paper', 'scissor' ]
-        const choosen = choice[Math.floor(Math.random() * choice.length)]
+        const chosen = choice[Math.floor(Math.random() * choice.length)]
 
         message.channel.send({embeds: [new Discord.MessageEmbed()
             .setDescription("Select your option within 10 seconds")
@@ -42,17 +42,17 @@ module.exports = {
             collector.on('collect', (b) =>{
                 //ROCK
                 if(b.customId === 'Rock'){
-                    if(choosen === 'rock'){
+                    if(chosen === 'rock'){
                         b.update({embeds: [new Discord.MessageEmbed()
-                            .setDescription(`Both choosed Rock. Draw!`)
+                            .setDescription(`Both chosen Rock. Draw!`)
                             .setColor("YELLOW")
                         ], components: []})
-                    }else if(choosen === 'paper'){
+                    }else if(chosen === 'paper'){
                         b.update({embeds: [new Discord.MessageEmbed()
                             .setDescription(`${client.user}: \`Paper\` \n${message.author}: \`Rock\` \n\n${client.user} won! 🎉`)
                             .setColor("RED")
                         ], components: []}) 
-                    }else if(choosen === 'scissor'){
+                    }else if(chosen === 'scissor'){
                         b.update({embeds: [new Discord.MessageEmbed()
                             .setDescription(`${client.user}: \`Scissor\` \n${message.author}: \`Rock\` \n\n${message.author} won! 🎉`)
                             .setColor("GREEN")
@@ -60,17 +60,17 @@ module.exports = {
                     }
                 //PAPER
                 }else if(b.customId === 'Paper'){
-                    if(choosen === 'rock'){
+                    if(chosen === 'rock'){
                         b.update({embeds: [new Discord.MessageEmbed()
                             .setDescription(`${client.user}: \`Rock\` \n${message.author}: \`peper\` \n\n${message.author} won! 🎉`)
                             .setColor("GREEN")
                         ], components: []})
-                    }else if(choosen === 'paper'){
+                    }else if(chosen === 'paper'){
                         b.update({embeds: [new Discord.MessageEmbed()
-                            .setDescription(`Both choosed Paper. Draw!`)
+                            .setDescription(`Both chosen Paper. Draw!`)
                             .setColor("YELLOW")
                         ], components: []}) 
-                    }else if(choosen === 'scissor'){
+                    }else if(chosen === 'scissor'){
                         b.update({embeds: [new Discord.MessageEmbed()
                             .setDescription(`${client.user}: \`Scissor\` \n${message.author}: \`Paper\` \n\n${client.user} won! 🎉`)
                             .setColor("RED")
@@ -78,17 +78,17 @@ module.exports = {
                     }
                 //SCISSOR
                 }else if(b.customId === 'Scissor'){
-                    if(choosen === 'paper'){
+                    if(chosen === 'paper'){
                         b.update({embeds: [new Discord.MessageEmbed()
                             .setDescription(`${client.user}: \`Paper\` \n${message.author} \`Scissor\` \n\n${message.author} won! 🎉`)
                             .setColor("GREEN")
                         ], components: []})
-                    }else if(choosen === 'scissor'){
+                    }else if(chosen === 'scissor'){
                         b.update({embeds: [new Discord.MessageEmbed()
-                            .setDescription(`Both choosed Scissor. Draw!`)
+                            .setDescription(`Both chosen Scissor. Draw!`)
                             .setColor("YELLOW")
                         ], components: []}) 
-                    }else if(choosen === 'rock'){
+                    }else if(chosen === 'rock'){
                         b.update({embeds: [new Discord.MessageEmbed()
                             .setDescription(`${client.user}: \`Rock\` \n${message.author}: \`Scissor\` \n\n${client.user} won! 🎉`)
                             .setColor("RED")

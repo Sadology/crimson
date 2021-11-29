@@ -1,0 +1,45 @@
+[
+    {
+        "TYPE": "JOINED",
+        "MESSAGES": [
+            "{member} just landed", 
+            "{member} entered the arena", 
+            "{member} Just joined, heres some cookies 🍪",
+            "Woah {member} just joined!",
+            "{member} joined, let's start the party",
+            "Hey {member} 👋, welcome to ${guild.name}",
+            "{member} Joined the party, let's drop on the chat 😂",
+            "Is it a bird or is it a cat, nah its just {member}",
+            "Hey our friend {member} joined the server. Let's go for mining",
+            "POG, look {member} just joined the server",
+            "Hey {member}, i warmly welcome you",
+            "konnichiwa {member}, welcome to the server.",
+            "welcome {member}, we hope you brought pizza",
+            "{member} just hopped intro the server",
+            "A wild {member} just appearede",
+            "Everyone welcome {member}",
+            "{member} joined the server to light up the dark cave and lead us the way",
+            "Rockstar release gta 6 or not, i'm happy with that {member} joined the server :D",
+            "Welcome {member}",
+            "Hoppity poppity {member} just landed on our property",
+            "Hey {member}! Enjoy your time in the server.",
+            "🤖 Beep boop, boop beep? {member}"
+        ]
+    },
+    {
+        "TYPE": "LEFT",
+        "MESSAGES": [
+            "{member} just left us ;-;", 
+            "{member} has dropped.", 
+            "{member} has fallen",
+            "Woah {member} has stepped down!",
+            "{member} just left the server",
+            "Hey {member} 👋, farewell mate",
+            "{member} feel free to meet us again.",
+            "i'm literally crying cause {member} just left the server.",
+            "Never gonna give you up {member}. Never gonna let you down {member}",
+            "Sigh {member} left, i'm all alone now.",
+            "Let's meet up underneath the sakura tree again {member}"
+        ]
+    }
+]

@@ -41,7 +41,7 @@ module.exports = {
                         .setDescription(`> ${data.Status.MSG}`)
                         .setColor("#fffafa")
                         .setFooter(Time)
-                    message.reply({embeds: [EMBED]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
+                    message.channel.send({embeds: [EMBED]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
 
                     session.set(message.guild.id);
                     setTimeout(() => {

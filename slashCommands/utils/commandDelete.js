@@ -11,7 +11,7 @@ module.exports = {
             option.setName('command-name')
             .setDescription("Name of your command.")
             .setRequired(true)),
-    permission: ["ADMINISTRATOR"],
+    permission: ["MANAGE_GUILD"],
     run: async(client, interaction) =>{
         const { options, guild } = interaction;
 

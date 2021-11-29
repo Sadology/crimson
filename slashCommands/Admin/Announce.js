@@ -27,7 +27,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName("message")
             .setDescription('A custom message to greet/farewell members. separated by [ , ]')),
-    permission: ["ADMINISTRATOR"],
+    permission: ["MANAGE_GUILD"],
     run: async(client, interaction) =>{
         const { options } = interaction;
 

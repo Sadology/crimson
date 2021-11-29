@@ -47,7 +47,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName("footer")
             .setDescription("Set a footer for embed")),
-    permission: ["ADMINISTRATOR"],
+    permission: ["MANAGE_GUILD"],
     run: async(client, interaction) =>{
         interaction.deferReply()
         await new Promise(resolve => setTimeout(resolve, 1000))

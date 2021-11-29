@@ -21,7 +21,7 @@ module.exports = {
                 guildID: message.guild.id
             }).catch(err => {return console.log(err)})
 
-            const prefix = settings ? settings.prefix : client.config.default_prefix
+            const prefix = settings ? settings.prefix : ">"
 
             if(!message.content.startsWith(prefix)){
                 return
