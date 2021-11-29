@@ -8,6 +8,9 @@ class Member{
         this.member = member
         this.message = message
         this.mentionedMember
+        if(!this.member){
+            return this.mentionedMember = this.member
+        }
         if(this.member.startsWith('<@')){
             this.mentionedMember = this.member.replace('<@', '').replace('>', '')
             .replace('&', '')

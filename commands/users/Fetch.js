@@ -23,7 +23,6 @@ module.exports = {
 
         const FindMembers = new Member(args[0], message);
         message.guild.members.fetch()
-        const member = message.guild.members.cache.get(FindMembers.mentionedMember)
 
         const row = new MessageActionRow()
         .addComponents(
