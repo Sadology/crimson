@@ -78,6 +78,14 @@ module.exports = {
                     },{
                         upsert: true,
                     })
+
+                    try {
+                        return channel.createWebhook("sadbot", {
+                            avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+                        })
+                    }catch(err){
+                        return console.log(err)
+                    }
                 } catch (err) {
                     interaction.channel.send({embeds: [new Discord.MessageEmbed()
                         .setDescription(err.message)

@@ -83,13 +83,14 @@ module.exports = {
                 const hooks = await c.fetchWebhooks();
                 const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
 
-                if(!webHook){
-                    c.createWebhook("sadbot", {
+                try {
+                    if(!webHook){
+                    return c.createWebhook("sadbot", {
                         avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
                     })
-                    setTimeout(() => {
-
-                    }, 1000)
+                }
+                }catch(err ){
+                    return console.log(err)
                 }
 
                 switch(opt){
