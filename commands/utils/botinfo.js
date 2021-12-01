@@ -46,8 +46,16 @@ module.exports = {
                     value: `${moment(client.user.createdAt).format('MMMM Do YYYY')} - ${moment(client.user.createdAt, "YYYYMMDD").fromNow()}`.toString(),
                     inline: true
                 },
+                {
+                    name: "Devs",
+                    value: `<@571964900646191104>`,
+                    inline: true
+                },
             ],
-            color: "WHITE"
+            color: "WHITE",
+            footer: {
+                text: "Special thanks to Hyper bot dev Fluxpuck for the design idea"
+            }
         }
 
         return message.channel.send({embeds: [Embeds]})

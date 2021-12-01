@@ -28,4 +28,4 @@ async function LogChannel(logOption, guild){
         }
     }
 }
-module.exports = {LogChannel}
+module.exports = { LogChannel }

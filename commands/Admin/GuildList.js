@@ -54,7 +54,6 @@ module.exports = {
                         `\n**Boost Count**: ${current[i].premiumSubscriptionCount}`,
                     ].toString())
                 }
-                console.log(Data.length, current.length)
                 
                 if(Data.length <= 1){
                     return ({embeds: [Embed]})

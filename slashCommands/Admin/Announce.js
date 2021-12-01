@@ -79,10 +79,15 @@ module.exports = {
                         upsert: true,
                     })
 
+                    const hooks = await channel.fetchWebhooks();
+                    const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
+    
                     try {
+                        if(!webHook){
                         return channel.createWebhook("sadbot", {
                             avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
                         })
+                    }
                     }catch(err){
                         return console.log(err)
                     }

@@ -1,7 +1,7 @@
 const sourcebin = require('sourcebin');
 const fsLibrary  = require('fs')
 const fs = require('fs')
-async function errLog(Content, Lang , Title, Desc) {
+async function errLog({Content, Lang , Title, Desc}) {
     const bin = await sourcebin.create(
         [
             {
