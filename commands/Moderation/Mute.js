@@ -8,25 +8,12 @@ module.exports = {
     name: 'mute',
     description: "Mute a member to prevent them from texting/speaking",
     permissions: ["MANAGE_MESSAGES"],
+    botPermission: ["MANAGE_ROLES", "MANAGE_CHANNELS"],
     usage: "mute [ member ] [ duraion ] [ reason ]",
     category: "Moderation",
-
+    delete: true,
+    cooldown: 1000,
     run: async(client, message, args, prefix) =>{
-        if(message.guild.me.permissions.has(["MANAGE_MESSAGES"])){
-            await message.delete();
-        }
-
-        if(!message.guild.me.permissions.has(["MANAGE_ROLES", "ADMINISTRATOR"])){
-            return message.channel.send({embeds: [
-                new Discord.MessageEmbed()
-                    .setDescription("I don't have \"Manage_Roles\" permission to add Muted role.")
-                    .setColor("RED")
-            ]})
-        }
-
-        if(!message.member.permissions.has("MANAGE_MESSAGES")){
-            return message.author.send('None of your role proccess to use this command')
-        }
         const { author, content, guild, channel } = message;
         
         const TutEmbed = new Discord.MessageEmbed().setAuthor( "Command - MUTE", author.displayAvatarURL({dynamic: false, format: "png", size: 1024}) )
@@ -163,25 +150,11 @@ module.exports = {
                                 color: '#000000',
                                 permissions: [],
                                 reason: 'sadBot mute role creation'
+                        }).then(m => {
+                            overWriteChannels(m)
+                            MuteMember(Member, m) 
                         })
-                        let permToChange = await message.guild.roles.cache.find(r => r.name === 'Muted')
-                        if(guild.me.permissions.has("MANAGE_CHANNELS", "ADMINISTRATOR")){
-                            await guild.channels.cache.forEach(channel => {
-                                channel.permissionOverwrites.set([
-                                    {
-                                        id: permToChange.id,
-                                        deny : ['SEND_MESSAGES', 'ADD_REACTIONS', 'VIEW_CHANNEL'],
-                                    }
-                                ], "Muted role overWrites")
-                            })
-                        }else {
-                            let successEmbed = new Discord.MessageEmbed()
-                                .setDescription("Missing permission to create ovrride for **Muted** role. | Require **MANAGE CHANNELS** permission to deny **Send Message** permission for Muted roles")
-                                .setColor("#ff303e")
-                            return channel.send({embeds: [successEmbed]
-                            })
-                        }
-                        MuteMember(Member, permToChange) 
+                        
                     }catch(err){
                         console.log(err)
                         return message.channel.send({embed: [new Discord.MessageEmbed()
@@ -239,6 +212,26 @@ module.exports = {
                 ModStatus({type: "Mute", guild: message.guild, member: message.author, content: content})
             } catch (err) {
                 return console.log(err)
+            }
+        }
+
+        async function overWriteChannels(data){
+            if(guild.me.permissions.has("MANAGE_CHANNELS", "ADMINISTRATOR")){
+                await guild.channels.cache.forEach(channel => {
+                    if(channel.permissionsFor(guild.me).has("VIEW_CHANNEL")){
+                        channel.permissionOverwrites.edit(data.id,
+                        {
+                            'SEND_MESSAGES': false,
+                            'ADD_REACTIONS': false,
+                            'VIEW_CHANNEL': false,
+                        },"Muted role overWrites")
+                    }
+                })
+            }else {
+                let successEmbed = new Discord.MessageEmbed()
+                    .setDescription("Missing permission to create ovrride for **Muted** role. | Require **MANAGE CHANNELS** permission to deny **Send Message** permission for Muted roles")
+                    .setColor("#ff303e")
+                return channel.send({embeds: [successEmbed]})
             }
         }
         GuildMember(FindMembers.mentionedMember)

@@ -3,11 +3,14 @@ const moment = require('moment');
 const {Member} = require('../../Functions/MemberFunction');
 module.exports = {
     name: 'whois',
+    aliases: ['userinfo', 'user-info',],
     description: "Check a members information",
+    permissions: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     category: "Utils",
     usage: "whois [ user ]",
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-
         const FindMembers = new Member(args[0], message);
         message.guild.members.fetch()
 

@@ -29,7 +29,7 @@ module.exports = {
         .addChannelOption(option =>
             option.setName("log-channel")
             .setDescription('Selected log option will log into the selected channel')),
-    permission: ["MANAGE_GUILD"],
+    permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
     run: async(client, interaction) =>{
         const { options } = interaction;
 

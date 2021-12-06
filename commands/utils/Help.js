@@ -2,12 +2,14 @@ const { MessageEmbed, MessageActionRow, MessageSelectMenu } = require('discord.j
 
 module.exports = {
     name: 'help',
-
+    permissions: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         const Menu = new MessageEmbed()
             .setAuthor(`${client.user.username} - Help Menu`, client.user.avatarURL({dynamic: true, size: 1024, type: 'png'}))
             .setDescription(
-                "Select a category from the select menu you would like to visit \n\n<:administration:915457421823078460> - Administration\n<:moderation:915457421831462922> - Moderation\n🎮 - Fun\n<:utility:915457793618739331> - Utility\n<:slashCmds:915458597801062461> - slash \n\n[Invite Me](https://discordbotlist.com/bots/sadbot) • [Support Server](https://discord.gg/DfmQmqWJmA) • [Website](https://d2x3xhvgiqkx42.cloudfront.net/12345678-1234-1234-1234-1234567890ab/9432a2ad-f01d-4a3d-ae53-370c37e15e62/2018/01/16/4b638361-3888-4e77-b1ea-af956fa98d7f.png)",
+                "Select a category from the select menu you would like to visit \n\n<:administration:915457421823078460> - Administration\n<:moderation:915457421831462922> - Moderation\n🎮 - Fun\n<:utility:915457793618739331> - Utility\n<:slashCmds:915458597801062461> - slash commands \n\n[Invite Me](https://discordbotlist.com/bots/sadbot) • [Support Server](https://discord.gg/DfmQmqWJmA) • [Website](https://d2x3xhvgiqkx42.cloudfront.net/12345678-1234-1234-1234-1234567890ab/9432a2ad-f01d-4a3d-ae53-370c37e15e62/2018/01/16/4b638361-3888-4e77-b1ea-af956fa98d7f.png)",
             )
             .setColor("WHITE")
             .setFooter("/help command-name: [ cmd name ] to check individual commands")
@@ -22,33 +24,38 @@ module.exports = {
                         label: 'Administration',
                         description: 'Administrative type commands',
                         value: 'adminOption',
+                        emoji: '<:administration:915457421823078460>'
                     },
                     {
                         label: 'Moderation',
                         description: 'Moderation type commands',
                         value: 'modOption',
+                        emoji: '<:moderation:915457421831462922>'
                     },
                     {
                         label: 'Fun',
                         description: 'Fun type commands',
                         value: 'funOption',
+                        emoji: '🎮'
                     },
                     {
                         label: 'Utils',
                         description: 'Utility type commands',
                         value: 'utilOption',
+                        emoji: '<:utility:915457793618739331>'
                     },
                     {
                         label: 'Slash',
                         description: 'Slash commands',
                         value: 'slashOption',
+                        emoji: '<:slashCmds:915458597801062461>'
                     },
 
                 ]),
             )
 
         message.channel.send({embeds: [Menu], components: [row]}).then((m) => {
-            const collector = m.channel.createMessageComponentCollector({ componentType: 'SELECT_MENU', time: 1000 * 60 * 10  });
+            const collector = m.createMessageComponentCollector({ componentType: 'SELECT_MENU', time: 1000 * 60 * 10  });
             collector.on('collect',async b => {
                 if(b.user.id !== message.author.id) return
                 if(b.customId === "selectHelpData"){

@@ -10,7 +10,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName('value')
             .setDescription('The new prefix value')),
-        permission: ["MANAGE_GUILD"],
+        permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
     run: async(client, interaction) =>{
         const { options } = interaction;
         const newPrefix = options.getString('value');

@@ -1,6 +1,6 @@
-const Monsters = require('./Monster.json');
+const Jobs = require('./works.json');
 const Messages = require('./Messages.json')
 module.exports = {
-    Monsters,
+    Jobs,
     Messages
 };

@@ -47,7 +47,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName("footer")
             .setDescription("Set a footer for embed")),
-    permission: ["MANAGE_GUILD"],
+    permission: ["MANAGE_GUILD", "ADMINISTRATOR"],
     run: async(client, interaction) =>{
         interaction.deferReply()
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -68,20 +68,31 @@ module.exports = {
             const Image = options.getString('image');
             const Footer = options.getString('footer');
 
-            const oldData = await CustomCommand.findOne({
+            await CustomCommand.findOne({
                 guildID: interaction.guild.id,
                 [`Data.Name`]: cmdName
+            }).then(res => {
+                if(res){
+                    let data = res.Data.find(item => item.Name == cmdName)
+                    if(!data){
+                        return interaction.editReply({embeds: [
+                            new Discord.MessageEmbed()
+                                .setDescription("No command exist by this name")
+                                .setColor("RED")
+                            ]
+                        })  
+                    }else {
+                        editCmd(data)
+                    }
+                }else {
+                    return interaction.editReply({embeds: [
+                        new Discord.MessageEmbed()
+                            .setDescription("No command exist by this name")
+                            .setColor("RED")
+                        ]
+                    })
+                }
             })
-
-            if(!oldData){
-                return interaction.editReply({embeds: [
-                    new Discord.MessageEmbed()
-                        .setDescription("No command exist by this name")
-                        .setColor("RED")
-                    ]
-                })
-            }
-            editCmd(...oldData.Data)
 
             function editCmd(data) {
                 const Data = {
@@ -115,6 +126,7 @@ module.exports = {
                 image(Image)
                 footer(Footer)
 
+                let permsStringArr = []
                 if(Data.Description !== null || 
                     Data.Author !== null || 
                     Data.Title !== null ||
@@ -124,22 +136,23 @@ module.exports = {
 
                 if(somethingWrong == true) return
                 let DataEmbed = new Discord.MessageEmbed()
+                    .setAuthor(interaction.user.tag, interaction.user.avatarURL({dynamic: true, size: 1024, type: 'png'}))
                     .setDescription(
                         `**Name:** ${Data.Name}
-                        \n**Content:** ${Data.Content}
-                        \n**Delete-cmd:** ${Data.DeleteCmd}
-                        \n**Mention:** ${Data.Mention}
-                        \n**Embed:** ${Data.Embed}
-                        \n**Description:** ${Data.Description}
-                        \n**Author:** ${Data.Author}
-                        \n**Title:** ${Data.Title}
-                        \n**Image:** ${Data.Image == null ? `[URL](https://youtu.be/dQw4w9WgXcQ)`: Data.Image})
-                        \n**Footer:** ${Data.Footer}
-                        \n**Color:** ${Data.Color}
-                        \n**Permission:** ${Data.Permission}
+                        **Content:** ${Data.Content}
+                        **Delete-cmd:** ${Data.DeleteCmd}
+                        **Mention:** ${Data.Mention}
+                        **Embed:** ${Data.Embed}
+                        **Description:** ${Data.Description}
+                        **Author:** ${Data.Author}
+                        **Title:** ${Data.Title}
+                        **Image:** ${Data.Image == null ? `[URL](https://youtu.be/dQw4w9WgXcQ)`: Data.Image.join(", ")})
+                        **Footer:** ${Data.Footer}
+                        **Color:** ${Data.Color}
+                        **Permission:** ${permsStringArr.join(", ")}
                         `
                     )
-                .setColor("#f5fff8")
+                    .setColor("#f5fff8")
 
                 const row = new Discord.MessageActionRow()
                 .addComponents(
@@ -155,46 +168,56 @@ module.exports = {
                         .setStyle('DANGER'),
                     );
 
-                interaction.editReply({content: "Do you wish to save this command? (confirm/cancel)",embeds: [DataEmbed], components: [row]})
-                const collector = interaction.channel.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 60 });
-                collector.on('collect', async i => {
-                    if(i.user.id !== interaction.user.id) return
-                    if (i.customId === 'YesButtonEdit') {
-                        await CustomCommand.findOneAndUpdate({
-                            guildID: interaction.guild.id,
-                            [`Data.Name`]: Data.Name
-                        }, {
-                            $pull: {
-                                Data: {
-                                    Name: Data.Name
+                interaction.editReply({content: "Do you wish to save this command? (confirm/cancel)",embeds: [DataEmbed], components: [row]}).then(inter => {
+                    const collector = inter.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 60 * 5 });
+                    collector.on('collect', async i => {
+                        if(i.user.id !== interaction.user.id) return
+                        if (i.customId === 'YesButtonEdit') {
+                            await CustomCommand.findOneAndUpdate({
+                                guildID: interaction.guild.id,
+                                [`Data.Name`]: cmdName
+                            }, {
+                                $pull: {
+                                    Data: {
+                                        Name: cmdName
+                                    }
                                 }
-                            }
-                        }, {upsert: true}).catch(err => console.log(err))
-
-                        await CustomCommand.findOneAndUpdate({
-                            guildID: interaction.guild.id,
-                        }, {
-                            $push: {
-                                Data: {
-                                    ...Data
+                            }).catch(err =>{ return console.log(err)})
+    
+                            await CustomCommand.findOneAndUpdate({
+                                guildID: interaction.guild.id,
+                            }, {
+                                $push: {
+                                    Data: {
+                                        ...Data
+                                    }
                                 }
-                            }
-                        }, {upsert: true}).catch(err => console.log(err))
-                        await i.update({ content: 'Saved to database', components: [] });
-                        collector.stop();
-                    }else if(i.customId === 'NoButtonEdit'){
-                        await i.update({ content: 'Canceled the command', components: []});
-                        collector.stop();
-                    }
-                });
-                
-                collector.on('end', collected => {});
+                            }, {upsert: true}).catch(err =>{ return console.log(err)})
+                            row.components[0].setDisabled(true)
+                            row.components[1].setDisabled(true)
+                            await i.update({ content: 'Saved to database', components: [row] }).catch(err =>{ return console.log(err)})
+                            return collector.stop();
+                        }else if(i.customId === 'NoButtonEdit'){
+                            row.components[0].setDisabled(true)
+                            row.components[1].setDisabled(true)
+                            await i.update({ content: 'Canceled the command', components: [row]}).catch(err =>{ return console.log(err)})
+                            return collector.stop();
+                        }
+                    });
+                    
+                    collector.on('end', async collected => {
+                        row.components[0].setDisabled(true)
+                        row.components[1].setDisabled(true)
+                        await interaction.editReply({ content: 'Canceled the command', components: [row]});
+                    });
+                })
 
                 function name(name) {
                     if(name){
                         let filterName = name.replace(/\s+/g, '')
+                        let finalize = filterName.slice(0, 5)
 
-                        Data.Name = filterName.toLowerCase()
+                        Data.Name = finalize.toLowerCase()
                     }
                 }
                 function content(content) {
@@ -253,6 +276,7 @@ module.exports = {
 
                             if(guildRoles){
                                 RolesArr.push(guildRoles.id)
+                                permsStringArr.push(guildRoles.toString())
                             }else if(typeof guildRoles === "undefined"){
                                 function add(value) {
                                     if (undefinesRole.indexOf(value) === -1) {

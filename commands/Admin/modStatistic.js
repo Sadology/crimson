@@ -6,16 +6,12 @@ module.exports = {
     name: 'mod-stats',
     aliases: ["modstats"],
     description: "Moderators statistic. Moderation data of all time.",
-    permissions: ["ADMINISTRATOR"],
+    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "mod-stats [ user ]",
     category: "Administrator",
-    
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-        //await message.delete();
-        if(!message.member.permissions.has("ADMINISTRATOR")){
-            return message.author.send('None of your role proccess to use this command')
-        }
-
         const fetchMember = new Member(args[0], message)
         await message.guild.members.fetch()
 

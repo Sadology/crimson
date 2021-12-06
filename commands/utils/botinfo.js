@@ -5,8 +5,10 @@ module.exports = {
     aliases: ['botinfo'],
     description: "checks bot informations",
     permissions: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "bot-info",
     category: "Utils",
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         const guilds = client.guilds.cache.size
 
@@ -18,7 +20,7 @@ module.exports = {
             fields: [
                 {
                     name: "Version",
-                    value: 'Beta v1',
+                    value: 'Beta v1.1',
                     inline: true
                 },
                 {

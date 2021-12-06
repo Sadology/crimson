@@ -5,16 +5,14 @@ module.exports = {
     aliases: ['purne'],
     description: "Purge amount of message in the channel with options",
     permissions: ['MANAGE_MESSAGES'],
+    botPermission: ["MANAGE_MESSAGES",],
     usage: "purge [ amount ] [ options *optional* ]",
     category: "Moderation",
-    
+    delete: true,
+    cooldown: 1000,
     run: async(client, message, args,prefix) =>{
-        await message.delete()
         const { channel } = message;
         
-        if(!message.member.permissions.has("MANAGE_MESSAGES")){
-            return message.author.send('None of your role proccess to use this command')
-        }
         const TutEmbed = new Discord.MessageEmbed()
             .setAuthor( "Command - Purge", client.user.displayAvatarURL({ dynamic: true, type: "png", size: 1024 }) )
             .setDescription( `Deletes a specific amount of messages ( Limit 100 ) \nUsage: \`${prefix}purge\ [ Amount of message ] [ Member ]\`` )

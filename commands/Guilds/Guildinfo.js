@@ -15,10 +15,12 @@ module.exports = {
     name: 'server',
     aliases: ['guild', 'serverinfo', 'guildinfo', 'server-info', 'guild-info'],
     description: "Get informations about your server.",
-    permissions: ["VIEW_MESSAGES"],
+    permissions: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "server-info",
     category: "Utils",
-
+    cooldown: 3000,
+    
     run: async (client, message, args,prefix) =>{
         const { author, content, guild } = message;
 

@@ -5,14 +5,12 @@ module.exports = {
     name: 'kick',
     description: "Kick out a member from the server.",
     permissions: ["KICK_MEMBERS"],
+    botPermission: ["KICK_MEMBERS"],
     usage: "kick [ member ]",
     category: "Moderation",
-
+    delete: true,
+    cooldown: 1000,
     run: async(client, message, args,prefix) =>{
-        if(message.guild.me.permissions.has(["MANAGE_MESSAGES"])){
-            await message.delete();
-        }
-
         if(!message.member.permissions.has("KICK_MEMBERS")){
             return message.author.send('None of your role proccess to use this command')
         }

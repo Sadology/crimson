@@ -9,6 +9,7 @@ module.exports = {
         .addUserOption(option => 
             option.setName('member')
             .setDescription('check another users profile.')),
+    permission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
     try {
         const { options } = interaction;

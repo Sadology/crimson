@@ -3,9 +3,11 @@ const { Guild } = require('../../models');
 module.exports = {
     name: 'prefix',
     description: "Change prefix of the bot or show current prefix",
-    permissions: ["MANAGE_GUILDS"],
+    permissions: ["MANAGE_GUILD", "ADMINISTRATOR"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "prefix [ new prefix ]",
     category: "Administrator",
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         const newPrefix = args[0]
 

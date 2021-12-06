@@ -12,7 +12,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName("reason")
                 .setDescription("Reason for Ban")),
-    permission: ["BAN_MEMBERS",],
+    permission: ["BAN_MEMBERS"],
     run: async(client, interaction) =>{
         const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')

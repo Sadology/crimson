@@ -6,15 +6,12 @@ module.exports = {
     name: 'delete-log',
     aliases: ["deletelog"],
     description: "Delete a moderation log",
-    permissions: ["ADMINISTRATOR"],
+    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "delete-log [ log ID ]",
     category: "Administrator",
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-
-        if(!message.member.permissions.has("ADMINISTRATOR")){
-            return message.author.send('None of your role proccess to use this command')
-        }
-
         const row = new MessageActionRow()
         .addComponents(
             new MessageButton()

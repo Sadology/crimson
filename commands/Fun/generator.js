@@ -4,7 +4,10 @@ module.exports = {
     name: 'makeme',
     aliases: ['generateme', 'makeme'],
     description: "Experimental command",
+    permissions: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "makeme",
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         axios.get("https://api.namefake.com/").then(function(res){
             let Embed = new Discord.MessageEmbed()

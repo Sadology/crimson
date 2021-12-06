@@ -5,8 +5,11 @@ module.exports = {
     name: 'avatar',
     aliases: ["av"],
     description: "check a members avatar",
+    permissions: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     category: "Utils",
     usage: "avatar [ user ]",
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         const FindMembers = new Member(args[0], message);
         message.guild.members.fetch(); 

@@ -13,7 +13,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName("reason")
                 .setDescription("Reason for kicking")),
-    permission: ["KICK_MEMBERS",],
+    permission: ["KICK_MEMBERS"],
     run: async(client, interaction) =>{
         const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')

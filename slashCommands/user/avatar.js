@@ -7,6 +7,7 @@ module.exports = {
         .setName('avatar')
         .setDescription('Check avatar in 4k')
         .addUserOption(option => option.setName('user').setDescription('Check your friends avatar in 4k')),
+    permission: ["SEND_MESSAGES"],
     run: async(client, interation) =>{
         const { options } = interation;
         const MemberID = options.getUser('user')

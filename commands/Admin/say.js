@@ -3,16 +3,14 @@ module.exports = {
     name: 'say',
     aliases: ['copycat', 'repeat'],
     description:'returns the arguement',
-    category: 'moderation',
-    disabled: true,
+    show: true,
     
     run: async(client, message, args,prefix) =>{
         if(message.author.id !== "571964900646191104"){
             return
         }
+        message.delete()
         
-        await message.delete()
-
         if(!message.member.permissions.has("MANAGE_GUILD","ADMINISTRATOR")) return message.author.send('None of your role proccess to use this command')
 
         if(!message.guild.me.permissions.has("SEND_MESSAGES", "MANAGE_MESSAGES")){

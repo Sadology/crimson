@@ -4,10 +4,11 @@ module.exports = {
     aliases: ['eightball'],
     description: "Ask the 8ball any question, it will reply and remove the confusion.",
     permissions: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "8ball [ question ]",
     category: "Fun",
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-
         let eightBallmessage = args.slice(0).join(' ')
         if(!eightBallmessage) return message.channel.send("What you wanst to know from 8ball?")
 

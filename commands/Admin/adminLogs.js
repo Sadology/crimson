@@ -7,15 +7,13 @@ module.exports = {
     aliases: ["adminlog"],
     description: "Most powerful log, view every single log in the server",
     permissions: ["ADMINISTRATOR"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "admin-log [ options ]",
     category: "Administrator",
+    cooldown: 3000,
 
     run: async(client, message, args,prefix) =>{
         let cmd = args[0];
-
-        if(!message.member.permissions.has("ADMINISTRATOR")){
-            return message.author.send('None of your role proccess to use this command')
-        }
 
         const ErrorEmbed = {
             color: "#fffafa",

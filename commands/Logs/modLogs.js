@@ -9,9 +9,10 @@ module.exports = {
     aliases: ['modlogs', 'modlog', 'log'],
     description: "Check moderation logs of a member.",
     permissions: ["MANAGE_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "mlogs [ member ]",
     category: "Moderation",
-
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
 
         if(!message.member.permissions.has("MANAGE_MESSAGES")){

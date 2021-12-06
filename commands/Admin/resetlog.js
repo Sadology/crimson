@@ -5,11 +5,14 @@ const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js')
 
 module.exports = {
     name: 'reset-log',
+    aliases: ["resetlog"],
+    description: "Reset every mod logs of a user.",
+    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
+    botPermission: ["SEND_MESSAGES"],
+    usage: "reset-log [ user ]",
+    category: "Administrator",
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-        if(!message.member.permissions.has("ADMINISTRATOR")){
-            return message.author.send('None of your role proccess to use this command')
-        }
-
         const row = new MessageActionRow()
         .addComponents(
             new MessageButton()

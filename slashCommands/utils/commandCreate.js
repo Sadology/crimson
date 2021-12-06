@@ -44,7 +44,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName("footer")
             .setDescription("Set a footer for embed")),
-    permission: ["MANAGE_GUILD"],
+    permission: ["MANAGE_GUILD", "ADMINISTRATOR"],
     run: async(client, interaction) =>{
 
         interaction.deferReply()
@@ -84,6 +84,7 @@ module.exports = {
             image(Image)
             footer(Footer)
 
+            let permsStringArr = []
             if(Data.Description !== null || 
                 Data.Author !== null || 
                 Data.Title !== null ||
@@ -93,19 +94,20 @@ module.exports = {
     
             if(somethingWrong == true) return
             let DataEmbed = new Discord.MessageEmbed()
+            .setAuthor(interaction.user.tag, interaction.user.avatarURL({dynamic: true, size: 1024, type: 'png'}))
                 .setDescription(
                     `**Name:** ${Data.Name}
-                    \n**Content:** ${Data.Content}
-                    \n**Delete-cmd:** ${Data.DeleteCmd}
-                    \n**Mention:** ${Data.Mention}
-                    \n**Embed:** ${Data.Embed}
-                    \n**Description:** ${Data.Description}
-                    \n**Author:** ${Data.Author}
-                    \n**Title:** ${Data.Title}
-                    \n**Image:** [URL](${Data.Image == null ? "https://youtu.be/dQw4w9WgXcQ": Data.Image})
-                    \n**Footer:** ${Data.Footer}
-                    \n**Color:** ${Data.Color}
-                    \n**Permission:** ${Data.Permission}
+                    **Content:** ${Data.Content}
+                    **Delete-cmd:** ${Data.DeleteCmd}
+                    **Mention:** ${Data.Mention}
+                    **Embed:** ${Data.Embed}
+                    **Description:** ${Data.Description}
+                    **Author:** ${Data.Author}
+                    **Title:** ${Data.Title}
+                    **Image:** ${Data.Image == null ? "[URL](https://youtu.be/dQw4w9WgXcQ)": Data.Image}
+                    **Footer:** ${Data.Footer}
+                    **Color:** ${Data.Color}
+                    **Permission:** ${permsStringArr.join(", ")}
                     `
                 )
             .setColor("#f5fff8")
@@ -124,18 +126,28 @@ module.exports = {
                     .setStyle('DANGER'),
                 );
     
-            interaction.editReply({content: "Do you wish to save this command? (confirm/cancel)",embeds: [DataEmbed], components: [row]})
-            const collector = interaction.channel.createMessageComponentCollector({ time: 1000 * 60 });
-            collector.on('collect', async i => {
-                if(i.user.id !== interaction.user.id) return
-                if (i.customId === 'YesButtonCreate') {
-                    const cmdsData = await CustomCommand.findOne({ 
-                        guildID: interaction.guild.id,
-                        [`Data.Name`] : Data.Name
-                    }) 
-                    if(cmdsData){
-                        return i.update({ content: 'Something went wrong', components: [] , embeds: [new Discord.MessageEmbed().setDescription("Error | Command already exist by this name").setColor("RED")], ephermal: true})
-                    }else {
+            let IfExistData = await CustomCommand.findOne({ 
+                guildID: interaction.guild.id,
+                [`Data.Name`] : Data.Name
+            })
+            .catch(err => {
+                return console.log(err.stack)
+            })
+            if(IfExistData){
+                let existedData = IfExistData.Data.find(i => i.Name == Data.Name)
+                if(existedData){
+                    return interaction.editReply({
+                        embeds: [new Discord.MessageEmbed()
+                            .setDescription("A custom command already exist by this name.")
+                            .setColor("RED")    
+                        ]
+                    })
+                }
+            }else interaction.editReply({content: "Do you wish to save this command? (confirm/cancel)",embeds: [DataEmbed], components: [row]}).then((inter) => {
+                const collector = inter.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 60 * 5 });
+                collector.on('collect', async i => {
+                    if(i.user.id !== interaction.user.id) return
+                    if (i.customId === 'YesButtonCreate') {
                         await CustomCommand.findOneAndUpdate({
                             guildID: interaction.guild.id,
                         }, {
@@ -144,23 +156,34 @@ module.exports = {
                                     ...Data
                                 }
                             }
-                        }, {upsert: true}).catch(err => console.log(err))
+                        }, {upsert: true})
+                        .then(async() => {
+                            row.components[0].setDisabled(true)
+                            row.components[1].setDisabled(true)
+                            await i.update({ content: 'Saved to database', components: [row] }).catch(err => {return console.log(err)})
+                            return collector.stop();
+                        })
+                        .catch(err => console.log(err))
+                    }else if(i.customId === 'NoButtonCreate'){
+                        row.components[0].setDisabled(true)
+                        row.components[1].setDisabled(true)
+                        await i.update({ content: 'Canceled the command', components: [row]}).catch(err => {return console.log(err)})
+                        return collector.stop();
                     }
-                    await i.update({ content: 'Saved to database', components: [] });
-                    return collector.stop();
-                }else if(i.customId === 'NoButtonCreate'){
-                    await i.update({ content: 'Canceled the command', components: []});
-                    return collector.stop();
-                }
-            });
+                });
+                
+                collector.on('end', async collected => {
+                    row.components[0].setDisabled(true)
+                    row.components[1].setDisabled(true)
+                    await interaction.editReply({ content: 'Canceled the command', components: [row]});
+                });
+            })
             
-            collector.on('end', collected => {});
-
             function name(name) {
                 if(name){
                     let filterName = name.replace(/\s+/g, '')
-
-                    Data.setName(filterName.toLowerCase())
+                    let finalize = filterName.slice(0, 5)
+                    Data.setName(finalize.toLowerCase())
                 }else {
                     errorEmbed.setDescription("Please specify a name for the command. You can't use the command without name.")
                     interaction.editReply({embeds: [errorEmbed], ephermal: true})
@@ -214,6 +237,7 @@ module.exports = {
                     Data.setDelete(false)
                 }
             }
+
             function permission(params) {
                 if(params){
                     let divide = params.split(/,\s+/)
@@ -229,6 +253,7 @@ module.exports = {
 
                         if(guildRoles){
                             RolesArr.push(guildRoles.id)
+                            permsStringArr.push(guildRoles.toString())
                         }else if(typeof guildRoles === "undefined"){
                             function add(value) {
                                 if (undefinesRole.indexOf(value) === -1) {

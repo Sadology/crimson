@@ -24,7 +24,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName("roles")
             .setDescription('Mention all the roles you want to set.')),
-    permission: ["MANAGE_GUILD"],
+    permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
     run: async(client, interaction) =>{
         const { options, guild } = interaction;
         const logOption = options.getString('options');

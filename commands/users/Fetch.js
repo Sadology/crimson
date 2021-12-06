@@ -9,8 +9,11 @@ module.exports = {
     name: 'seek',
     aliases: ["fetch",],
     description: "Find a member and check their informations",
+    permissions: ["MANAGE_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     category: "Moderation",
     usage: "fetch [ user ]",
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         if(!args.length){
             return message.reply({embeds: [new MessageEmbed()

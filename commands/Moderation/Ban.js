@@ -5,18 +5,12 @@ module.exports = {
     name: 'ban',
     description: "Bans a member from the server",
     permissions: ["BAN_MEMBERS"],
+    botPermission: ["BAN_MEMBERS"],
     usage: "ban [ member ]",
     category: "Moderation",
-
+    delete: true,
+    cooldown: 1000,
     run: async(client, message, args,prefix) =>{
-        if(message.guild.me.permissions.has(["MANAGE_MESSAGES"])){
-            await message.delete();
-        }
-
-        if(!message.member.permissions.has("BAN_MEMBERS")){
-            return message.author.send('None of your role proccess to use this command')
-        }
-
         const { guild, content, channel, author } = message;
         const ErrorEmbed = {
             color: "#fffafa",

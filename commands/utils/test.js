@@ -1,17 +1,13 @@
-const { saveData } = require('../../Functions/functions');
-const Discord = require('discord.js');
-module.exports = {
-    name: 'test',
-    description: 'ping pong',
-    category: 'Utils',
-    disabled: true,
-    run: async(client, message, args)=> {
-        let c = message.guild.channels.cache.get("874975341347762209")
+// const { saveData } = require('../../Functions/functions');
+// const Discord = require('discord.js');
+// const axios = require('axios')
+// const { Client } = require('unb-api');
+// const { Permissions } = require('discord.js');
 
-        c.createWebhook("sadbot", {
-            avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
-        })
+// module.exports = {
+//     name: 'test',
 
-        message.channel.send('ye')
-    }
-}
+//     run: async(client, message, args)=> {
+//         console.log(message.member.permissions.any(["ADMINISTRATOR",]));
+//     }
+// }

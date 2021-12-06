@@ -7,28 +7,14 @@ module.exports = {
     name: 'unmute',
     description: "Unmute a muted member.",
     permissions: ["MANAGE_MESSAGES"],
+    botPermission: ["MANAGE_CHANNELS", "MANAGE_ROLES"],
     usage: "unmute [ member ]",
     category: "Moderation",
-
+    delete: true,
+    cooldown: 1000,
     run: async(client, message, args, prefix) =>{
-        if(message.guild.me.permissions.has(["MANAGE_MESSAGES"])){
-            await message.delete();
-        }
-
-        if(!message.guild.me.permissions.has(["MANAGE_ROLES", "ADMINISTRATOR"])){
-            return message.channel.send({embeds: [
-                new Discord.MessageEmbed()
-                    .setDescription("I don't have \"Manage_Roles\" permission to remove Muted role.")
-                    .setColor("RED")
-            ]})
-        }
-
-        if(!message.member.permissions.has("MANAGE_MESSAGES")){
-            return message.author.send('None of your role proccess to use this command')
-        }
         const { author, guild,  } = message;
         
-
         if( !args.length ){
             return message.channel.send({
                 embeds: [

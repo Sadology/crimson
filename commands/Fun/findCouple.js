@@ -4,12 +4,12 @@ module.exports = {
     name: 'findgf',
     aliases: ['findbf'],
     description: "Lonely? not anymore, bot will find the best match couple for you.",
-    permissions: ["EVERYONE"],
+    permissions: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "findgf",
     category: "Fun",
-
+    cooldown: 3000,
     run: async(client, message, args,prefix, cmd) =>{
-
         await message.channel.send("Looking for match...").then((m) =>{
             const chance = Math.random() < 0.5
             if(chance){

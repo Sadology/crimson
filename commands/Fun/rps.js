@@ -4,10 +4,11 @@ module.exports = {
     name: 'rps',
     description: "Rock! Paper! Scissor!",
     permissions: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     usage: "rps",
     category: "Fun",
+    cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-
         const row = new MessageActionRow()
         .addComponents(
             new MessageButton()
@@ -62,7 +63,7 @@ module.exports = {
                 }else if(b.customId === 'Paper'){
                     if(chosen === 'rock'){
                         b.update({embeds: [new Discord.MessageEmbed()
-                            .setDescription(`${client.user}: \`Rock\` \n${message.author}: \`peper\` \n\n${message.author} won! 🎉`)
+                            .setDescription(`${client.user}: \`Rock\` \n${message.author}: \`paper\` \n\n${message.author} won! 🎉`)
                             .setColor("GREEN")
                         ], components: []})
                     }else if(chosen === 'paper'){
