@@ -15,8 +15,6 @@ module.exports = {
             .addChoice('action-log','actionLog')
             .addChoice('ban-log','banLog')
             .addChoice('message-log','messageLog')
-            .addChoice('roles-log','rolesLog')
-            .addChoice('status-log','statusLog')
             .addChoice('user-log','userLog')
             .addChoice('story-log','myStoryLog'))
         .addStringOption(option =>
@@ -175,7 +173,7 @@ module.exports = {
                        name: DataType
                    }
                 },
-            }, {upsert: true})
+            })
             .then(() => {
                 return interaction.reply({embeds: [
                     new Discord.MessageEmbed()
