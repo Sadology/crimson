@@ -450,6 +450,14 @@ module.exports = {
                         if(d !== false){
                             LogCollector.stop()
                             saveToData.setLog(d, type)
+                            const hooks = await d.fetchWebhooks();
+                            const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
+                
+                            if(!webHook){
+                                Data.createWebhook("sadbot", {
+                                    avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+                                })
+                            }
                             await msg.editReply({embeds: [
                                 new MessageEmbed()
                                 .setDescription(`__${type}__ updatated ${d}`)

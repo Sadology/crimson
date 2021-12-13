@@ -9,6 +9,7 @@ module.exports = {
     run: async(message, client) =>{
     try {
         if(message.author.bot) return;
+        if(message.channel.type === 'DM') return;
 
         let Permission;
         let Mention;

@@ -11,7 +11,7 @@ module.exports = {
     run: async(message, client) =>{
     try {
         if(message.author.bot) return;
-        if(message.channel.type === 'dm') return;
+        if(message.channel.type === 'DM') return;
 
         let settings = await Guild.findOne({guildID: message.guild.id})
 
