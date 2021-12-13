@@ -290,7 +290,7 @@ module.exports = {
             .setColor("WHITE")
             .setFooter("Note: Press \"Cancel\" if you want to cancel setup")
 
-        let mainMsg = await message.channel.send({content: "Select an option you would like to change", embeds: [mainEmbed], components: [cancelButton, row]})
+        let mainMsg = await message.channel.send({content: "Select an option you would like to change", embeds: [mainEmbed], components: [cancelButton, row]}).catch(err => {return console.log(err)})
         const collector = mainMsg.createMessageComponentCollector({time: 1000 * 60 * 10  });
         collector.on('collect',async b => {
             if(b.user.id !== message.author.id) return
@@ -376,6 +376,7 @@ module.exports = {
                     }
                 })
             })
+            .catch(err => {return console.log(err)})
         }
 
         async function logSetupFunction(messages){
@@ -412,6 +413,7 @@ module.exports = {
                     }
                 });
             })
+            .catch(err => {return console.log(err)})
         }
 
         function logDataTypes(type, message){
@@ -470,6 +472,7 @@ module.exports = {
                     })
                 })
             })
+            .catch(err => {return console.log(err)})
         }
 
         async function verifyChannel(data, msg) {
@@ -528,6 +531,7 @@ module.exports = {
                     }
                 });
             })
+            .catch(err => {return console.log(err)})
         }
 
         async function roleDataSetupFunction(msg, type){
@@ -556,6 +560,7 @@ module.exports = {
                     })
                 })
             })
+            .catch(err => {return console.log(err)})
         }
 
         async function verifyRoles(data, msg){
