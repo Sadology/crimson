@@ -188,7 +188,13 @@ module.exports = {
         
         function individualData(){
             let Data = client.commands.find(cmd => cmd.name == cmdName || cmd.aliases == cmdName)
-
+            if(!Data.category || Data.category == "Owner"){
+                return interaction.editReply({embeds: [
+                    new MessageEmbed()
+                        .setDescription("No command exist by this name")
+                        .setColor("RED")
+                ]})
+            }
             if(Data){
                 let name = Data.name ? Data.name : "Not found";
                 let desc = Data.description ?Data.description : "No descriptions avaiable :(";

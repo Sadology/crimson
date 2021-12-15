@@ -1,6 +1,6 @@
 const { LogsDatabase, GuildChannel } = require('../models')
 const { saveData, sendLogData, sendMoreLogData } = require('../Functions/functions');
-module.exports = (client, message) =>{
+module.exports = (client) =>{
     const checkMute = async () =>{
         const now = new Date()
         const conditional = {
@@ -34,7 +34,10 @@ module.exports = (client, message) =>{
                 }
 
                 if( muteRole ){
-                    memberID.roles.remove(muteRole.id)
+                    let botRole = guild.members.resolve( client.user ).roles.highest.position;
+                    if(muteRole.position < botRole){
+                        memberID.roles.remove(muteRole.id)
+                    }
                 }else {
                     await LogsDatabase.findOneAndUpdate({
                         guildID: guildID,
@@ -78,7 +81,10 @@ module.exports = (client, message) =>{
 
             if(muteRole){
                 try{
-                    member.roles.add(muteRole.id)
+                    let botRole = guild.members.resolve( client.user ).roles.highest.position;
+                    if(muteRole.position < botRole){
+                        member.roles.remove(muteRole.id)
+                    }
 
                     const Data = {
                         guildID: guild.id,

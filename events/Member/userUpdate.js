@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const { GuildChannel } = require('../../models');
 const { errLog } = require('../../Functions/erroHandling');
-const { LogChannel } = require('../../Functions')
+const { LogManager } = require('../../Functions')
 module.exports = {
     event: "userUpdate",
     once: false,
@@ -40,22 +40,8 @@ module.exports = {
         userNameChange()
 
         function sendData(guild, type) {
-            LogChannel('userLog', guild).then(async c => {
-                if(!c || c == null) return;
-                
-                const hooks = await c.fetchWebhooks();
-                const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
-
-                if(!webHook){
-                    return c.createWebhook("sadbot", {
-                        avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
-                    })
-                }
-
-                EmbedOption(type).then((data) => {
-                    webHook.send({embeds: [data]})
-                })
-                
+            EmbedOption(type).then((data) => {
+                new LogManager(guild).sendData({type: 'userlog', data: data, client})
             })
         }
 

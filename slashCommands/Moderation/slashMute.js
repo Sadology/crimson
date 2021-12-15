@@ -184,6 +184,14 @@ module.exports = {
                     })
                 }
             }else {
+                let botRole = interaction.guild.members.resolve( client.user ).roles.highest.position;
+                if(muteRole.position > botRole){
+                    return interaction.reply({embeds: [new Discord.MessageEmbed()
+                        .setDescription("Muted role is above my highest role. I can't add a role higher than me")
+                        .setColor("RED")
+                    ]
+                    }).catch(err => {return console.log(err)})
+                }
                MuteMember(Member, muteRole) 
             }
         }

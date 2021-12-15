@@ -72,22 +72,23 @@ module.exports = {
         .setFooter(`Created at: ${moment(message.guild.createdTimestamp).format("LL")} | server ID: ${message.guild.id}`)
         .setColor("#fffafa")
                 
-            message.channel.send({embeds: [serverInfo], components: [row]}).then(msg =>{
-                const filter = (button) => button.clicker.user.id === message.author.id
-
-                const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
-
-                collector.on('collect', (b) =>{
-                    if(b.user.id !== message.author.id) return
-                    if(b.customId === 'serverRoles'){
-                        let rolesEmbed = new Discord.MessageEmbed()
-                            .setDescription(`Server Roles \`[${message.guild.roles.cache.size}]\` \n${Roles}`)
-                            .setColor("#fffafa")
-                            b.update({embeds: [rolesEmbed], components: []})
-                    }
-                })
-
-                collector.on('end', () =>{})
+        message.channel.send({embeds: [serverInfo], components: [row]}).then(msg =>{
+            const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
+            collector.on('collect', (b) =>{
+                if(b.user.id !== message.author.id) return
+                if(b.customId === 'serverRoles'){
+                    let rolesEmbed = new Discord.MessageEmbed()
+                        .setDescription(`Server Roles \`[${message.guild.roles.cache.size}]\` \n${Roles}`)
+                        .setColor("#fffafa")
+                    collector.stop()
+                    b.update({embeds: [rolesEmbed], components: []}).catch(err => {return console.log(err)})
+                }
             })
+
+            collector.on('end', () =>{
+                row.components[0].setDisabled(true)
+                msg.edit({components: [row]}).catch(err => {return console.log(err)})
+            })
+        }).catch(err => {return console.log(err)})
     }
 }

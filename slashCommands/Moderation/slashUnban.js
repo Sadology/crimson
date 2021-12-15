@@ -1,11 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
 const ms = require('ms');
-const { LogsDatabase, GuildChannel} = require('../../models');
-const { commandUsed } = require('../../Functions/CommandUsage');
-const { errLog } = require('../../Functions/erroHandling');
-const { LogChannel } = require('../../Functions/logChannelFunctions');
-const e = require('express');
 
 module.exports = {
     data: new SlashCommandBuilder()

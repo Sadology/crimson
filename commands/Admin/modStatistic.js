@@ -18,12 +18,10 @@ module.exports = {
         function findMember(Member) {
             if(!Member){
                 return message.channel.send({
-                    embeds: [
-                        new Discord.MessageEmbed()
-                            .setDescription("Please mention a moderator to check their statistics")
-                            .setColor("RED")
-                    ]
-                })
+                    embeds: [new Discord.MessageEmbed()
+                        .setDescription("Please mention a moderator to check their statistics")
+                        .setColor("RED")
+                    ]})
             }
 
             const member = message.guild.members.cache.get(Member)
@@ -42,48 +40,46 @@ module.exports = {
             .then(res => {
                 if(!res || Object.keys(res.ModerationStats).length === 0){
                     return message.channel.send({
-                        embeds: [
-                            new Discord.MessageEmbed()
-                                .setDescription("User doesn't have any moderation history")
-                                .setColor("RED")
-                        ]
-                    })
+                        embeds: [new Discord.MessageEmbed()
+                            .setDescription("User doesn't have any moderation history")
+                            .setColor("RED")
+                        ]})
                 }else {
-                    return values(res.ModerationStats ,Member)
+                    return values(res.ModerationStats ,Member, res)
                 }
             })
             .catch(err => {
-                return console.log(err)
+                return console.log(err.stack)
             })
         }
 
-        function values(Data, Member) {
+        function values(Data, Member, timeData) {
             let Embed = new Discord.MessageEmbed()
                 .setAuthor(`${Member.user ? Member.user.tag : Member}'s - Moderation Statistics`)
                 .setDescription(`${Data.Recent ? Data.Recent : "None"}`)
                 .setColor("WHITE")
-                let values = Object.keys(Data)
-                values.shift()
-                values.forEach((keys) => {
-                    let item = Data[keys]
-                    if(item == undefined){
-                        item = "0"
-                    }
-                    Embed.addField(`${keys}`,`\`\`\`${item}\`\`\``, true)
-                })
-                let Time
-                // if(Object.keys(timeData.OnlineTime).length){
-                //     if(timeData.OnlineTime.LastOnline == null) {
-                //         Time = moment(timeData.OnlineTime.OnlineSince).format("lll") + ' - ' +moment(timeData.OnlineTime.OnlineSince, "YYYYMMDD").fromNow()
-                //         Embed.addField("Online Since", `\`\`\`${Time}\`\`\``)
-                //     }else if(timeData.OnlineTime.OnlineSince == null) {
-                //         Time = moment(timeData.OnlineTime.LastOnline).format("lll") + ' - ' +moment(timeData.OnlineTime.LastOnline, "YYYYMMDD").fromNow()
-                //         Embed.addField("Last Online", `\`\`\`${Time}\`\`\``)
-                //     }
-                // }
+            let values = Object.keys(Data)
+            values.shift()
+            values.forEach((keys) => {
+                let item = Data[keys]
+                if(item == undefined){
+                    item = "0"
+                }
+                Embed.addField(`${keys}`,`\`\`\`${item}\`\`\``, true)
+            })
+            let Time
+            if(timeData.OnlineTime){
+                if(timeData.OnlineTime.LastOnline == null) {
+                    Time = moment(timeData.OnlineTime.OnlineSince).format("lll") + ' - ' +moment(timeData.OnlineTime.OnlineSince, "YYYYMMDD").fromNow()
+                    Embed.addField("Online Since", `\`\`\`${Time}\`\`\``)
+                }else if(timeData.OnlineTime.OnlineSince == null) {
+                    Time = moment(timeData.OnlineTime.LastOnline).format("lll") + ' - ' +moment(timeData.OnlineTime.LastOnline, "YYYYMMDD").fromNow()
+                    Embed.addField("Last Online", `\`\`\`${Time}\`\`\``)
+                }
+            }
             return message.channel.send({
                 embeds: [Embed]
-            })
+            }).catch(err => {return console.log(err.stack)})
         }
         findMember(fetchMember.mentionedMember)
     }

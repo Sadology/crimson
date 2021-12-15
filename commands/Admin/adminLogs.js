@@ -5,7 +5,7 @@ const moment = require('moment');
 module.exports = {
     name: 'admin-log',
     aliases: ["adminlog"],
-    description: "Most powerful log, view every single log in the server",
+    description: "Most powerful log, view every single log in your server",
     permissions: ["ADMINISTRATOR"],
     botPermission: ["SEND_MESSAGES"],
     usage: "admin-log [ options ]",
@@ -48,12 +48,12 @@ module.exports = {
             case "infraction":
             case "action":
                 async function fetchData(){
-                    let Data = await LogsDatabase.find({
+                    await LogsDatabase.find({
                         guildID: message.guild.id,
                     }).sort([
                         ['Action','ascending']
                     ]).exec((err, res) => {
-                        if(err) return console.log(err);
+                        if(err) return console.log(err.stack);
                         if(res.length === 0 ){
                             return message.channel.send({embeds: [
                                 new Discord.MessageEmbed()
@@ -121,26 +121,28 @@ module.exports = {
                             if(b.user.id !== message.author.id) return
                             if(b.customId === 'NextPageAdminLog'){
                                 currentIndex += 5
-                                await b.update(MakeEmbed(currentIndex))
+                                await b.update(MakeEmbed(currentIndex)).catch(err => {return console.log(err.stack)})
                             }
                             if(b.customId === "PreviousPageAdminLog"){
                                 currentIndex -= 5
-                                await b.update(MakeEmbed(currentIndex))
+                                await b.update(MakeEmbed(currentIndex)).catch(err => {return console.log(err.stack)})
                             }
                         });
                         collector.on("end", async() =>{
                             // When the collector ends
                             row.components[0].setDisabled(true)
                             row.components[1].setDisabled(true)
-                            await msg.edit({components: [row]})
+                            await msg.edit({components: [row]}).catch(err => {return console.log(err.stack)})
                         })
-                    })
+                    }).catch(err => {return console.log(err.stack)})
                 }
                 fetchData()
             break;
 
             default:
-                return message.channel.send({embeds: [ErrorEmbed]}).then(m=>setTimeout(() => m.delete(), 1000 * 10))
+                return message.channel.send({embeds: [ErrorEmbed]})
+                .then(m=>setTimeout(() => m.delete(), 1000 * 10))
+                .catch(err => {return console.log(err.stack)})
         }
     }
 }

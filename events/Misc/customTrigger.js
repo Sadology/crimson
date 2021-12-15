@@ -112,9 +112,10 @@ module.exports = {
             }
 
             if(Data.Content == null || Data.Content == `{empty}`){
-                return message.channel.send({embeds: [Embed]})
+                return message.channel.send({embeds: [Embed]}).catch(err => {return console.log(err.stack)})
             }else {
                 return message.channel.send({content: Variable(Data.Content, Member),embeds: [Embed]})
+                .catch(err => {return console.log(err.stack)})
             }
 
         }
@@ -130,10 +131,10 @@ module.exports = {
                 if(Data.Content == null || Data.Content == `{empty}`){
                     return
                 }else {
-                    return message.channel.send({content: Variable(Data.Content, Member)+`\n${Image}`})
+                    return message.channel.send({content: Variable(Data.Content, Member)+`\n${Image}`}).catch(err => {return console.log(err.stack)})
                 }
             }else {
-                return message.channel.send({content: Variable(Data.Content, Member)})
+                return message.channel.send({content: Variable(Data.Content, Member)}).catch(err => {return console.log(err.stack)})
             }
         }
 
@@ -178,7 +179,7 @@ module.exports = {
         checkPrefix(message)
         return
     }catch(err) {
-        return console.log(err)
+        return console.log(err.stack)
     }
     }
 }

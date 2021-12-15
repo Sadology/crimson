@@ -86,12 +86,6 @@ module.exports = {
                 const hooks = await c.fetchWebhooks();
                 const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
 
-                if(!webHook){
-                    c.createWebhook("sadbot", {
-                        avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
-                    })
-                }
-
                 let Embed = new Discord.MessageEmbed()
                     .setAuthor(`${interaction.user.tag}'s story`, interaction.user.displayAvatarURL({dynamic: true, size: 1024, type: "png"}))
                     .setColor(interaction.member.displayColor)
@@ -110,18 +104,32 @@ module.exports = {
                             Embed.setImage(image)
                         }
                     }
+                if(!webHook){
+                    c.createWebhook("sadbot", {
+                        avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+                    }).then((w) => {
+                        return w.send({
+                            username: interaction.user.username,
+                            avatarURL: interaction.user.avatarURL({dynamic: true, size: 1024, type: 'png'}),
+                            embeds: [Embed]
+                        }).then(m => {
+                            m.react("♥")
+                        })
+                        .catch(err => {return console.log(err)})
+                    }).catch(err => {return console.log(err)})
+                }
 
                 webHook.send({
                     username: interaction.user.username,
-                    avatarURL: interaction.user.avatarURL({dynamic: false, size: 1024, type: 'png'}),
+                    avatarURL: interaction.user.avatarURL({dynamic: true, size: 1024, type: 'png'}),
                     embeds: [Embed]
                 }).then(m => {
                     m.react("♥")
-                })
+                }).catch(err => {return console.log(err)})
 
                 interaction.reply({embeds: [
                     new Discord.MessageEmbed()
-                        .setDescription(`Your story has been posted in ${c}`)
+                        .setDescription(`Your story were posted in ${c}`)
                         .setColor("GREEN")
                     ], ephemeral: true
                 })

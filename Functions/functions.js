@@ -1,5 +1,5 @@
 const { LogsDatabase } = require('../models');
-const { LogChannel } = require('../Functions/logChannelFunctions');
+const { LogManager } = require('./index');
 const { Profiles } = require('../models')
 
 async function saveData({
@@ -59,52 +59,40 @@ async function saveData({
 function sendLogData({data, client, Member, guild}){
     switch(data.actionType){
         case "Mute":
-            LogChannel('actionLog', guild).then(c => {
-                if(!c) return;
-                if(c === null) return;
-
-                else {
-                    const informations = {
-                        color: "#ff303e",
-                        author: {
-                            name: `Mute Detection`,
-                            icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
-                        },
-                        fields: [
-                            {
-                                name: "User",
-                                value: `\`\`\`${Member.user.tag}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Moderator",
-                                value: `\`\`\`${data.moderator}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Duration",
-                                value: `\`\`\`${data.actionLength === null ? "∞" : data.actionLength}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Reason",
-                                value: `\`\`\`${data.actionReason == null ? "No reason provided" : data.actionReason}\`\`\``,
-                            },
-                        ],
-                        timestamp: new Date(),
-                        footer: {
-                            text: `User ID: ${Member.user.id}`
-                        }
-                    }
-
-                    let hasPermInChannel = c
-                    .permissionsFor(client.user)
-                    .has('SEND_MESSAGES', false);
-                    if (hasPermInChannel) {
-                        c.send({embeds: [informations]})
-                    }
+            const muteData = {
+                color: "#ff303e",
+                author: {
+                    name: `Mute Detection`,
+                    icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                },
+                fields: [
+                    {
+                        name: "User",
+                        value: `\`\`\`${Member.user.tag}\`\`\``,
+                        inline: true
+                    },
+                    {
+                        name: "Moderator",
+                        value: `\`\`\`${data.moderator}\`\`\``,
+                        inline: true
+                    },
+                    {
+                        name: "Duration",
+                        value: `\`\`\`${data.actionLength === null ? "∞" : data.actionLength}\`\`\``,
+                        inline: true
+                    },
+                    {
+                        name: "Reason",
+                        value: `\`\`\`${data.actionReason == null ? "No reason provided" : data.actionReason}\`\`\``,
+                    },
+                ],
+                timestamp: new Date(),
+                footer: {
+                    text: `User ID: ${Member.user.id}`
                 }
-            }).catch(err => {return console.log(err)});
+            }
+
+            new LogManager(guild).sendData({type: 'actionlog', data: muteData, client})
         break;
     }
 }
@@ -112,95 +100,70 @@ function sendLogData({data, client, Member, guild}){
 function sendMoreLogData({data, dataType, Member ,client, guild}){
     switch(dataType){
         case "unmute":
-            LogChannel('actionLog', guild).then(c =>{
-                if(!c) return;
-                if(c === null) return;
-
-                else {
-                    const informations = {
-                        color: "#45f766",
-                        author: {
-                            name: `Unmute - ${Member.user.tag}`,
-                            icon_url: Member.user.displayAvatarURL({
-                                dynamic: false, 
-                                type: "png", 
-                                size: 1024
-                            })
-                        },
-                        fields: [
-                            {
-                                name: "User",
-                                value: `\`\`\`${Member.user.tag}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Moderator",
-                                value: `\`\`\`${client.user.tag}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Reason",
-                                value: `\`\`\`[ AUTO ]\`\`\``,
-                            },
-                        ],
-                        timestamp: new Date(),
-                        footer: {
-                            text: `User ID: ${Member.user.id}`
-                        }
-
-                    }
-                    let hasPermInChannel = c
-                    .permissionsFor(client.user)
-                    .has('SEND_MESSAGES', false);
-                    if (hasPermInChannel) {
-                        c.send({embeds: [informations]})
-                    }
+            const unMuteData = {
+                color: "#45f766",
+                author: {
+                    name: `Unmute - ${Member.user.tag}`,
+                    icon_url: Member.user.displayAvatarURL({
+                        dynamic: false, 
+                        type: "png", 
+                        size: 1024
+                    })
+                },
+                fields: [
+                    {
+                        name: "User",
+                        value: `\`\`\`${Member.user.tag}\`\`\``,
+                        inline: true
+                    },
+                    {
+                        name: "Moderator",
+                        value: `\`\`\`${client.user.tag}\`\`\``,
+                        inline: true
+                    },
+                    {
+                        name: "Reason",
+                        value: `\`\`\`[ AUTO ]\`\`\``,
+                    },
+                ],
+                timestamp: new Date(),
+                footer: {
+                    text: `User ID: ${Member.user.id}`
                 }
-            })
+
+            }
+            new LogManager(guild).sendData({type: 'actionlog', data: unMuteData, client})
         break;
 
         case 'muteEvade':
-            LogChannel('actionLog', guild).then(c =>{
-                if(!c) return;
-                if(c === null) return;
-
-                else {
-                    const informations = {
-                        color: "#ff303e",
-                        author: {
-                            name: `Auto Mute - ${Member.user.username}`,
-                            icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
-                        },
-                        fields: [
-                            {
-                                name: "User",
-                                value: `\`\`\`${Member.user.tag}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Moderator",
-                                value: `\`\`\`${client.user.tag}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Reason",
-                                value: `\`\`\`Mute evade detection [ Auto muted ]\`\`\``,
-                            },
-                        ],
-                        timestamp: new Date(),
-                        footer: {
-                            text: `User ID: ${Member.user.id}`
-                        }
-
-                    }
-                    const hasPermInChannel = c
-                    .permissionsFor(client.user)
-                    .has('SEND_MESSAGES', false);
-                    if (hasPermInChannel) {
-                        c.send({embeds: [informations]})
-                    }
+            const evadeData = {
+                color: "#ff303e",
+                author: {
+                    name: `Auto Mute - ${Member.user.username}`,
+                    icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                },
+                fields: [
+                    {
+                        name: "User",
+                        value: `\`\`\`${Member.user.tag}\`\`\``,
+                        inline: true
+                    },
+                    {
+                        name: "Moderator",
+                        value: `\`\`\`${client.user.tag}\`\`\``,
+                        inline: true
+                    },
+                    {
+                        name: "Reason",
+                        value: `\`\`\`Mute evade detection [ Auto muted ]\`\`\``,
+                    },
+                ],
+                timestamp: new Date(),
+                footer: {
+                    text: `User ID: ${Member.user.id}`
                 }
-            })
+            }
+            new LogManager(guild).sendData({type: 'actionlog', data: evadeData, client})
         break;
     }
 }

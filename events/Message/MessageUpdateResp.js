@@ -9,78 +9,78 @@ module.exports = {
     event: 'messageUpdate',
     once: false,
     run: async(oldMessage, message, client) =>{
-    try {
-        if(message.author.bot) return;
-        if(message.channel.type === 'dm') return;
-
-        let settings = await Guild.findOne({guildID: message.guild.id})
-
-        const prefix = settings ? settings.prefix : config.default_prefix
-        if(!message.content.startsWith(prefix)) return
-        if(!prefix) return
-        if (!message.member){
-            message.member = await message.guild.fetchMember(message);
-        }
-
-        let args = message.content
-            .slice(prefix.length)
-            .trim()
-            .split(/ +/g);
-
-        const cmd = args.shift().toLowerCase();
-        if (cmd.length === 0) return;
-        let command = client.commands.get(cmd);
-        if (!command) command = client.commands.get(client.aliases.get(cmd));
-        
-        if (command){
-            const hasPermissionInChannel = message.channel
-                .permissionsFor(client.user)
-                .has('SEND_MESSAGES', false);
-            if (!hasPermissionInChannel) {
-                return
+        try {
+            if(message.author.bot) return;
+            if(message.channel.type === 'DM') return;
+    
+            let settings = await Guild.findOne({guildID: message.guild.id})
+    
+            const prefix = settings ? settings.prefix : config.default_prefix
+            if(!message.content.startsWith(prefix)) return
+            if(!prefix) return
+            if (!message.member){
+                message.member = await message.guild.fetchMember(message);
             }
-            cooldownSet(command, message).then(timer => { //Set Cooldown
-                if(timer == false){
+    
+            let args = message.content
+                .slice(prefix.length)
+                .trim()
+                .split(/ +/g);
+    
+            const cmd = args.shift().toLowerCase();
+            if (cmd.length === 0) return;
+            let command = client.commands.get(cmd);
+            if (!command) command = client.commands.get(client.aliases.get(cmd));
+            
+            if (command){
+                const hasPermissionInChannel = message.channel
+                    .permissionsFor(client.user)
+                    .has('SEND_MESSAGES', false);
+                if (!hasPermissionInChannel) {
                     return
-                }else {
-                    checkPermission(command, message).then(data => { // Checking User Permissions
-                        if(data == false){
-                            return;
-                        }else {
-                            checkBotPerms(command, message).then(i => { // Checking Bots Permissions
-                                if(i == false){
-                                    return;
-                                }else {
-                                    try{
-                                        command.run(client, message, args, prefix, cmd)
-                                    }catch(err){
-                                        message.channel.send({
-                                            embeds: [
-                                                new Discord.MessageEmbed()
-                                                .setDescription(err.message)
-                                                .setColor("RED")
-                                            ]
-                                            })
-                                        return console.log(err.stack)
-                                    }
-                                    deleteAfterRun(command, message)
-                                }
-                            })
-                        }
-                    })
                 }
-            })
+                cooldownSet(command, message).then(timer => { //Set Cooldown
+                    if(timer == false){
+                        return
+                    }else {
+                        checkPermission(command, message).then(data => { // Checking User Permissions
+                            if(data == false){
+                                return;
+                            }else {
+                                checkBotPerms(command, message, client).then(i => { // Checking Bots Permissions
+                                    if(i == false){
+                                        return;
+                                    }else {
+                                        try{
+                                            command.run(client, message, args, prefix, cmd)
+                                        }catch(err){
+                                            message.channel.send({
+                                                embeds: [
+                                                    new Discord.MessageEmbed()
+                                                    .setDescription(err.message)
+                                                    .setColor("RED")
+                                                ]
+                                                })
+                                            return console.log(err.stack)
+                                        }
+                                        deleteAfterRun(command, message)
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            }
+        }catch(err){
+            message.channel.send({
+                embeds: [
+                    new Discord.MessageEmbed()
+                    .setDescription(err.message)
+                    .setColor("RED")
+                ]
+                }).catch(err => {return console.log(err)})
+            return console.log(err.stack)
         }
-    }catch(err){
-        message.channel.send({
-            embeds: [
-                new Discord.MessageEmbed()
-                .setDescription(err.message)
-                .setColor("RED")
-            ]
-            })
-        return console.log(err.stack)
-    }
     }
 }
     
@@ -143,8 +143,18 @@ async function checkPermission(command, message){
         }
     }
 }
-async function checkBotPerms(command, message){
+async function checkBotPerms(command, message, client){
     if(command.botPermission){
+        if(message.guild.me.roles.cache.size == 1 && message.guild.me.roles.cache.find(r => r.name == '@everyone')){
+            message.author.send({
+                embeds: [
+                    new Discord.MessageEmbed()
+                    .setDescription(`Hey i don't have any roles to execute any commands`)
+                    .setColor("RED")
+                ]
+            }).catch(err => {return console.log(err.stack)})
+            return false
+        }
         if(!message.guild.me.permissions.has(command.botPermission)){
             message.channel.send({
                 embeds: [
@@ -152,23 +162,22 @@ async function checkBotPerms(command, message){
                     .setDescription(`Bot Require following permissions to execute this command \n\n\`\`\`${command.botPermission.join(", ").toLowerCase()}\`\`\``)
                     .setColor("RED")
                 ]
-            })
+            }).catch(err => {return console.log(err.stack)})
             return false;
         }
     }
-    
 }
 function deleteAfterRun(command, message){
     if(command.delete == true){
         if(message.guild.me.permissions.has('MANAGE_MESSAGES')){
             message.delete()
             .catch(err => {
-                console.log(err.message)
-                })
+                return console.log(err.stack)
+            })
         }
     }
 }
-
+    
 async function cooldownSet(command, message){
     if(!command.cooldown) return true
 
@@ -196,11 +205,12 @@ async function cooldownSet(command, message){
                     if (!m.deleted) {
                         m.delete()
                         .catch(err => {
-                            console.log(err.message)
+                            return console.log(err.stack)
                         })
                     }
                 }, 1000 * 3)
             })
+            .catch(err => {return console.log(err.stack)})
             return false
         }
     }

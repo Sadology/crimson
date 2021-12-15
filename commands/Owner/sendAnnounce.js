@@ -21,7 +21,7 @@ module.exports = {
                 channel.send({embeds: [
                     new Discord.MessageEmbed()
                         .setAuthor(client.user.tag, client.user.displayAvatarURL({dynamic: false, type: 'png'}))
-                        .setDescription("SADBOT UPDATE - v1.3\n\nWhats new: \n+ New command added `>setup`. Setup sadbot in your server more easily.\n**Note**:\nThis command is not stable yet. If you find any issue or bug please report it to <#913796472368144394>")
+                        .setDescription("SADBOT UPDATE - v1.3.1\n\nWhats new: \n+ Fixed issues for bot crashing while creating a new webhook.\n+ Added a new functionality for `modstats`. You can now check moderators online activity through stats. This setting will only apply on those who has \"Moderator\" category roles. Setup now by `/set-roles`.\n+ Added functionality for other bot mute. Sadbot will now log other bot mutes and you can check them by `logs` command. (Bot can't log mute reasons cause bot can't see them 😔)\n+ Logging system has been moved to a more faster system. \n\nMore bug fixes.")
                         .setColor("WHITE")
                 ]})
             }else {

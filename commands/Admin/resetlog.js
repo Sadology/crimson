@@ -33,6 +33,7 @@ module.exports = {
                     .setDescription(`Please mention a valid member \n\n**Usage:** ${prefix}reset-log [ user ]`)
                     .setColor("RED")
             ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+            .catch(err => {return console.log(err.stack)})
         }
         const FindMembers = new Member(args[0], message);
         await message.guild.members.fetch()
@@ -51,6 +52,7 @@ module.exports = {
                         .setDescription(`Please mention a valid member \n\n**Usage:** ${prefix}reset-log [ user ]`)
                         .setColor("RED")
                 ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+                .catch(err => {return console.log(err.stack)})
             }
         }
 
@@ -64,7 +66,7 @@ module.exports = {
                     new Discord.MessageEmbed()
                         .setDescription(`User doesn't have any logs yet.`)
                         .setColor("RED")
-                ], ephemeral: true}) 
+                ], ephemeral: true}).catch(err => {return console.log(err.stack)})
             }else {
                 confirmation(Member)
             }
@@ -101,17 +103,17 @@ module.exports = {
                     // When the collector ends
                     row.components[0].setDisabled(true)
                     row.components[1].setDisabled(true)
-                    msg.edit({content: "Canceled the command", components: [row]})
+                    msg.edit({content: "Canceled the command", components: [row]}).catch(err => {return console.log(err.stack)})
 
                 })
-            })
+            }).catch(err => {return console.log(err.stack)})
         }
 
         async function DeleteData(member) {
             await LogsDatabase.findOneAndDelete({
                 guildID: message.guild.id,
                 userID: member.user ? member.user.id : member
-            }).catch(err => {return console.log(err)})
+            }).catch(err => {return console.log(err.stack)})
         }
 
         if(!args.length || !args[0]) return message.reply({
@@ -120,7 +122,7 @@ module.exports = {
                     .setDescription(`Please mention a member to reset log \n\n**Usage:** \`${prefix}reset-log @shadow~\``)
                     .setColor("WHITE")
             ]
-        })
+        }).catch(err => {return console.log(err.stack)})
 
         GuildMember(FindMembers.mentionedMember)
     }

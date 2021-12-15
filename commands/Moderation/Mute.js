@@ -52,10 +52,14 @@ module.exports = {
                 if(member){
                     checkMemberPermission(member);
                 }else {
-                    return message.channel.send({embeds: [MemberError]}).then(m=>setTimeout(() => m.delete(), 1000 * 20)); 
+                    return message.channel.send({embeds: [MemberError]})
+                    .then(m=>setTimeout(() => m.delete(), 1000 * 20))
+                    .catch(err => {return console.log(err)})
                 }
             }else {
-                return message.channel.send({embeds: [MemberError]}).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+                return message.channel.send({embeds: [MemberError]})
+                .then(m=>setTimeout(() => m.delete(), 1000 * 20))
+                .catch(err => {return console.log(err)})
             }
         }
 
@@ -65,21 +69,25 @@ module.exports = {
                 const mentionHighestRole = Member.roles.highest.position;
 
                 if(Member.id === message.author.id){
-                    return message.channel.send({embeds: [MemberError]}).then(m=>setTimeout(() => m.delete(), 1000 * 10));
-                }else if(Member.permissions.has("MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_GUILD", "ADMINISTRATOR", { checkAdmin: true, checkOwner: true })){
+                    return message.channel.send({embeds: [MemberError]})
+                    .then(m=>setTimeout(() => m.delete(), 1000 * 10))
+                    .catch(err => {return console.log(err)})
+                }else if(Member.permissions.any("MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_GUILD", "ADMINISTRATOR", { checkAdmin: true, checkOwner: true })){
                     return message.channel.send({embeds: [
                         new Discord.MessageEmbed()
                             .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
                             .setDescription("Can't mute an Admin/Moderator.")
                             .setColor("RED")
-                    ]}).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+                    ]}).then(m=>setTimeout(() => m.delete(), 1000 * 20))
+                    .catch(err => {return console.log(err)})
                 }else if(mentionHighestRole >= authorHighestRole) {
                     return message.channel.send({embeds: [
                         new Discord.MessageEmbed()
                             .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
                             .setDescription("Can't mute a member higher or equal role as me.")
                             .setColor("RED")
-                    ]}).then(m=> setTimeout(() => m.delete(), 1000 * 20));
+                    ]}).then(m=> setTimeout(() => m.delete(), 1000 * 20))
+                    .catch(err => {return console.log(err)})
                 }else {
                     Data['userID'] = Member.user.id
                     Data['userName'] = Member.user.tag
@@ -96,7 +104,7 @@ module.exports = {
                     .setDescription(`<@${Member.user.id}> is already muted`)
                     .setColor("RED")
 
-                    return message.channel.send({embeds: [NotMuted]})
+                    return message.channel.send({embeds: [NotMuted]}).catch(err => {return console.log(err)})
                 }else if(value === false){
                     DurationMaker()
                     findMuteRole(Member)
@@ -143,7 +151,7 @@ module.exports = {
         async function findMuteRole(Member){
             const muteRole = await message.guild.roles.cache.find(r => r.name === 'Muted') || await message.guild.roles.cache.find(r => r.name === 'muted')
             if( !muteRole ){
-                if(guild.me.permissions.has("MANAGE_ROLES", "ADMINISTRATOR")){
+                if(guild.me.permissions.any(["MANAGE_ROLES", "ADMINISTRATOR"])){
                     try {
                         await message.guild.roles.create({
                                 name: 'Muted',
@@ -160,16 +168,24 @@ module.exports = {
                         return message.channel.send({embed: [new Discord.MessageEmbed()
                             .setDescription(err.message)
                             .setColor("RED")
-                        ]})
+                        ]}).catch(err => {return console.log(err)})
                     }
                 }else {
                     return channel.send({embeds: [new Discord.MessageEmbed()
                         .setDescription("Missing permission to create **Muted** role. | Please provide permission or create a role called **Muted**")
                         .setColor("#ff303e")
                     ]
-                    })
+                    }).catch(err => {return console.log(err)})
                 }
             }else {
+                let botRole = message.guild.members.resolve( client.user ).roles.highest.position;
+                if(muteRole.position > botRole){
+                    return channel.send({embeds: [new Discord.MessageEmbed()
+                        .setDescription("Muted role is above my highest role. I can't add a role higher than me")
+                        .setColor("RED")
+                    ]
+                    }).catch(err => {return console.log(err)})
+                }
                MuteMember(Member, muteRole) 
             }
         }
@@ -181,6 +197,7 @@ module.exports = {
                 .setDescription("Please provide a reason less than 200 words")
                 .setColor('#ff303e')
                 return message.channel.send({embeds: [failed]})
+                .catch(err => {return console.log(err)})
             }
 
             if(Member.roles.cache.has(muteRole.id)){
@@ -190,14 +207,18 @@ module.exports = {
                 let successEmbed = new Discord.MessageEmbed()
                     .setDescription(`${Member.user} is now Muted | ${muteReason}`)
                     .setColor("#45f766")
-                channel.send({embeds: [successEmbed]}).then(m =>setTimeout(() => m.delete(), 1000 * 30))
+                channel.send({embeds: [successEmbed]})
+                .then(m =>setTimeout(() => m.delete(), 1000 * 30))
+                .catch(err => {return console.log(err)})
                 Data['actionReason'] = muteReason
             }else {
                 Member.roles.add(muteRole.id)
                 let successEmbed = new Discord.MessageEmbed()
                     .setDescription(`${Member.user} is now Muted | ${muteReason}`)
                     .setColor("#45f766")
-                channel.send({embeds: [successEmbed]}).then(m =>setTimeout(() => m.delete(), 1000 * 30))
+                channel.send({embeds: [successEmbed]})
+                .then(m =>setTimeout(() => m.delete(), 1000 * 30))
+                .catch(err => {return console.log(err)})
                 Data['actionReason'] = muteReason
             }
             CreateLog(Member)
@@ -216,22 +237,22 @@ module.exports = {
         }
 
         async function overWriteChannels(data){
-            if(guild.me.permissions.has("MANAGE_CHANNELS", "ADMINISTRATOR")){
+            if(guild.me.permissions.any(["MANAGE_CHANNELS", "ADMINISTRATOR"])){
                 await guild.channels.cache.forEach(channel => {
-                    if(channel.permissionsFor(guild.me).has("VIEW_CHANNEL")){
+                    if(channel.permissionsFor(guild.me).has("MANAGE_CHANNELS")){
                         channel.permissionOverwrites.edit(data.id,
                         {
                             'SEND_MESSAGES': false,
                             'ADD_REACTIONS': false,
                             'VIEW_CHANNEL': false,
-                        },"Muted role overWrites")
+                        }, "Muted role overWrites")
                     }
                 })
             }else {
                 let successEmbed = new Discord.MessageEmbed()
                     .setDescription("Missing permission to create ovrride for **Muted** role. | Require **MANAGE CHANNELS** permission to deny **Send Message** permission for Muted roles")
                     .setColor("#ff303e")
-                return channel.send({embeds: [successEmbed]})
+                return channel.send({embeds: [successEmbed]}).catch(err => {return console.log(err)})
             }
         }
         GuildMember(FindMembers.mentionedMember)

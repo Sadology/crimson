@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { GuildChannel, LogsDatabase } = require('../../models');
-const { LogChannel } = require('../../Functions/logChannelFunctions');
+const { LogManager } = require('../../Functions');
 const { saveData, sendLogData, ModStatus } = require('../../Functions/functions');;
 module.exports = {
     event: "guildBanAdd",
@@ -65,29 +65,14 @@ module.exports = {
                 saveData({
                     ...Data,
                 })
-                //sendLogData({data: Data, client: client, Member: Member, guild: guild})
                 ModStatus({type: "Ban", guild: Guild.guild, member: executor, content: "Banned " + ` ${target.tag}`})
             } catch (err) {
                 return console.log(err)
             }
         }
         CreateLog(target)
-        LogChannel('banLog', Guild.guild).then(async c => {
-            if(!c) return;
-            if(c === null) return;
 
-            const hooks = await c.fetchWebhooks();
-            const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
-
-            if(!webHook){
-                return c.createWebhook("sadbot", {
-                    avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
-                })
-            }
-
-            webHook.send({embeds: [banEmbed]})
-
-        }).catch(err => console.log(err));
+        new LogManager(Guild.guild).sendData({type: 'banlog', data: banEmbed, client})
     }catch(err){
         return console.log(err)
     }

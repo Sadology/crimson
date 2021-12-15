@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { GuildChannel } = require('../../models')
-const { LogChannel } = require('../../Functions/logChannelFunctions')
+const { LogManager } = require('../../Functions')
 const { Messages } = require('../../localDb')
 module.exports = {
     event: "guildMemberRemove",
@@ -76,34 +76,17 @@ module.exports = {
                 .setFooter(member.user.id)
                 .setTimestamp()
                 .setColor(guild.me.displayColor)
-            
-            LogChannel("leftLog", guild).then(async (c) => {
-                if(!c || c == null) return
 
-                const hooks = await c.fetchWebhooks();
-                const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
-
-                try {
-                    if(!webHook){
-                    return c.createWebhook("sadbot", {
-                        avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
-                    })
-                }
-                }catch(err ){
-                    return console.log(err)
-                }
-
-                switch(opt){
-                    case 'db':
-                        Embed.setDescription(`${convertValue(GreetMessage, 'db')}`)
-                        webHook.send({embeds: [Embed]})
-                    break;
-                    case 'local':
-                        Embed.setDescription(`\`\`\`${convertValue(GreetMessage, 'local')}\`\`\``)
-                        webHook.send({embeds: [Embed]})
-                    break;
-                }
-            })
+            switch(opt){
+                case 'db':
+                    Embed.setDescription(`${convertValue(GreetMessage, 'db')}`)
+                    new LogManager(guild).sendData({type: 'leftlog', data: Embed, client})
+                break;
+                case 'local':
+                    Embed.setDescription(`\`\`\`${convertValue(GreetMessage, 'local')}\`\`\``)
+                    new LogManager(guild).sendData({type: 'leftlog', data: Embed, client})
+                break;
+            }
         }
         fetchData()
     }

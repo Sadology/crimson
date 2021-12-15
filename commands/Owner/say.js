@@ -3,7 +3,7 @@ module.exports = {
     name: 'say',
     aliases: ['copycat', 'repeat'],
     description:'returns the arguement',
-    show: true,
+    category: "Owner",
     
     run: async(client, message, args,prefix) =>{
         if(message.author.id !== "571964900646191104"){
@@ -11,11 +11,19 @@ module.exports = {
         }
         message.delete()
         
-        if(!message.member.permissions.has("MANAGE_GUILD","ADMINISTRATOR")) return message.author.send('None of your role proccess to use this command')
-
         if(!message.guild.me.permissions.has("SEND_MESSAGES", "MANAGE_MESSAGES")){
-            return message.channel.send(`Rip! I don't have permission`)
+            return
         }
+
+        // let item = message.content.split(/--/g).join(' ')
+        // let item2 = item.split(/\s+/g).slice()
+        // let chan = item2.indexOf("channel")+1
+
+        // let chann = item2[chan]
+        // const channels = message.guild.channels.cache.find(c => c.id == chann.replace('<#','').replace('>',''))
+
+        // channels.send(item2[chan+1])
+
         if(!args.length){
             return message.channel.send({embeds: [new Discord.MessageEmbed()
                 .setAuthor("Command: Say", client.user.displayAvatarURL({

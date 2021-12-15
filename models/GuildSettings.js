@@ -5,10 +5,8 @@ const serverSchema = mongoose.Schema({
     guildName: String,
     Active: Boolean,
     prefix: String,
-    ownerName: String,
     ownerID: String,
-    botOwnerGuild: String,
     WelcomeMessage: String,
 })
 
-module.exports = mongoose.model('Server_Settings', serverSchema);
+module.exports = mongoose.model('Guilds', serverSchema);

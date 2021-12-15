@@ -69,7 +69,7 @@ module.exports = {
                         .setDescription("No one LoL")
                         .setColor("#fffafa")
                     ]
-                })
+                }).catch(err => {return console.log(err.stack)})
             };
 
             let currentIndex = 0
@@ -109,11 +109,11 @@ module.exports = {
                     if(b.user.id !== message.author.id) return
                     if(b.customId === 'NextPageMemberInit'){
                         currentIndex += 10
-                        await b.update(MakeEmbed(currentIndex))
+                        await b.update(MakeEmbed(currentIndex)).catch(err => {return console.log(err.stack)})
                     }
                     if(b.customId === "PreviousPageMemberInit"){
                         currentIndex -= 10
-                        await b.update(MakeEmbed(currentIndex))
+                        await b.update(MakeEmbed(currentIndex)).catch(err => {return console.log(err.stack)})
                     }
                 });
                 collector.on("end", async() =>{
@@ -121,10 +121,10 @@ module.exports = {
                     if(currentIndex !== 0){
                         row.components[0].setDisabled(true)
                         row.components[1].setDisabled(true)
-                        await msg.edit({components: [row]})
+                        await msg.edit({components: [row]}).catch(err => {return console.log(err.stack)})
                     }
                 })
-            })
+            }).catch(err => {return console.log(err.stack)})
         }
     }
 }

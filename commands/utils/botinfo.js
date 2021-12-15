@@ -20,7 +20,7 @@ module.exports = {
             fields: [
                 {
                     name: "Version",
-                    value: 'Beta v1.3',
+                    value: 'Beta v1.3.1',
                     inline: true
                 },
                 {
@@ -31,11 +31,6 @@ module.exports = {
                 {
                     name: "Node Version",
                     value: 'v17',
-                    inline: true
-                },
-                {
-                    name: "Made By",
-                    value: 'Vhera Inc',
                     inline: true
                 },
                 {

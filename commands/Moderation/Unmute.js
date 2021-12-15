@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const { LogsDatabase } = require('../../models');
 const {Member} = require('../../Functions/memberFunction');
-const { LogChannel } = require('../../Functions/logChannelFunctions');
+const { LogManager } = require('../../Functions');
 
 module.exports = {
     name: 'unmute',
@@ -100,6 +100,14 @@ module.exports = {
             }else if(value === false){
                 if(muteRole){
                     if(Member.roles.cache.has(muteRole.id)){
+                        let botRole = message.guild.members.resolve( client.user ).roles.highest.position;
+                        if(muteRole.position > botRole){
+                            return message.channel.send({embeds: [new Discord.MessageEmbed()
+                                .setDescription("Muted role is above my highest role. I can't remove a role higher than me")
+                                .setColor("RED")
+                            ]
+                            }).catch(err => {return console.log(err)})
+                        }
                         await Member.roles.remove(muteRole.id)
 
                         message.channel.send({embeds: [
@@ -132,48 +140,31 @@ module.exports = {
         }
 
         async function sendLog(Member){
-            let count = await LogsDatabase.findOne({
-                guildID: message.guild.id, 
-                userID: Member.user.id
-            })
-
-            LogChannel('actionLog', guild).then(c => {
-                if(!c) return;
-                if(c === null) return;
-
-                else {
-                    const informations = {
-                        color: "#65ff54",
-                        author: {
-                            name: `Unmute`,
-                            icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
-                        },
-                        fields: [
-                            {
-                                name: "User",
-                                value: `\`\`\`${Member.user.tag}\`\`\``,
-                                inline: true
-                            },
-                            {
-                                name: "Moderator",
-                                value: `\`\`\`${message.author.tag}\`\`\``,
-                                inline: true
-                            },
-                        ],
-                        timestamp: new Date(),
-                        footer: {
-                            text: `User ID: ${Member.user.id}`
-                        }
-
-                    }
-                    const hasPermInChannel = c
-                        .permissionsFor(client.user)
-                        .has('SEND_MESSAGES', false);
-                    if (hasPermInChannel) {
-                        c.send({embeds: [informations]})
-                    }
+            const informations = {
+                color: "#65ff54",
+                author: {
+                    name: `Unmute`,
+                    icon_url: Member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
+                },
+                fields: [
+                    {
+                        name: "User",
+                        value: `\`\`\`${Member.user.tag}\`\`\``,
+                        inline: true
+                    },
+                    {
+                        name: "Moderator",
+                        value: `\`\`\`${message.author.tag}\`\`\``,
+                        inline: true
+                    },
+                ],
+                timestamp: new Date(),
+                footer: {
+                    text: `User ID: ${Member.user.id}`
                 }
-            }).catch(err => console.log(err));
+
+            }
+            new LogManager(message.guild).sendData({type: 'actionlog', data: informations, client})
         }
 
         GuildMember(FindMembers.mentionedMember)

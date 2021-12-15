@@ -83,7 +83,7 @@ module.exports = {
                     msg.edit({content: "Canceled the command", components: [row]})
 
                 })
-            })
+            }).catch(err => {return console.log(err.stack)})
         }
 
         async function DeleteData(id) {
@@ -96,7 +96,7 @@ module.exports = {
                         caseID: id
                     }
                 },
-            }).catch(err => {return console.log(err)})
+            }).catch(err => {return console.log(err.stack)})
         }
 
         if(!args.length || !args[0]) return message.reply({
@@ -104,8 +104,7 @@ module.exports = {
                 new Discord.MessageEmbed()
                     .setDescription(`Please provide case ID you want to delete \n\n**Usage: ** \`${prefix}delete-log [ case ID ]\``)
                     .setColor("WHITE")
-            ]
-        })
+            ]}).catch(err => {return console.log(err.stack)})
 
         fetchData(args[0])
     }

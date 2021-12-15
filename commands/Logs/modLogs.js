@@ -10,9 +10,9 @@ module.exports = {
     description: "Check moderation logs of a member.",
     permissions: ["MANAGE_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
-    usage: "mlogs [ member ]",
+    usage: "logs [ member ]",
     category: "Moderation",
-    cooldown: 3000,
+    cooldown: 1000,
     run: async(client, message, args,prefix) =>{
 
         if(!message.member.permissions.has("MANAGE_MESSAGES")){
@@ -26,6 +26,7 @@ module.exports = {
                 .setDescription(`Mention a user to fetch their logs \n\n**Usage:** \`${prefix}logs [ user ]\` \n**Example:** \`${prefix}logs @shadow~\``)
             ]
             }).then(m=>setTimeout(() =>m.delete(), 1000 * 10))
+            .catch(err => {return console.log(err.stack)})
         }
 
         const GetMembers = new Member(args[0], message);
@@ -60,6 +61,7 @@ module.exports = {
                         .setDescription(`Please mention a valid member \n\n**Usage:** ${prefix}logs [ user ]`)
                         .setColor("RED")
                 ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+                .catch(err => {return console.log(err.stack)})
             }
         }
 
@@ -77,6 +79,7 @@ module.exports = {
                         .setDescription(`${Member.user ? Member.user.id : '<@'+Member+'>'} has No logs`)
                         .setColor("RED")
                 ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+                .catch(err => {return console.log(err.stack)})
             }
         }
 
@@ -87,6 +90,7 @@ module.exports = {
                         .setDescription(`${Member.user ? Member.user : '<@'+Member+'>'} has No logs`)
                         .setColor("RED")
                 ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+                .catch(err => {return console.log(err.stack)})
             }
             let arr = []
             Data.Action.forEach(data => {
@@ -145,11 +149,11 @@ module.exports = {
                     if(b.user.id !== message.author.id) return
                     if(b.customId === 'NextPageModLog'){
                         currentIndex += 5
-                        await b.update(MakeEmbed(currentIndex))
+                        await b.update(MakeEmbed(currentIndex)).catch(err => {return console.log(err.stack)})
                     }
                     if(b.customId === "PreviousPageModLog"){
                         currentIndex -= 5
-                        await b.update(MakeEmbed(currentIndex))
+                        await b.update(MakeEmbed(currentIndex)).catch(err => {return console.log(err.stack)})
                     }
                 });
                 collector.on("end", async() =>{
@@ -157,10 +161,10 @@ module.exports = {
                     if(currentIndex !== 0){
                         row.components[0].setDisabled(true)
                         row.components[1].setDisabled(true)
-                        await msg.edit({components: [row]})
+                        await msg.edit({components: [row]}).catch(err => {return console.log(err.stack)})
                     }
                 })
-            })
+            }).catch(err => {return console.log(err.stack)})
         }
 
         FindMember(GetMembers.mentionedMember)

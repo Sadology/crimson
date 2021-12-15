@@ -11,7 +11,7 @@ module.exports = {
     run: async(client, message, args,prefix) =>{
         const newPrefix = args[0]
 
-        function showPrefix(params) {
+        function showPrefix() {
             return message.channel.send({
                 embeds: [new Discord.MessageEmbed()
                     .setDescription(`**Prefix: **` + "\`\`\`"+prefix+"\`\`\`")
@@ -23,13 +23,22 @@ module.exports = {
         }
 
         async function changePrefix() {
+            if(newPrefix.length >= 6){
+                return message.channel.send({
+                    embeds: [new Discord.MessageEmbed()
+                        .setDescription("Prefix can't be longer than 5 characters")
+                        .setColor("RED")
+                        .setAuthor(`${message.guild.name}`, message.author.avatarURL({dynamic: false, size: 1024, type: 'png'}))
+                    ]
+                })
+            }
             let removeBlanks = newPrefix.trim()
 
             await Guild.findOneAndUpdate({
                 guildID: message.guild.id,
                 Active: true
             }, {
-                prefix: removeBlanks
+                prefix: removeBlanks.substring(0, 5)
             }, {upsert: true})
             .then((res) => {
                 message.channel.send({

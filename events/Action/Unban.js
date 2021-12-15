@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { GuildChannel, LogsDatabase } = require('../../models');
-const { LogChannel } = require('../../Functions/logChannelFunctions');
+const { LogManager } = require('../../Functions');
 module.exports = {
     event: "guildBanRemove",
     once: false,
@@ -21,7 +21,7 @@ module.exports = {
         const unbanEmbed = {
             color: "#45ff6d",
             author: {
-                name: `UNBAN DETECTION - ${target.tag}`,
+                name: `Unban Detection - ${target.tag}`,
                 icon_url: target.displayAvatarURL({
                     dynamic: true , 
                     type: 'png'
@@ -44,23 +44,9 @@ module.exports = {
                 text: `${target.id}`
             }
         }
-        LogChannel('banLog', Guild.guild).then(async c => {
-            if(!c) return;
-            if(c === null) return;
-
-            const hooks = await c.fetchWebhooks();
-            const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
-
-            if(!webHook){
-                return c.createWebhook("sadbot", {
-                    avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
-                })
-            }
-
-            webHook.send({embeds: [unbanEmbed]})
-        }).catch(err => console.log(err));
+        new LogManager(Guild.guild).sendData({type: 'banlog', data: unbanEmbed, client})
     }catch(err){
-        return console.log(err)
+        return console.log(err.stack)
     }
     }
 }

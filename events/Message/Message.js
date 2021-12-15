@@ -47,7 +47,7 @@ module.exports = {
                         if(data == false){
                             return;
                         }else {
-                            checkBotPerms(command, message).then(i => { // Checking Bots Permissions
+                            checkBotPerms(command, message, client).then(i => { // Checking Bots Permissions
                                 if(i == false){
                                     return;
                                 }else {
@@ -78,7 +78,7 @@ module.exports = {
                 .setDescription(err.message)
                 .setColor("RED")
             ]
-            })
+            }).catch(err => {return console.log(err)})
         return console.log(err.stack)
     }
     }
@@ -143,8 +143,18 @@ async function checkPermission(command, message){
         }
     }
 }
-async function checkBotPerms(command, message){
+async function checkBotPerms(command, message, client){
     if(command.botPermission){
+        if(message.guild.me.roles.cache.size == 1 && message.guild.me.roles.cache.find(r => r.name == '@everyone')){
+            message.author.send({
+                embeds: [
+                    new Discord.MessageEmbed()
+                    .setDescription(`Hey i don't have any roles to execute any commands`)
+                    .setColor("RED")
+                ]
+            }).catch(err => {return console.log(err.stack)})
+            return false
+        }
         if(!message.guild.me.permissions.has(command.botPermission)){
             message.channel.send({
                 embeds: [
@@ -152,19 +162,18 @@ async function checkBotPerms(command, message){
                     .setDescription(`Bot Require following permissions to execute this command \n\n\`\`\`${command.botPermission.join(", ").toLowerCase()}\`\`\``)
                     .setColor("RED")
                 ]
-            })
+            }).catch(err => {return console.log(err.stack)})
             return false;
         }
     }
-    
 }
 function deleteAfterRun(command, message){
     if(command.delete == true){
         if(message.guild.me.permissions.has('MANAGE_MESSAGES')){
             message.delete()
             .catch(err => {
-                console.log(err.message)
-             })
+                return console.log(err.stack)
+            })
         }
     }
 }
@@ -196,11 +205,12 @@ async function cooldownSet(command, message){
                     if (!m.deleted) {
                         m.delete()
                         .catch(err => {
-                           console.log(err.message)
+                           return console.log(err.stack)
                         })
                     }
                 }, 1000 * 3)
             })
+            .catch(err => {return console.log(err.stack)})
             return false
         }
     }

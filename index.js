@@ -13,6 +13,7 @@ const client = new Discord.Client({
     Intents.FLAGS.DIRECT_MESSAGE_TYPING
   ]
 });
+
 //const keepAlive = require("./server")
 require('dotenv').config();
 const fs = require('fs');
