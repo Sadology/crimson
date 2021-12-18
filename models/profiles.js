@@ -24,6 +24,10 @@ const profilesSchema = mongoose.Schema({
         LastOnline: Date,
         OnlineSince: Date,
         TotalHours: Number,
+    },
+    Economy: {
+        Balance: Number,
+        Job: String,
     }
 })
 

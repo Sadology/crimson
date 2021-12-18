@@ -198,19 +198,19 @@ module.exports = {
                     label: 'Prefix',
                     description: 'Change default prefix',
                     value: 'prefixOpt',
-                    //emoji: '<:administration:915457421823078460>'
+                    emoji: '<:reply:897083777703084035>'
                 },
                 {
                     label: 'Log Channels',
                     description: 'Server log channels',
                     value: 'logOpt',
-                    //emoji: '<:moderation:915457421831462922>'
+                    emoji: '<:logs:921093310368596008>'
                 },
                 {
                     label: 'Roles',
                     description: 'Mod/bot manager roles',
                     value: 'roleOpt',
-                    //emoji: '<:moderation:915457421831462922>'
+                    emoji: '<:roles:921093178046693377>'
                 },
             ]),
         )
@@ -225,25 +225,25 @@ module.exports = {
                     label: 'Action Log',
                     description: 'Mute/unmute/warn log channel',
                     value: 'actionLogOpt',
-                    //emoji: '<:administration:915457421823078460>'
+                    emoji: '🔇'
                 },
                 {
                     label: 'Message Log',
                     description: 'Message delete/edit log',
                     value: 'msgLogOpt',
-                    //emoji: '<:moderation:915457421831462922>'
+                    emoji: '📃'
                 },
                 {
                     label: 'Ban Log',
                     description: 'Ban/unban log',
                     value: 'banLogOpt',
-                    //emoji: '<:moderation:915457421831462922>'
+                    emoji: '<:banHammer:921094864073011221>'
                 },
                 {
                     label: 'User Log',
                     description: 'user update log',
                     value: 'userLogOpt',
-                    //emoji: '<:moderation:915457421831462922>'
+                    emoji: '<:user:921095589997977632>'
                 },
             ]),
         )
@@ -258,13 +258,13 @@ module.exports = {
                     label: 'Moderator',
                     description: 'Server moderator',
                     value: 'moderatorOpt',
-                    //emoji: '<:administration:915457421823078460>'
+                    emoji: '<:moderation:915457421831462922>'
                 },
                 {
                     label: 'Manager',
                     description: 'Bot manager',
                     value: 'managerOpt',
-                    //emoji: '<:moderation:915457421831462922>'
+                    emoji: '<:administration:915457421823078460>'
                 },
             ]),
         )
@@ -286,7 +286,7 @@ module.exports = {
 
         let mainEmbed = new MessageEmbed()
             .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: 'png'}))
-            .setDescription("Select a category of your choice \n\nPrefix - Key to run a command\nLog channels - Server log channels\nRoles - Mod/Bot manager roles\n*More options will be available in future*")
+            .setDescription("Select a category of your choice \n\n<:reply:897083777703084035> Prefix ` - ` The key that allows you to use the bot commands\n<:logs:921093310368596008> Log channels ` - ` Server log channels\n<:roles:921093178046693377> Roles ` - ` Mod/Bot-manager roles\n\n*More options will be available in the future*")
             .setColor("WHITE")
             .setFooter("Note: Press \"Cancel\" if you want to cancel setup")
 
@@ -370,6 +370,7 @@ module.exports = {
                 backButtonCollector.on('collect', (b) => {
                     if(b.user.id !== message.author.id) return
                     if(b.customId === 'setupLogFinished'){
+                        backButtonCollector.stop()
                         prefixCollector.stop()
                         msg.deleteReply().catch(err => {return console.log(err)})
                         session = false
@@ -383,7 +384,7 @@ module.exports = {
             await messages.channel.send({embeds: [
                 new MessageEmbed()
                     .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: "png"}))
-                    .setDescription("Please select a log category\n\nAction log - Mute/Unmute/Warn data will get logged\nBan log - Ban/Unban data will get logged\nUser log = User updates will get logged\nMessage log - Message Update/Delete will get logged")
+                    .setDescription("Please select a log category\n\n🔇 Action log ` - ` Mute/Unmute/Warn logs\n<:banHammer:921094864073011221> Ban log ` - ` Ban/Unban logs\n<:user:921095589997977632> User log ` - ` User updates logs\n📃 Message log ` - ` Message Update/Delete logs")
                     .setFooter("Note: Press \"Back\" to go back")
                     .setColor("WHITE")
                 ], components: [logDoneButton, LogRow]}).then((msg) => {
@@ -445,8 +446,9 @@ module.exports = {
                     .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: "png"}))
                     .setDescription("Please mention a valid channel to set as "+" __"+type+"__")
                     .setColor("GREEN")
-            ]}).then(() => {
+            ], components: [logDoneButton]}).then(() => {
                 let LogCollector = msg.channel.createMessageCollector({filter, time: 1000 * 60 * 10})
+                let backButtonCollector = msg.channel.createMessageComponentCollector({ time: 1000 * 60 * 10  });
                 LogCollector.on('collect', async(m) => {
                     verifyChannel(m.content, m).then(async d => {
                         if(d !== false){
@@ -463,6 +465,15 @@ module.exports = {
                             logSession = false
                         }
                     })
+                })
+                backButtonCollector.on('collect', (b) => {
+                    if(b.user.id !== message.author.id) return
+                    if(b.customId === 'setupLogFinished'){
+                        LogCollector.stop()
+                        backButtonCollector.stop()
+                        msg.deleteReply().catch(err => {return console.log(err)})
+                        logSession = false
+                    }
                 })
             })
             .catch(err => {return console.log(err)})
@@ -494,7 +505,7 @@ module.exports = {
             await messages.channel.send({embeds: [
                 new MessageEmbed()
                     .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: "png"}))
-                    .setDescription("Please select a log category\n\nModerator - Can use any moderation type commands.\nManager - This role users can use any commands.")
+                    .setDescription("Please select a role category\n\n<:moderation:915457421831462922> Moderator ` - ` Can use any moderation type commands.\n<:administration:915457421823078460> Manager ` - ` This role users can use any commands.")
                     .setFooter("Note: Press \"Back\" to go back")
                     .setColor("WHITE")
                 ], components: [logDoneButton, rolesRow]}).then((msg) => {
@@ -534,8 +545,9 @@ module.exports = {
                     .setDescription(`"Please mention the roles you'd like to bind to __${type}__`)
                     .setFooter("Note: Use \",\" to separate each roles.")
                     .setColor("GREEN")
-            ]}).then(() => {
+            ], components: [logDoneButton]}).then(() => {
                 let rolesDataCollector = msg.channel.createMessageCollector({filter, time: 1000 * 60 * 10})
+                let backButtonCollector = msg.channel.createMessageComponentCollector({ time: 1000 * 60 * 10  });
                 rolesDataCollector.on('collect', async(m) => {
                     verifyRoles(m.content, m).then(async (val) => {
                         if(val !== false){
@@ -551,6 +563,15 @@ module.exports = {
                             roleSession = false
                         }
                     })
+                })
+                backButtonCollector.on('collect', (b) => {
+                    if(b.user.id !== message.author.id) return
+                    if(b.customId === 'setupLogFinished'){
+                        rolesDataCollector.stop()
+                        backButtonCollector.stop()
+                        msg.deleteReply().catch(err => {return console.log(err)})
+                        roleSession = false
+                    }
                 })
             })
             .catch(err => {return console.log(err)})

@@ -1,7 +1,6 @@
 const Discord = require('discord.js');
 const { LogsDatabase } = require('../../models');
-const {Member} = require('../../Functions/memberFunction');
-const { LogManager } = require('../../Functions');
+const { LogManager, Member } = require('../../Functions');
 
 module.exports = {
     name: 'unmute',
@@ -15,60 +14,32 @@ module.exports = {
     run: async(client, message, args, prefix) =>{
         const { author, guild,  } = message;
         
-        if( !args.length ){
-            return message.channel.send({
-                embeds: [
-                    new Discord.MessageEmbed()
-                    .setDescription( `Unmute a muted person \n**Usage**: ${prefix}unmute [ Member ] \n**Example:** \n${prefix}unmute @shadow~` )
-                    .setFooter( "Bot require \"MANAGE_ROLES\" permission to add \"Muted\" role" )
+        if(!args.length){
+            return message.channel.send( {embeds: [
+                new Discord.MessageEmbed()
+                    .setAuthor(message.author.tag, message.author.displayAvatarURL({type: 'png', dynamic: false}))
+                    .setDescription( `<:error:921057346891939840> Please mention a member \n\n**Usage**: \`${prefix}unmute [ Member ]\`` )
                     .setColor( "#fffafa" )
-                ]
-            }).then(m=>setTimeout(() => m.delete(), 1000 * 30));
+            ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+            .catch(err => {return console.log(err)})
         }
         
-        const FindMembers = new Member(args[0], message);
-        await message.guild.members.fetch()
+        const member = new Member(message, client).getMember({member: args[0]})
+        if(member == false ) return
+        PreviousMuteCheck(member);
 
-        let MemberError = new Discord.MessageEmbed()
-            .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
-            .setDescription(`Coudn't find the member. Please mention a valid member.`)
-            .setColor("RED")
-
-        function GuildMember(Member){
-            if (Member){
-                const member = message.guild.members.cache.get(Member);
-                if(member){
-                    return PreviousMuteCheck(member)
-                }else {
-                    return message.channel.send({embeds: [MemberError]}).then(m=>setTimeout(() => m.delete(), 1000 * 20)); 
-                }
-            }else {
-                return message.channel.send({embeds: [MemberError]}).then(m=>setTimeout(() => m.delete(), 1000 * 20));
-            }
-        }
-
-        function PreviousMuteCheck(Member){
-            FindData(Member).then( value => {
-                if(value === true){
-                    removeMuteRole(Member, true)
-                }else if(value === false){
-                    removeMuteRole(Member, false)
-                }
-            })
-        }
-
-        async function FindData(Member){
-            const previosMute = await LogsDatabase.findOne({
+        async function PreviousMuteCheck(Member){
+            await LogsDatabase.findOne({
                 userID: Member.user.id,
                 guildID: message.guild.id,
                 Muted: true
-            })
-
-            if(previosMute){
-                return true
-            }else {
-                return false
-            }
+            }).then(res => {
+                if(res){
+                    return removeMuteRole(Member, true)
+                }else {
+                    return removeMuteRole(Member, false)
+                }
+            }).catch(err => {return console.log(err.stack)})
         }
 
         async function removeMuteRole(Member, value){
@@ -76,13 +47,15 @@ module.exports = {
             if(value === true){
                 if(muteRole){
                     if(Member.roles.cache.has(muteRole.id)){
-                        await Member.roles.remove(muteRole.id)
+                        await Member.roles.remove(muteRole.id).catch(err => {return console.log(err.stack)})
     
                         message.channel.send({embeds: [
                             new Discord.MessageEmbed()
                                 .setDescription(`${Member.user} is now Unmuted.`)
                                 .setColor("GREEN")
-                        ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30));
+                        ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+                        .catch(err => {return console.log(err.stack)})
+
                         updateData(Member)
                         sendLog(Member)
                     }else {
@@ -91,7 +64,7 @@ module.exports = {
                             new Discord.MessageEmbed()
                                 .setDescription(`${Member.user} is now Unmuted`)
                                 .setColor("GREEN")
-                        ]})
+                        ]}).catch(err => {return console.log(err.stack)})
                     }
                 }else {
                     updateData(Member)
@@ -114,14 +87,17 @@ module.exports = {
                             new Discord.MessageEmbed()
                                 .setDescription(`${Member.user} is now Unmuted.`)
                                 .setColor("GREEN")
-                        ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30));
+                        ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+                        .catch(err => {return console.log(err.stack)})
+
                         sendLog(Member)
                     }else {
                         return message.channel.send({embeds: [
                             new Discord.MessageEmbed()
                                 .setDescription(`${Member.user} is not Muted.`)
                                 .setColor("RED")
-                        ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30));
+                        ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+                        .catch(err => {return console.log(err.stack)})
                     }
                 }else {
                     return
@@ -166,7 +142,5 @@ module.exports = {
             }
             new LogManager(message.guild).sendData({type: 'actionlog', data: informations, client})
         }
-
-        GuildMember(FindMembers.mentionedMember)
     }
 }

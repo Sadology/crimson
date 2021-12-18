@@ -9,6 +9,7 @@ const serverSchema = mongoose.Schema({
     ownerID: String,
     botOwnerGuild: String,
     WelcomeMessage: String,
+    Balance: Number
 })
 
 module.exports = mongoose.model('Server_Settings', serverSchema);

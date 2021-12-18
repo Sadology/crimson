@@ -28,7 +28,7 @@ class LogManager{
             const channel = await this.Guild.channels.cache.get(i.channel)
 
             const hooks = await channel.fetchWebhooks();
-            const webHook = hooks.find(i => i.owner.id == client.user.id)// && i.name == 'sadbot')
+            const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
 
             if(!webHook){
                 channel.createWebhook("sadbot", {
@@ -42,12 +42,26 @@ class LogManager{
         })
     }
 
-    GiveData(data){
-
+    GiveData(type){
+        if(!type) return
+        this.findData(type).then(async i => {
+            if(!i || i == null) return;
+            else return i;
+        })
     }
 
-    LogChannel(data){
+    LogChannel(type){
+        if(!type) return
+        this.findData(type).then(async i => {
+            if(!i || i == null) return;
+            
+            if(i.enabled == false) return
+            const channel = await this.Guild.channels.cache.get(i.channel)
 
+            if(channel){
+                return channel;
+            }
+        })
     }
 }
 module.exports = LogManager

@@ -3,7 +3,7 @@ const { LogsDatabase, GuildRole} = require('../../models');
 const moment = require('moment');
 const { errLog } = require('../../Functions/erroHandling');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js')
-const {Member} = require('../../Functions/MemberFunction');
+const { Member } = require('../../Functions');
 module.exports = {
     name: 'logs',
     aliases: ['modlogs', 'modlog', 'log'],
@@ -14,80 +14,58 @@ module.exports = {
     category: "Moderation",
     cooldown: 1000,
     run: async(client, message, args,prefix) =>{
-
-        if(!message.member.permissions.has("MANAGE_MESSAGES")){
-            return message.author.send('None of your role proccess to use this command')
-        }
-
         if(!args.length){
-            return message.channel.send({embeds: [new Discord.MessageEmbed()
-                .setAuthor(`${message.author.tag} - Mod Logs`)
-                .setColor("#fc5947")
-                .setDescription(`Mention a user to fetch their logs \n\n**Usage:** \`${prefix}logs [ user ]\` \n**Example:** \`${prefix}logs @shadow~\``)
-            ]
-            }).then(m=>setTimeout(() =>m.delete(), 1000 * 10))
-            .catch(err => {return console.log(err.stack)})
+            return message.channel.send({
+                embeds: [new Discord.MessageEmbed()
+                    .setAuthor(message.author.tag, message.author.displayAvatarURL({type: 'png', dynamic: false}))
+                    .setDescription(`<:error:921057346891939840> Mention a member \n\nUsage: \`${prefix}logs [ member ]\``)
+                    .setColor("WHITE")
+                ]
+            })
         }
-
-        const GetMembers = new Member(args[0], message);
-        await message.guild.members.fetch()
-
         const row = new MessageActionRow()
-            .addComponents(
-                new MessageButton()
-                    .setStyle("SUCCESS")
-                    .setLabel("Next")
-                    .setCustomId("NextPageModLog")
-            )
-            .addComponents(
-                new MessageButton()
-                    .setStyle("DANGER")
-                    .setLabel("Previous")
-                    .setCustomId("PreviousPageModLog")
-            )
-
-
-        function FindMember(Member){ 
-            if(Member){
-                const member = message.guild.members.cache.get(Member)
-                if(member){
-                    return fetchData(member)
-                }else {
-                    return fetchData(Member)
-                }
-            }else {
-                return message.channel.send({embeds: [
-                    new Discord.MessageEmbed()
-                        .setDescription(`Please mention a valid member \n\n**Usage:** ${prefix}logs [ user ]`)
-                        .setColor("RED")
-                ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
-                .catch(err => {return console.log(err.stack)})
-            }
+        .addComponents(
+            new MessageButton()
+                .setStyle("SUCCESS")
+                .setLabel("Next")
+                .setCustomId("NextPageModLog")
+        )
+        .addComponents(
+            new MessageButton()
+                .setStyle("DANGER")
+                .setLabel("Previous")
+                .setCustomId("PreviousPageModLog")
+        )
+        
+        let member = new Member(message, client).getMemberWithoutErrHandle({member: args[0], clientMember: true})
+        if(member == false ) {
+            member = args[0].replace(/<@!/g, '').replace(/>/g, '')
         }
+        fetchData(member)
 
         async function fetchData(Member){
-            let Data = await LogsDatabase.findOne({
+            await LogsDatabase.findOne({
                 guildID: message.guild.id,
-                userID: Member.user ? Member.user.id : Member
-            })
-
-            if(Data){
-                return createData(Member, Data)
-            }else {
-                return message.channel.send({embeds: [
-                    new Discord.MessageEmbed()
-                        .setDescription(`${Member.user ? Member.user.id : '<@'+Member+'>'} has No logs`)
-                        .setColor("RED")
-                ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
-                .catch(err => {return console.log(err.stack)})
-            }
+                userID: Member.user ? Member.user.id : Member.id
+            }).then((res) => {
+                if(res){
+                    return createData(Member, res) 
+                }else {
+                    return message.channel.send({embeds: [
+                        new Discord.MessageEmbed()
+                            .setDescription(`${Member.user ? Member.user.id : '<@'+Member+'>'} has No logs`)
+                            .setColor("RED")
+                    ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
+                    .catch(err => {return console.log(err.stack)})
+                }
+            }).catch(err => {return console.log(err.stack)})
         }
 
         async function createData(Member, Data){
             if(Data.Action.length == 0){
                 return message.channel.send({embeds: [
                     new Discord.MessageEmbed()
-                        .setDescription(`${Member.user ? Member.user : '<@'+Member+'>'} has No logs`)
+                        .setDescription(`${Member.user ? Member.user : Member.tag} has No logs`)
                         .setColor("RED")
                 ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
                 .catch(err => {return console.log(err.stack)})
@@ -104,21 +82,20 @@ module.exports = {
             let currentIndex = 0
             let MakeEmbed = start => {
                 const current = Data.slice(start, start + 5)
-
                 const Embed = new Discord.MessageEmbed()
-                    .setDescription(`${Member.user ? Member.user : '<@'+Member+'>'} Mod-Logs - \`[ ${Data.length} ]\``)
+                    .setDescription(`${Member.user ? Member.user : Member} Mod-Logs - \`[ ${Data.length} ]\``)
                     .setFooter(`Logs ${start + 1} - ${start + current.length}/${Data.length}`)
                     .setColor("#fffafa")
 
                 for (i = 0; i < current.length; i++){
                     Embed.addField(`**${start + i + 1}**• [ ${current[i].actionType} ]`,[
                         `\`\`\`py\nUser     - ${current[i].userName}`,
-                        `\nReason   - ${current[i].actionReason}`,
-                        `\nMod      - ${current[i].moderator}`,
-                        `\nDuration - ${current[i].actionLength ? current[i].actionLength : "∞"}`, 
-                        `\nDate     - ${moment(current[i].actionDate).format('llll')}`,
-                        `\nLogID    - ${current[i].caseID}\`\`\``
-                    ].toString())
+                        `Reason   - ${current[i].actionReason}`,
+                        `Mod      - ${current[i].moderator}`,
+                        `Duration - ${current[i].actionLength ? current[i].actionLength : "∞"}`,
+                        `Date     - ${moment(current[i].actionDate).format('llll')}`,
+                        `LogID    - ${current[i].caseID}\`\`\``
+                    ].join(" \n").toString())
                 }
                 
                 if(Data.length <= 5){
@@ -166,8 +143,5 @@ module.exports = {
                 })
             }).catch(err => {return console.log(err.stack)})
         }
-
-        FindMember(GetMembers.mentionedMember)
-        return
     }
 }

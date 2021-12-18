@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { Member } = require('../../Functions/MemberFunction');
+const { Member } = require('../../Functions');
 
 module.exports = {
     name: 'avatar',
@@ -11,35 +11,35 @@ module.exports = {
     usage: "avatar [ user ]",
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-        const FindMembers = new Member(args[0], message);
-        message.guild.members.fetch(); 
+        let member = new Member(message, client).getMemberWithoutErrHandle({member: args[0], clientMember: true})
 
-        async function fetchMember(member) {
-            if(!member){
-                return fetchAvatar(message.member)
-            }
-
-            let Member = message.guild.members.cache.get(member) || await message.channel.guild.members.fetch({cache : false}).then(members=>members.find(member=>member.user.tag === args[0]))
-            if(Member){
-                fetchAvatar(Member)
-            }else {
-                fetchAvatar(message.member)
-            }
+        if(member.type == false){
+            member = await message.channel.guild.members.fetch({cache : true}).then(members=>members.find(member=>member.user.tag.split(" ").join('').toLowerCase() == message.content.split(" ").slice(1).join('').toLowerCase()));
         }
-
-        function fetchAvatar(Member){
-            let Embed = new Discord.MessageEmbed()
-                .setAuthor(Member.user.tag,  Member.user.displayAvatarURL({dynamic: true, size: 1024, type: "png"}))
-                .setTitle( "Avatar")
-                .setImage(Member.user.avatarURL({dynamic: true, size: 4096, type: "png"}) ? Member.user.displayAvatarURL({dynamic: true, size: 4096, type: "png"}) : Member.user.displayAvatarURL({dynamic: true, size: 4096, type: "png"}))
-                .setColor("#fffafa")
-            message.channel.send({embeds: [Embed]})
-        }
-
-        if(args[0]){
-            fetchMember(FindMembers.mentionedMember)
+        if(member){
+            fetchAvatar(member, "user")
         }else {
-            fetchMember()
+            fetchAvatar()
+        }
+
+        function fetchAvatar(Member, type){
+            switch(type){
+                case 'user':
+                    let Embed = new Discord.MessageEmbed()
+                        .setAuthor(Member.user ? Member.user.tag : Member.tag, Member.user ? Member.user.displayAvatarURL({dynamic: true, type: "png"}): Member.displayAvatarURL({dynamic: true, type: "png"}))
+                        .setTitle( "Avatar")
+                        .setImage(Member.user ? Member.user.displayAvatarURL({dynamic: true, size: 4096, type: "png"}) : Member.displayAvatarURL({dynamic: true, size: 4096, type: "png"}))
+                        .setColor("WHITE")
+                    message.channel.send({embeds: [Embed]}).catch(err => {return console.log(err)})
+                break;
+                default:
+                    let Embed2 = new Discord.MessageEmbed()
+                        .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: true, type: "png"}))
+                        .setTitle( "Avatar")
+                        .setImage(message.author.displayAvatarURL({dynamic: true, size: 4096, type: "png"}))
+                        .setColor("WHITE")
+                    message.channel.send({embeds: [Embed2]}).catch(err => {return console.log(err)})
+            }
         }
     }
 };

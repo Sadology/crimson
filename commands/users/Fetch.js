@@ -1,9 +1,8 @@
 const Discord = require('discord.js');
 const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js')
-const { LogsDatabase, GuildRole} = require('../../models')
+const { LogsDatabase } = require('../../models')
 const moment = require('moment');
-const { errLog } = require('../../Functions/erroHandling');
-const {Member} = require('../../Functions/MemberFunction');
+const { Member } = require('../../Functions');
 
 module.exports = {
     name: 'seek',
@@ -24,47 +23,34 @@ module.exports = {
             }).then(m => setTimeout(() =>m.delete(), 1000 * 10))
         }
 
-        const FindMembers = new Member(args[0], message);
-        message.guild.members.fetch()
+        let member = new Member(message, client).getMemberWithoutErrHandle({member: args[0]})
+        if(member == false){
+            fetchBanList(args[0].replace(/<@!/g, '').replace(/>/g, ''))
+        }else {
+            fetchMemberData(member)
+        }
 
         const row = new MessageActionRow()
         .addComponents(
             new MessageButton()
             .setStyle("SUCCESS")
-            .setLabel("More")
+            .setLabel("More Info")
             .setCustomId("Info")
             .setEmoji("❔")
         )
 
-        function lookupMember(Member){
-            if(Member){
-                const member = message.guild.members.cache.get(Member)
-                if(member){
-                    fetchMemberData(member)
-                }else {
-                    fetchBanList(Member)
-                }
-            }else {
-                message.channel.send({embeds: [
-                    new Discord.MessageEmbed()
-                        .setDescription("No member found. Please mention a valid member")
-                        .setColor("RED")
-                ]})
-            }
-        }
-
         async function fetchBanList(Member){
-            let banList = await message.guild.bans.fetch();
-            let bannedMember = banList.find(u => u.user.id === Member);
-
-            if(bannedMember){
-                fetchMemberData(bannedMember, bannedMember.reason, true)
-            }else {
-                return message.channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`No member found. Please mention a valid member`)
-                    .setColor("RED")
-                ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
-            }
+            await message.guild.bans.fetch(Member).then((res) => {
+                if(res){
+                    fetchMemberData(res, res.reason, true)
+                }else {
+                    return message.channel.send({embeds: [new Discord.MessageEmbed()
+                        .setDescription(`Please mention a valid member`)
+                        .setColor("RED")
+                    ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+                    .catch(err => {return console.log(err.stack)}) 
+                }
+            })
         }
 
         async function fetchMemberData(Member, reason, isBanned){
@@ -80,20 +66,20 @@ module.exports = {
                 count = 0
             }
             const Embed = new MessageEmbed()
-            .setAuthor(`${Member.user.tag}`, Member.user.displayAvatarURL({
-                dynamic: true, 
-                type: 'png', 
-                size: 1024
-            }))
-            .setThumbnail(Member.user.displayAvatarURL({
-                dynamic: true,
-                type: 'png',
-                size: 1024
-            }))
-            .addField('User', `\`\`\`${Member.user.tag}\`\`\``, true)
-            .addField('User ID', `\`\`\`${Member.user.id}\`\`\``, true)
-            .addField("Logs", count ? `\`\`\`${count}\`\`\``.toString() : "\`\`\`0\`\`\`", true)
-            .addField('Created At', `\`\`\`${moment(Member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.user.createdAt, "YYYYMMDD").fromNow()}\`\`\``.toString(),true)
+                .setAuthor(`${Member.user.tag}`, Member.user.displayAvatarURL({
+                    dynamic: true, 
+                    type: 'png', 
+                    size: 1024
+                }))
+                .setThumbnail(Member.user.displayAvatarURL({
+                    dynamic: true,
+                    type: 'png',
+                    size: 1024
+                }))
+                .addField('User', `\`\`\`${Member.user.tag}\`\`\``, true)
+                .addField('User ID', `\`\`\`${Member.user.id}\`\`\``, true)
+                .addField("Logs", count ? `\`\`\`${count}\`\`\``.toString() : "\`\`\`0\`\`\`", true)
+                .addField('Created At', `\`\`\`${moment(Member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.user.createdAt, "YYYYMMDD").fromNow()}\`\`\``.toString(),true)
             if(isBanned == true){
                 Embed.addField('Joined at', `\`\`\`No Data Found\`\`\``.toString(),true)
                 Embed.setColor("RED")
@@ -103,23 +89,28 @@ module.exports = {
                 Embed.addField('Joined at', `\`\`\`${moment(Member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.joinedAt, "YYYYMMDD").fromNow()}\`\`\``.toString(),true)
             }
             if(isBanned == true) {
-                return message.channel.send({content: `${Member.user}`, embeds: [Embed]})
+                return message.channel.send({content: `${Member.user}`, embeds: [Embed]}).catch(err => {return console.log(err.stack)})
             }else {
                 message.channel.send({content: `${Member.user}`, embeds: [Embed], components: [row]}).then(msg => {
                     let newEmbed;
                     MoreInformations(Member, count).then(data => {
                         newEmbed = data
                     })
-                    const collector = message.channel.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 10 });
+                    const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 60 * 10 });
                     collector.on('collect',async b => {
                         if(b.user.id !== message.author.id) return
                         if(b.customId === "Info"){
-                            return b.update({content: `${Member.user}`,embeds: [newEmbed], components: []})
+                            row.components[0].setDisabled(true)
+                            collector.stop()
+                            return b.update({content: `${Member.user}`,embeds: [newEmbed], components: [row]})
+                            .catch(err => {return console.log(err.stack)})
                         }
                     });
                     collector.on("end", (b) =>{
+                        row.components[0].setDisabled(true)
+                        msg.edit({components: [row]}).catch(err => {return console.log(err.stack)})
                     })
-                })
+                }).catch(err => {return console.log(err.stack)})
             }
         }
 
@@ -173,7 +164,5 @@ module.exports = {
                 resolve(EditedEmbed)
             })
         }
-
-        lookupMember(FindMembers.mentionedMember)
     }
 };

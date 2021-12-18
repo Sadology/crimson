@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const ms = require('ms');
 const { LogsDatabase } = require('../../models');
-const {Member} = require('../../Functions/memberFunction');
+const { Member } = require('../../Functions');
 const { saveData, sendLogData, ModStatus } = require('../../Functions/functions');
 
 module.exports = {
@@ -15,18 +15,16 @@ module.exports = {
     cooldown: 1000,
     run: async(client, message, args, prefix) =>{
         const { author, content, guild, channel } = message;
-        
-        const TutEmbed = new Discord.MessageEmbed().setAuthor( "Command - MUTE", author.displayAvatarURL({dynamic: false, format: "png", size: 1024}) )
 
-        if( !args.length ){
-            TutEmbed.setDescription( `Mutes someone to pause them from chatting or speaking \n**Usage**: ${prefix}mute [ Member ] [ duration ] [ reason ] \n**Example:** \n${prefix}mute @shadow~ 20m for Spamming \n${prefix}mute @shadow~ 3h Deserve it!` )
-            TutEmbed.setFooter( "Bot require \"MANAGE_ROLES\" permission to add \"Muted\" role" )
-            TutEmbed.setColor( "#fffafa" )
-            return message.channel.send( {embeds: [TutEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 30));
+        if(!args.length){
+            return message.channel.send( {embeds: [
+                new Discord.MessageEmbed()
+                    .setAuthor(message.author.tag, message.author.displayAvatarURL({type: 'png', dynamic: false}))
+                    .setDescription( `<:error:921057346891939840> Please mention a member \n\n**Usage**: \`${prefix}mute [ Member ] [ duration ] [ reason ]\`` )
+                    .setColor( "#fffafa" )
+            ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+            .catch(err => {return console.log(err)})
         }
-        
-        const FindMembers = new Member(args[0], message);
-        await message.guild.members.fetch()
         
         const Data = {
             guildID: message.guild.id, 
@@ -41,27 +39,9 @@ module.exports = {
             moderatorID: message.author.id,
         }
 
-        let MemberError = new Discord.MessageEmbed()
-            .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
-            .setDescription(`Coudn't find the member. Please mention a valid member.`)
-            .setColor("RED")
-
-        function GuildMember(Member){
-            if (Member){
-                const member = message.guild.members.cache.get(Member);
-                if(member){
-                    checkMemberPermission(member);
-                }else {
-                    return message.channel.send({embeds: [MemberError]})
-                    .then(m=>setTimeout(() => m.delete(), 1000 * 20))
-                    .catch(err => {return console.log(err)})
-                }
-            }else {
-                return message.channel.send({embeds: [MemberError]})
-                .then(m=>setTimeout(() => m.delete(), 1000 * 20))
-                .catch(err => {return console.log(err)})
-            }
-        }
+        const member = new Member(message, client).getMember({member: args[0]})
+        if(member == false ) return
+        checkMemberPermission(member);
 
         function checkMemberPermission(Member){
             if(Member){
@@ -72,7 +52,7 @@ module.exports = {
                     return message.channel.send({embeds: [MemberError]})
                     .then(m=>setTimeout(() => m.delete(), 1000 * 10))
                     .catch(err => {return console.log(err)})
-                }else if(Member.permissions.any("MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_GUILD", "ADMINISTRATOR", { checkAdmin: true, checkOwner: true })){
+                }else if(Member.permissions.any(["MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_GUILD", "ADMINISTRATOR"], { checkAdmin: true, checkOwner: true })){
                     return message.channel.send({embeds: [
                         new Discord.MessageEmbed()
                             .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
@@ -101,7 +81,7 @@ module.exports = {
                 if(value === true){
                     let NotMuted = new Discord.MessageEmbed()
                     .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
-                    .setDescription(`<@${Member.user.id}> is already muted`)
+                    .setDescription(`${Member} is already muted`)
                     .setColor("RED")
 
                     return message.channel.send({embeds: [NotMuted]}).catch(err => {return console.log(err)})
@@ -157,11 +137,11 @@ module.exports = {
                                 name: 'Muted',
                                 color: '#000000',
                                 permissions: [],
-                                reason: 'sadBot mute role creation'
+                                reason: 'sadbot mute role creation'
                         }).then(m => {
                             overWriteChannels(m)
                             MuteMember(Member, m) 
-                        })
+                        }).catch(err => {return console.log(err)})
                         
                     }catch(err){
                         console.log(err)
@@ -192,17 +172,17 @@ module.exports = {
 
         async function MuteMember(Member, muteRole){
             const muteReason = content.split(/\s+/).slice(3).join(" ") || 'No reason provided'
-            if(message.cleanContent.length >= 200) {
+            if(message.content.length >= 250) {
                 let failed = new Discord.MessageEmbed()
-                .setDescription("Please provide a reason less than 200 words")
+                .setDescription("Reason can't be longer than 250 characters")
                 .setColor('#ff303e')
                 return message.channel.send({embeds: [failed]})
                 .catch(err => {return console.log(err)})
             }
 
             if(Member.roles.cache.has(muteRole.id)){
-                await Member.roles.remove(muteRole.id)
-                await Member.roles.add(muteRole.id)
+                await Member.roles.remove(muteRole.id).catch(err => {return console.log(err)})
+                await Member.roles.add(muteRole.id).catch(err => {return console.log(err)})
 
                 let successEmbed = new Discord.MessageEmbed()
                     .setDescription(`${Member.user} is now Muted | ${muteReason}`)
@@ -212,7 +192,7 @@ module.exports = {
                 .catch(err => {return console.log(err)})
                 Data['actionReason'] = muteReason
             }else {
-                Member.roles.add(muteRole.id)
+                Member.roles.add(muteRole.id).catch(err => {return console.log(err)})
                 let successEmbed = new Discord.MessageEmbed()
                     .setDescription(`${Member.user} is now Muted | ${muteReason}`)
                     .setColor("#45f766")
@@ -255,6 +235,5 @@ module.exports = {
                 return channel.send({embeds: [successEmbed]}).catch(err => {return console.log(err)})
             }
         }
-        GuildMember(FindMembers.mentionedMember)
     }
 }

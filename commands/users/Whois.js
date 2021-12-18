@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const moment = require('moment');
-const {Member} = require('../../Functions/MemberFunction');
+const { Member } = require('../../Functions');
 module.exports = {
     name: 'whois',
     aliases: ['userinfo', 'user-info',],
@@ -11,21 +11,16 @@ module.exports = {
     usage: "whois [ user ]",
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-        const FindMembers = new Member(args[0], message);
-        message.guild.members.fetch()
-
-        async function fetchMember(member) {
-            if(!member){
-                getInfo(message.member)
-            }else {
-                let Member = message.guild.members.cache.get(member) || await message.channel.guild.members.fetch({cache : false}).then(members=>members.find(member=>member.user.tag === args[0]))
-                if(Member){
-                    getInfo(Member)
-                }else {
-                    getInfo(message.member)
-                }
-            }
+        let member
+        if(!args.lenght){
+            member = message.member
         }
+        member = new Member(message, client).getMemberWithoutErrHandle({member: args[0]})
+        if(member == false){
+            member = await message.channel.guild.members.fetch({cache : true}).then(members=>members.find(member=>member.user.tag.split(" ").join('').toLowerCase() == message.content.split(" ").slice(1).join('').toLowerCase())) || message.member
+        }
+
+        getInfo(member)
 
         function getInfo(Member) {
             let isOwner;
@@ -92,11 +87,6 @@ module.exports = {
                 .setColor(Member.displayColor)
 
             message.channel.send({embeds: [ Embed ]})
-        }
-        if(args.length && args[0]){
-            fetchMember(FindMembers.mentionedMember)
-        }else {
-            fetchMember()
         }
     }
 };

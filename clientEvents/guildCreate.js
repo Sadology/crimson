@@ -12,6 +12,7 @@ module.exports = async client =>{
                 Active: true,
                 prefix: ">",
                 ownerID: guild.ownerId,
+                Balance: 100000
             }, {upsert: true})
             .catch(err => {return console.log(err)})
         }
@@ -79,6 +80,13 @@ module.exports = async client =>{
             .then((res) =>{
                 if(!res){
                     GuildCreate.GuildChannels(guild)
+                }else {
+                    Guild.findOneAndUpdate({
+                        Active: true,
+                        Balance: {$exists : false}
+                    }, {
+                        $set: {'Balance': 1000000}
+                    }).catch(err => {return console.log(err)})
                 }
             })
             .catch(err => {return console.log(err.stack)});

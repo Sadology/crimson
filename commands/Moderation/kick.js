@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { ModStatus } = require('../../Functions/functions');
-const {Member} = require('../../Functions/MemberFunction');
+const { Member } = require('../../Functions');
 module.exports = {
     name: 'kick',
     description: "Kick out a member from the server.",
@@ -11,68 +11,20 @@ module.exports = {
     delete: true,
     cooldown: 1000,
     run: async(client, message, args,prefix) =>{
-        if(!message.member.permissions.has("KICK_MEMBERS")){
-            return message.author.send('None of your role proccess to use this command')
-        }
-
         const { guild, content, channel, author } = message;
-        const ErrorEmbed = {
-            color: "#fffafa",
-            author: {
-                name: `Command - Kick`,
-                icon_url: client.user.displayAvatarURL({dynamic: false, format: "png", size: 1024})
-            },
-            description: `Kick a member from the server 
-            \n**Usage:** \`${prefix}kick [ Member ] [ Reason ]\` \n**Example:** \`${prefix}kick @shadow~ sending nsfw content\``,
-            footer: {
-                text: "Bot require \"Kick_Members\" permission"
-            },
-            timestamp: new Date()
-        }
 
-        if( !args.length ){
-            return message.channel.send({embeds: [ErrorEmbed]}).then(m=>setTimeout(() => m.delete(), 1000 * 60))
-        };
-
-        if(!args[0]){
+        if(!args.length){
             return message.channel.send({embeds: [
                 new Discord.MessageEmbed()
-                    .setDescription(`Please mention a member. \n\n**Usage:** ${prefix}kick [ user ] [ reason ]`)
-            ]}).then(m=>setTimeout(() => m.delete(), 1000 * 20))
+                    .setAuthor(message.author.tag, message.author.displayAvatarURL({type: 'png', dynamic: false}))
+                    .setDescription(`<:error:921057346891939840> Mention a member \n\nUsage: \`${prefix}kick [ member ] [ reason ]\``)
+                    .setColor("WHITE")
+            ]}).catch(err => {return console.log(err)})
         }
-
-        const getMembers = new Member(args[0], message);
-        await message.guild.members.fetch();
-        const kickReason = message.content.split(/\s+/).slice(2).join(" ") || "No reason Provided"
-
-        function findMember(Member){
-            try {
-                if(Member){
-                    const member = message.guild.members.cache.get(Member);
-
-                    if(member){
-                        MemberPermissionCheck(member);
-                    } else {
-                        return message.channel.send({embeds: [new Discord.MessageEmbed()
-                            .setDescription(`Couldn't find the member. Please mention a valid member`)
-                            .setColor("RED")
-                        ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
-                    }
-                }else {
-                    return message.channel.send({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`Please mention a valid member.`)
-                        .setColor("RED")
-                    ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
-                }
-            }catch(err){
-                message.channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(err.message)
-                    .setColor("RED")
-                ]})
-                return console.log(err);
-            }
-
-        }
+        const kickReason = message.content.split(/s+/g).slice(2).join(' ') || "No reason provided"
+        const member = new Member(message, client).getMember({member: args[0]})
+        if(member == false ) return
+        MemberPermissionCheck(member)
 
         function MemberPermissionCheck(Member){
             try {
@@ -89,14 +41,14 @@ module.exports = {
                     return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
 
                 }else if(Member.user.id === client.user.id){
-                    ErrorEmbed.setDescription(`Why you want to kicl me ;-;`)
+                    ErrorEmbed.setDescription(`Why you want to kick me ;-;`)
                     return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
 
                 }else if (Member.kickable === false){  
                     ErrorEmbed.setDescription(`Can't kick a Mod/Admin.`)
                     return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
 
-                }else if (Member.permissions.has("BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_CHANNELS", "MANAGE_ROLES", "MANAGE_MESSAGES", "MANAGE_GUILD", "ADMINISTRATOR", { checkAdmin: true, checkOwner: true })){
+                }else if (Member.permissions.any(["BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_CHANNELS", "MANAGE_ROLES", "MANAGE_MESSAGES", "MANAGE_GUILD", "ADMINISTRATOR"], { checkAdmin: true, checkOwner: true })){
                     ErrorEmbed.setDescription(`Can't kick a Mod/Admin.`)
                     return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
 
@@ -116,19 +68,20 @@ module.exports = {
                     .setDescription(err.message)
                     .setColor("RED")
                 ]})
-                return console.log(err) 
+                return console.log(err.stack) 
             }
         }
 
         async function kickMember(Member){
             try {
-                await message.guild.members.kick(Member.id, kickReason + ' | ' + `${Member.user.id}` + ' | ' + `${message.author.tag}`);
-                message.channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`${Member} was kicked from the server | ${kickReason}`)
-                    .setColor( "#45f766" )
-                ]
-                }).then(m=>setTimeout(() => m.delete(), 1000 * 30))
-                
+                await message.guild.members.kick(Member.id, `${kickReason} | ${Member.user.id} | ${message.author.tag}`).then(() => {
+                    message.channel.send({embeds: [new Discord.MessageEmbed()
+                        .setDescription(`${Member} was kicked from the server | ${kickReason}`)
+                        .setColor( "#45f766" )
+                    ]
+                    }).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+                    .catch(err => {return console.log(err)})
+                })
                 ModStatus({type: "Kick", guild: message.guild, member: message.author, content: content})
             }catch(err){
                 message.channel.send({embeds: [new Discord.MessageEmbed()
@@ -138,7 +91,5 @@ module.exports = {
                 return console.log(err)
             }
         }
-
-        findMember(getMembers.mentionedMember)
     }
 }

@@ -37,7 +37,7 @@ module.exports = {
             }else {
                 return message.reply({embeds: [
                     new Discord.MessageEmbed()
-                        .setDescription(`No log found by his ID: **${caseid}**`)
+                        .setDescription(`No logs was found by this ID: **${caseid}**`)
                         .setColor("RED")
                 ], ephemeral: true})
             }
@@ -102,7 +102,7 @@ module.exports = {
         if(!args.length || !args[0]) return message.reply({
             embeds: [
                 new Discord.MessageEmbed()
-                    .setDescription(`Please provide case ID you want to delete \n\n**Usage: ** \`${prefix}delete-log [ case ID ]\``)
+                    .setDescription(`Please provide the case ID you want to delete \n\n**Usage: ** \`${prefix}delete-log [ case ID ]\``)
                     .setColor("WHITE")
             ]}).catch(err => {return console.log(err.stack)})
 

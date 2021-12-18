@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const { commandUsed } = require('../../Functions/CommandUsage');
-const {Member} = require('../../Functions/MemberFunction');
 module.exports = {
     name: 'sendannounce',
     run: async(client, message, args,prefix) =>{

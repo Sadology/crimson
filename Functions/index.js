@@ -6,5 +6,6 @@ module.exports = {
     commandCreate: require('./CommandObject'),
     LogChannel,
     errLog,
-    LogManager: require('./LogManager')
+    LogManager: require('./LogManager'),
+    Member: require('./MemberManager'),
 };

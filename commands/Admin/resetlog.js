@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { LogsDatabase }= require('../../models');
-const {Member} = require('../../Functions/memberFunction');
+const { Member } = require('../../Functions');
 const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js')
 
 module.exports = {
@@ -27,55 +27,30 @@ module.exports = {
                 .setCustomId("cancelResetLog")
         )   
 
-        if(!args.length || !args[0]){
-            return message.channel.send({embeds: [
-                new Discord.MessageEmbed()
-                    .setDescription(`Please mention a valid member \n\n**Usage:** ${prefix}reset-log [ user ]`)
-                    .setColor("RED")
-            ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
-            .catch(err => {return console.log(err.stack)})
-        }
-        const FindMembers = new Member(args[0], message);
-        await message.guild.members.fetch()
-        
-        function GuildMember(Member){
-            if(Member){
-                const member = message.guild.members.cache.get(Member)
-                if(member){
-                    return fetchData(member)
-                }else {
-                    return fetchData(Member)
-                }
-            }else {
-                return message.channel.send({embeds: [
-                    new Discord.MessageEmbed()
-                        .setDescription(`Please mention a valid member \n\n**Usage:** ${prefix}reset-log [ user ]`)
-                        .setColor("RED")
-                ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
-                .catch(err => {return console.log(err.stack)})
-            }
-        }
+        const member = new Member(message, client).getMember({member: args[0], clientMember: true})
+        if(member == false ) return
+        fetchData(member)
 
         async function fetchData(Member){
             let Data = await LogsDatabase.findOne({
                 guildID: message.guild.id,
-                userID: Member.user ? Member.user.id : Member
-            }).catch(err => {return console.log(err)})
+                userID: Member.user ? Member.user.id : Member.id
+            }).catch(err => {return console.log(err.stack)})
             if(!Data){
                 return message.channel.send({embeds: [
                     new Discord.MessageEmbed()
                         .setDescription(`User doesn't have any logs yet.`)
                         .setColor("RED")
-                ], ephemeral: true}).catch(err => {return console.log(err.stack)})
+                ]}).catch(err => {return console.log(err.stack)})
             }else {
                 confirmation(Member)
             }
         }
 
         function confirmation (member){
-            message.channel.send({ content: "You you wish to reset all log? (yes/no)",embeds: [
+            message.channel.send({ content: "You you wish to reset logs? (yes/no)",embeds: [
                 new Discord.MessageEmbed()
-                    .setDescription(`Data will be permanently deleted from server and you can't recover it later.`)
+                    .setDescription(`Data will be permanently deleted from databse and you can't recover it later.`)
                     .setColor("RED")
             ], components: [row]}).then(async msg => {
                 const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
@@ -85,7 +60,7 @@ module.exports = {
                         DeleteData(member).then(async () =>{
                             row.components[0].setDisabled(true)
                             row.components[1].setDisabled(true)
-                            await b.update({content: "All data has been deleted", components: [row]})
+                            await b.update({content: "Factory reset complete", components: [row]})
 
                         })
                         .catch(err => {return console.log(err)})
@@ -94,7 +69,7 @@ module.exports = {
                     if(b.customId === "cancelResetLog"){
                         row.components[0].setDisabled(true)
                         row.components[1].setDisabled(true)
-                        await b.update({content: "Canceled the command (timeout)", components: [row]})
+                        await b.update({content: "Canceled the command", components: [row]})
 
                         collector.stop();
                     }
@@ -112,18 +87,8 @@ module.exports = {
         async function DeleteData(member) {
             await LogsDatabase.findOneAndDelete({
                 guildID: message.guild.id,
-                userID: member.user ? member.user.id : member
+                userID: member.user ? member.user.id : member.id
             }).catch(err => {return console.log(err.stack)})
         }
-
-        if(!args.length || !args[0]) return message.reply({
-            embeds: [
-                new Discord.MessageEmbed()
-                    .setDescription(`Please mention a member to reset log \n\n**Usage:** \`${prefix}reset-log @shadow~\``)
-                    .setColor("WHITE")
-            ]
-        }).catch(err => {return console.log(err.stack)})
-
-        GuildMember(FindMembers.mentionedMember)
     }
 }

@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { Profiles } = require('../../models');
-const { Member } = require('../../Functions/MemberFunction');
+const { Member } = require('../../Functions');
 const moment = require('moment');
 module.exports = {
     name: 'mod-stats',
@@ -12,30 +12,14 @@ module.exports = {
     category: "Administrator",
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-        const fetchMember = new Member(args[0], message)
-        await message.guild.members.fetch()
-
-        function findMember(Member) {
-            if(!Member){
-                return message.channel.send({
-                    embeds: [new Discord.MessageEmbed()
-                        .setDescription("Please mention a moderator to check their statistics")
-                        .setColor("RED")
-                    ]})
-            }
-
-            const member = message.guild.members.cache.get(Member)
-            if(member){
-                return fetchData(member)
-            }else {
-                return fetchData(Member)
-            }
-        }
+        const member = new Member(message, client).getMember({member: args[0], clientMember: true})
+        if(member == false ) return
+        fetchData(member)
 
         async function fetchData(Member) {
             await Profiles.findOne({
                 guildID: message.guild.id,
-                userID: Member.user ? Member.user.id : Member
+                userID: Member.user ? Member.user.id : Member.id
             })
             .then(res => {
                 if(!res || Object.keys(res.ModerationStats).length === 0){
@@ -43,7 +27,7 @@ module.exports = {
                         embeds: [new Discord.MessageEmbed()
                             .setDescription("User doesn't have any moderation history")
                             .setColor("RED")
-                        ]})
+                        ]}).catch(err => {return console.log(err)})
                 }else {
                     return values(res.ModerationStats ,Member, res)
                 }
@@ -55,7 +39,7 @@ module.exports = {
 
         function values(Data, Member, timeData) {
             let Embed = new Discord.MessageEmbed()
-                .setAuthor(`${Member.user ? Member.user.tag : Member}'s - Moderation Statistics`)
+                .setAuthor(`${Member.user ? Member.user.tag : Member.tag}'s - Moderation Statistics`)
                 .setDescription(`${Data.Recent ? Data.Recent : "None"}`)
                 .setColor("WHITE")
             let values = Object.keys(Data)
@@ -81,6 +65,5 @@ module.exports = {
                 embeds: [Embed]
             }).catch(err => {return console.log(err.stack)})
         }
-        findMember(fetchMember.mentionedMember)
     }
 }

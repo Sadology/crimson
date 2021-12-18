@@ -1,12 +1,10 @@
-// const { saveData } = require('../../Functions/functions');
-// const Discord = require('discord.js');
+const { saveData } = require('../../Functions/functions');
+const Discord = require('discord.js');
+var axios = require("axios")
+module.exports = {
+    name: 'test',
 
-// module.exports = {
-//     name: 'test',
+    run: async(client, message, args, prefix)=> {
 
-//     run: async(client, message, args, prefix)=> {
-//         let Embed = new Discord.MessageEmbed()
-//             .setDescription("OWOWOWOWOWOOW")
-//         new LogManager(message.guild).sendData({type: 'actionlog', data: Embed, client})
-//     }
-// }
+    }
+}

@@ -12,7 +12,8 @@ module.exports = {
         });
         const roleAddLog = fetchedLogs.entries.first();
         const { executor, changes, target } = roleAddLog;
-
+        
+        if(executor.id == client.user.id) return
         let addition = changes.find(i => i.key == '$add')
         if(!addition){
             return

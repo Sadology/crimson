@@ -25,7 +25,7 @@ module.exports = {
             ]
 
             const Embed = new Discord.MessageEmbed()
-                .setDescription(`**Cookies:** ${cookiesAmount}`)
+                .setDescription(`**Cookies:** ${cookiesAmount} \nBalance: ${data.Economy.Balance}`)
                 .setColor("WHITE")
                 .setAuthor(`${Member ? Member.user.tag : interaction.user.tag}`)
 
