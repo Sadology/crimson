@@ -11,7 +11,8 @@ module.exports = {
         .setName('fetch')
         .setDescription('Moderator Imformations')
         .addUserOption(option => option.setName('user').setDescription('Moderator informations of a user')),
-    permission: ["MANAGE_MESSAGES",],
+    permission: ["MANAGE_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
 
         const { options } = interaction;

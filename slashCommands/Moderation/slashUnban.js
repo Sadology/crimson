@@ -13,21 +13,14 @@ module.exports = {
         .addStringOption(option => 
             option.setName("reason")
                 .setDescription("Reason for Unban")),
-    permission: ["BAN_MEMBERS",],
+    permission: ["BAN_MEMBERS"],
+    botPermission: ["BAN_MEMBERS"],
     run: async(client, interaction) =>{
         const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')
 
         interaction.deferReply({ephemeral: true})
         await new Promise(resolve => setTimeout(resolve, 1000))
-
-        if(!interaction.guild.me.permissions.has(["BAN_MEMBERS", "ADMINISTRATOR"])){
-            return interaction.reply({embeds: [
-                new Discord.MessageEmbed()
-                    .setDescription("I don't have \"BAN_MEMBERS\" permission to Ban the member.")
-                    .setColor("RED")
-            ]})
-        }
 
         function findMember(Member){
             try {

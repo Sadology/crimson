@@ -20,7 +20,7 @@ module.exports = {
             fields: [
                 {
                     name: "Version",
-                    value: 'Beta v1.3.1',
+                    value: 'Beta v1.3.2',
                     inline: true
                 },
                 {

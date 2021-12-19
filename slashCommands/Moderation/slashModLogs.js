@@ -14,6 +14,7 @@ module.exports = {
                 .setDescription('The user you want to check logs')
                 .setRequired(true)),
     permission: ["MANAGE_MESSAGES",],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
         const { options, guild } = interaction;
 

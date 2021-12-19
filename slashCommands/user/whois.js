@@ -8,6 +8,7 @@ module.exports = {
         .setDescription('User Inofrmations')
         .addUserOption(option => option.setName('user').setDescription('Informations of another user')),
     permission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
         const { options } = interaction;
         const MemberID = options.getUser('user')

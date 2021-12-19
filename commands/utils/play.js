@@ -18,12 +18,12 @@
 //     run: async(client, message, args)=> {
 //         const audioplayer = createAudioPlayer();
 
-//         // connection.on('stateChange', (oldState, newState) => {
-//         //     console.log(`Connection transitioned from ${oldState.status} to ${newState.status}`);
-//         // });
-//         // audioplayer.on('stateChange', (oldState, newState) => {
-//         //     console.log(`Audio player transitioned from ${oldState.status} to ${newState.status}`);
-//         // });
+//         connection.on('stateChange', (oldState, newState) => {
+//             console.log(`Connection transitioned from ${oldState.status} to ${newState.status}`);
+//         });
+//         audioplayer.on('stateChange', (oldState, newState) => {
+//             console.log(`Audio player transitioned from ${oldState.status} to ${newState.status}`);
+//         });
 
 //         let stream = await ytdl(args[0], {
             

@@ -13,19 +13,23 @@ module.exports = {
         if(!slashCmd) return client.slash.delete(interaction.commandName)
         checkPermission(slashCmd, interaction).then(i =>{
             if(i == false) return
+        
+            checkBotPerms(slashCmd, interaction).then(i => {
+                if(i == false) return
 
-            try {
-                slashCmd.run(client, interaction)
-            }catch(err) {
-                interaction.channel.send({
-                    embeds: [
-                    new Discord.MessageEmbed()
-                    .setDescription(err.message)
-                    .setColor("RED")
-                    ]
-                })
-                return console.log(err.stack)
-            }
+                try {
+                    slashCmd.run(client, interaction)
+                }catch(err) {
+                    interaction.channel.send({
+                        embeds: [
+                        new Discord.MessageEmbed()
+                        .setDescription(err.message)
+                        .setColor("RED")
+                        ]
+                    }).catch(err => {return console.log(err.stack)})
+                    return console.log(err.stack)
+                }
+            })
         })
     }
 }
@@ -76,6 +80,30 @@ async function checkPermission(command, interaction){
             return AccessGranted;
         }else {
             return AccessGranted
+        }
+    }
+}
+async function checkBotPerms(command, interaction){
+    if(command.botPermission){
+        if(interaction.guild.me.roles.cache.size == 1 && interaction.guild.me.roles.cache.find(r => r.name == '@everyone')){
+            interaction.author.send({
+                embeds: [
+                    new Discord.MessageEmbed()
+                    .setDescription(`Hey i don't have any roles to execute any commands`)
+                    .setColor("RED")
+                ]
+            }).catch(err => {return console.log(err.stack)})
+            return false
+        }
+        if(!interaction.guild.me.permissions.has(command.botPermission)){
+            interaction.reply({
+                embeds: [
+                    new Discord.MessageEmbed()
+                    .setDescription(`Bot Requires following permissions to execute this command \n\n\`\`\`${command.botPermission.join(", ").toLowerCase()}\`\`\``)
+                    .setColor("RED")
+                ], ephemerl: true
+            }).catch(err => {return console.log(err.stack)})
+            return false;
         }
     }
 }

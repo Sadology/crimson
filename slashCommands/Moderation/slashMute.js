@@ -18,22 +18,11 @@ module.exports = {
         .addStringOption(option => 
             option.setName("reason")
                 .setDescription("Reason for mute")),
-    permission: ["MANAGE_MESSAGES",],
+    permission: ["MANAGE_MESSAGES"],
+    botPermission: ["MANAGE_ROLES", "MANAGE_CHANNELS"],
     run: async(client, interaction) =>{
         const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')
-
-        if(!interaction.member.permissions.has("MANAGE_MESSAGES")){
-            return interaction.reply('None of your role proccess to use this command')
-        }
-
-        if(!interaction.guild.me.permissions.has(["MANAGE_ROLES", "ADMINISTRATOR"])){
-            return interaction.reply({embeds: [
-                new Discord.MessageEmbed()
-                    .setDescription("I don't have \"Manage_Roles\" permission to add Muted role.")
-                    .setColor("RED")
-            ]})
-        }
         
         const Data = {
             guildID: interaction.guild.id, 

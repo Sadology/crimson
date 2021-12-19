@@ -7,6 +7,7 @@ module.exports = {
         .setName('ping')
         .setDescription('Ping pong'),
     permission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interation) =>{
         let choices = ["Checking pings...","Pinging...", "What's my ping?...", "Now checking..."]
         let response = choices[Math.floor(Math.random() * choices.length)]

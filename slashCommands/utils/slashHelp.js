@@ -18,6 +18,7 @@ module.exports = {
             option.setName('command-name')
                 .setDescription('Help of individual commands')),
     permission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
         interaction.deferReply()
         await new Promise(resolve => setTimeout(resolve, 1000))

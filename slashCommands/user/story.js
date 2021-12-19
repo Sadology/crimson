@@ -13,6 +13,7 @@ module.exports = {
             option.setName('image-link')
             .setDescription('You can add a image on your story.')),
     permission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
         try {
             const { options } = interaction;

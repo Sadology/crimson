@@ -9,6 +9,9 @@ module.exports = {
     event: 'messageUpdate',
     once: false,
     run: async(oldMessage, message, client) =>{
+        if(!message.guild.me.permissions.has("VIEW_AUDIT_LOG")){
+            return
+        }
         try {
             if(message.author.bot) return;
             if(message.channel.type === 'DM') return;

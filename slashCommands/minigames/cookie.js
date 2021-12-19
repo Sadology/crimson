@@ -12,6 +12,7 @@ module.exports = {
             .setRequired(true)
             .setDescription('your friend you want to give cookies')),
     permission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
         const { options } = interaction;
 

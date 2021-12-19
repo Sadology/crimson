@@ -6,6 +6,9 @@ module.exports = {
     event: "messageDeleteBulk",
     once: false,
     run: async(deletedMessage, client)=> {
+        if(!deletedMessage.guild.me.permissions.has("VIEW_AUDIT_LOG")){
+            return
+        }
 	    try{
             await Discord.Util.delayFor(900);
             let ID = deletedMessage.first().guildId;

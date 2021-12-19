@@ -45,6 +45,7 @@ module.exports = {
             option.setName("footer")
             .setDescription("Set a footer for embed")),
     permission: ["MANAGE_GUILD", "ADMINISTRATOR"],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
 
         interaction.deferReply()
@@ -70,6 +71,7 @@ module.exports = {
             const errorEmbed = new Discord.MessageEmbed()
                 .setColor("RED")
             let somethingWrong;
+            let permsStringArr = []
 
             name(Name)
             content(Content)
@@ -84,7 +86,6 @@ module.exports = {
             image(Image)
             footer(Footer)
 
-            let permsStringArr = []
             if(Data.Description !== null || 
                 Data.Author !== null || 
                 Data.Title !== null ||
@@ -175,7 +176,7 @@ module.exports = {
                 collector.on('end', async collected => {
                     row.components[0].setDisabled(true)
                     row.components[1].setDisabled(true)
-                    await interaction.editReply({ content: 'Canceled the command', components: [row]});
+                    await interaction.editReply({components: [row]});
                 });
             })
             

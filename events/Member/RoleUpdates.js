@@ -5,6 +5,9 @@ module.exports = {
     event: "guildMemberUpdate",
     once: false,
     run: async(oldMember, newMember, client)=> {
+        if(!newMember.guild.me.permissions.has("VIEW_AUDIT_LOG")){
+            return
+        }
         const { guild } = newMember;
         const fetchedLogs = await newMember.guild.fetchAuditLogs({
             limit: 1,

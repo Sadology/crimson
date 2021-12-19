@@ -27,6 +27,11 @@ class LogManager{
             if(i.enabled == false) return
             const channel = await this.Guild.channels.cache.get(i.channel)
 
+            if(!this.Guild.me.permissions.any("MANAGE_WEBHOOKS")){
+                return channel.send("Hey i don't have permission to send webhook logs here. Please provide me \`Manage Webhooks\` permission")
+                .catch(err => {return console.log(err.stack)})
+            }
+
             const hooks = await channel.fetchWebhooks();
             const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
 

@@ -12,7 +12,8 @@ module.exports = {
         .addUserOption(option => 
             option.setName('user')
             .setDescription('Purge messages of a user')),
-    permission: ["MANAGE_MESSAGES",],
+    permission: ["MANAGE_MESSAGES"],
+    botPermission: ["MANAGE_MESSAGES"],
     run: async(client, interaction) =>{
 
         const { options } = interaction;
@@ -25,7 +26,7 @@ module.exports = {
                 .setColor("RED")
             ], ephemeral: true})   
         }
-        if(Amount >= 100){
+        if(Amount >= 101){
             return interaction.reply({embeds: [new Discord.MessageEmbed()
                 .setDescription("Can't delete more than 100 messages at once. Limit: 100")
                 .setColor("RED")

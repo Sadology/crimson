@@ -18,6 +18,7 @@ module.exports = {
             option.setName("name")
             .setDescription("Command name for command info option")),
     permission: ["MANAGE_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
         interaction.reply('temporary disabled')
         // const { options, guild } = interaction;

@@ -12,6 +12,7 @@ module.exports = {
             .setDescription("Name of your command.")
             .setRequired(true)),
     permission: ["MANAGE_GUILD", "ADMINISTRATOR"],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
         const { options, guild } = interaction;
 

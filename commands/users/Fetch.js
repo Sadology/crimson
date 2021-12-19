@@ -40,12 +40,21 @@ module.exports = {
         )
 
         async function fetchBanList(Member){
-            await message.guild.bans.fetch(Member).then((res) => {
+            await message.guild.bans.fetch().then((res) => {
                 if(res){
-                    fetchMemberData(res, res.reason, true)
+                    let data = res.find(u => u.user.id == Member)
+                    if(data){
+                        fetchMemberData(data, data.reason, true)
+                    }else {
+                        return message.channel.send({embeds: [new Discord.MessageEmbed()
+                            .setDescription(`<:error:921057346891939840> Please mention a valid member`)
+                            .setColor("RED")
+                        ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
+                        .catch(err => {return console.log(err.stack)}) 
+                    }
                 }else {
                     return message.channel.send({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`Please mention a valid member`)
+                        .setDescription(`<:error:921057346891939840> Please mention a valid member`)
                         .setColor("RED")
                     ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
                     .catch(err => {return console.log(err.stack)}) 

@@ -11,18 +11,11 @@ module.exports = {
             option.setName('user')
                 .setDescription('The user you wants to unmute')
                 .setRequired(true)),
-    permission: ["MANAGE_MESSAGES",],
+    permission: ["MANAGE_MESSAGES"],
+    botPermission: ["MANAGE_ROLES"],
     run: async(client, interaction) =>{
         const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')
-
-        if(!interaction.guild.me.permissions.has(["MANAGE_ROLES", "ADMINISTRATOR"])){
-            return interaction.reply({embeds: [
-                new Discord.MessageEmbed()
-                    .setDescription("I don't have \"Manage_Roles\" permission to add Muted role.")
-                    .setColor("RED")
-            ]})
-        }
         
         let MemberError = new Discord.MessageEmbed()
             .setAuthor(interaction.user.tag, interaction.user.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))

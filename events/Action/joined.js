@@ -6,6 +6,9 @@ module.exports = {
     event: "guildMemberAdd",
     once: false,
     run: async(member, client)=> {
+        if(!member.guild.me.permissions.has("VIEW_AUDIT_LOG")){
+            return
+        }
         const { guild } = member;
 
         let GreetMessage;

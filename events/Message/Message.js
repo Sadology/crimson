@@ -134,7 +134,7 @@ async function checkPermission(command, message){
                         .setDescription(`**Missing Permissions to use this command** \n\nRequire any of the following permission to use this command\n\`\`\`${missing}\`\`\``)
                         .setColor("RED")
                     ]
-                })
+                }).catch(err => {return console.log(err.stack)})
                 return false
             }
             return AccessGranted;

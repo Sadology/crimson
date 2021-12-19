@@ -10,6 +10,7 @@ module.exports = {
             .setRequired(true)
             .setDescription('Your lover')),
     permission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES"],
     run: async(client, interaction) =>{
         const { options } = interaction;
 

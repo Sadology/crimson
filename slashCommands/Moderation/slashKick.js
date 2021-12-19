@@ -14,6 +14,7 @@ module.exports = {
             option.setName("reason")
                 .setDescription("Reason for kicking")),
     permission: ["KICK_MEMBERS"],
+    botPermission: ["KICK_MEMBERS"],
     run: async(client, interaction) =>{
         const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')
@@ -21,13 +22,6 @@ module.exports = {
         interaction.deferReply({ephemeral: true})
         await new Promise(resolve => setTimeout(resolve, 1000))
 
-        if(!interaction.guild.me.permissions.has(["KICK_MEMBERS", "ADMINISTRATOR"])){
-            return interaction.reply({embeds: [
-                new Discord.MessageEmbed()
-                    .setDescription("I don't have \"KICK_MEMBERS\" permission to kick the member.")
-                    .setColor("RED")
-            ]})
-        }
         const kickReason = options.getString('reason') || "No reason Provided"
         function findMember(Member){
             try {
