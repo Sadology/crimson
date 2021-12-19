@@ -6,6 +6,9 @@ module.exports = {
     event: "messageDeleteBulk",
     once: false,
     run: async(deletedMessage, client)=> {
+        if(interaction.guild.me.roles.cache.size == 1 && interaction.guild.me.roles.cache.find(r => r.name == '@everyone')){
+            return
+        }
         if(!deletedMessage.guild.me.permissions.has("VIEW_AUDIT_LOG")){
             return
         }

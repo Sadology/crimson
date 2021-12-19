@@ -5,6 +5,9 @@ module.exports = {
     event: "guildBanRemove",
     once: false,
     run: async(Guild, client)=> {
+        if(interaction.guild.me.roles.cache.size == 1 && interaction.guild.me.roles.cache.find(r => r.name == '@everyone')){
+            return
+        }
         if(!Guild.guild.me.permissions.has("VIEW_AUDIT_LOG")){
             return
         }
