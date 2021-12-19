@@ -6,7 +6,7 @@ module.exports = {
     event: "guildMemberAdd",
     once: false,
     run: async(member, client)=> {
-        if(interaction.guild.me.roles.cache.size == 1 && interaction.guild.me.roles.cache.find(r => r.name == '@everyone')){
+        if(member.guild.me.roles.cache.size == 1 && member.guild.me.roles.cache.find(r => r.name == '@everyone')){
             return
         }
         if(!member.guild.me.permissions.has("VIEW_AUDIT_LOG")){
