@@ -61,7 +61,7 @@ module.exports = {
             const filter = m => m.user.id == items.playerOne || m.user.id == items.playerTwo
             message.channel.send({content: `${message.author} Vs ${member}`,embeds: [new Discord.MessageEmbed()
                 .setAuthor("Rock! Paper! Scissor!")
-                .setDescription("Both a make a choice within 30 seconds")
+                .setDescription("Both make a choice within 30 seconds")
                 .setColor("WHITE")
             ], components: [row]}).then(msg =>{
                 const collector = msg.createMessageComponentCollector({filter, componentType: "BUTTON", time: 1000 * 30 });

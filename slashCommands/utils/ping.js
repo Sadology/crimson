@@ -14,6 +14,6 @@ module.exports = {
         const resEmbed = new Discord.MessageEmbed()
             .setDescription(`Api Latency: **${client.ws.ping.toString()}**`)
             .setColor("#fafcff")
-        await interation.reply({embeds: [resEmbed]})
+        interation.reply({embeds: [resEmbed]})
     }
 }

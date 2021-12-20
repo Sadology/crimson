@@ -9,9 +9,6 @@ module.exports = {
     event: 'messageUpdate',
     once: false,
     run: async(oldMessage, message, client) =>{
-        if(message.guild.me.roles.cache.size == 1 && message.guild.me.roles.cache.find(r => r.name == '@everyone')){
-            return
-        }
         if(!message.guild.me.permissions.has("VIEW_AUDIT_LOG")){
             return
         }

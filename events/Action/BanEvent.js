@@ -6,9 +6,6 @@ module.exports = {
     event: "guildBanAdd",
     once: false,
     run: async(Guild, client)=> {
-        if(Guild.guild.me.roles.cache.size == 1 && Guild.guild.me.roles.cache.find(r => r.name == '@everyone')){
-            return
-        }
         if(!Guild.guild.me.permissions.has("VIEW_AUDIT_LOG")){
             return
         }
