@@ -23,7 +23,7 @@
 //                     .setPlaceholder("Select your job")
 //                     .addOptions(
 //                         {
-//                             label: 'Workshop worker',
+//                             label: 'RepairShop worker',
 //                             description: 'Minimum wage - 10',
 //                             value: 'jobTagOn',
 //                         },
@@ -49,7 +49,7 @@
 
 //                     b.update({embeds: [
 //                         new discord.MessageEmbed()
-//                             .setDescription("Good jobe. Now select your job\n\nWorkshop worker - minimum wage: 10\nBookshop worker - minimum wage: 12\nDiscord bot dev - minimum wage: 20")
+//                             .setDescription("Good jobe. Now select your job\n\nRepairShop worker - minimum wage: 10\nBookshop worker - minimum wage: 12\nDiscord bot dev - minimum wage: 20")
 //                             .setColor("WHITE")
 //                     ], components: []})
 //                     .then(() => {
@@ -60,7 +60,22 @@
 //         })
 
 //         function jobCollector(msg){
-//             msg.edit({components: [Jobs]})
+//             msg.edit({components: [Jobs]}).then(m => {
+//                 let jobCollector = m.createMessageComponentCollector({ time: 1000 * 60 * 10 });
+//                 jobCollector.on('collect', (b) => {
+//                 if(b.user.id !== message.author.id) return
+
+//                 if(b.customId === 'jobTagOn'){
+//                     collector.stop()
+
+//                     b.update({embeds: [
+//                         new discord.MessageEmbed()
+//                             .setDescription("You're now a RepairShop worker")
+//                             .setColor("WHITE")
+//                     ], components: []})
+//                 }
+//             })
+//             })
 //         }
 //     }
 // }

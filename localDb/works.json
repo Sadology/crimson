@@ -1,10 +1,14 @@
 [
     {
-        "job": "discord moderator",
-        "wages": 10
+        "job": "Jobless",
+        "wages": 1
     },
     {
-        "job": "raddit moderator",
+        "job": "Discord Mod",
+        "wages": 5
+    },
+    {
+        "job": "Raddit Mod",
         "wages": 5
     }
 ]

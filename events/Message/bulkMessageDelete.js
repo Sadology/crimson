@@ -7,15 +7,12 @@ module.exports = {
     once: false,
     run: async(deletedMessage, client)=> {
 	    try{
-            if(deletedMessage.channel.type === 'dm') return;
-			if(deletedMessage.author.bot) return;
-            
-            const clientPerm = deletedMessage.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
-            if (!clientPerm || clientPerm == false) return
-
             await Discord.Util.delayFor(900);
             let ID = deletedMessage.first().guildId;
             let guild = client.guilds.cache.get(ID)
+
+            const clientPerm = guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
+            if (!clientPerm || clientPerm == false) return
 
             let length = [...deletedMessage.values()].length;
             let channel = deletedMessage.first().channel;

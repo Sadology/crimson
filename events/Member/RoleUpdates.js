@@ -5,52 +5,57 @@ module.exports = {
     event: "guildMemberUpdate",
     once: false,
     run: async(oldMember, newMember, client)=> {
-        const clientPerm = newMember.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
-        if (!clientPerm || clientPerm == false) return
+        try {
+            const clientPerm = newMember.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
+            if (!clientPerm || clientPerm == false) return
 
-        const { guild } = newMember;
-        const fetchedLogs = await newMember.guild.fetchAuditLogs({
-            limit: 1,
-            type: 'MEMBER_ROLE_UPDATE',
-        });
-        const roleAddLog = fetchedLogs.entries.first();
-        const { executor, changes, target } = roleAddLog;
-        
-        if(executor.id == client.user.id) return
-        let addition = changes.find(i => i.key == '$add')
-        if(!addition){
-            return
-        }
-        else checkMuted()
+            const { guild } = newMember;
+            const fetchedLogs = await newMember.guild.fetchAuditLogs({
+                limit: 1,
+                type: 'MEMBER_ROLE_UPDATE',
+            });
+            const roleAddLog = fetchedLogs.entries.first();
+            const { executor, changes, target } = roleAddLog;
+            if(!executor || !changes || !target) return;
+            
+            if(executor.id == client.user.id) return
+            let addition = changes.find(i => i.key == '$add')
+            if(!addition){
+                return
+            }
+            else checkMuted()
 
-        function checkMuted(){
-            let findRoleNewMember = newMember.roles.cache.find(r => r.name == "muted") || newMember.roles.cache.find(r => r.name == "Muted")
-            if(findRoleNewMember){
-                let findRoleOldMember = oldMember.roles.cache.find(r => r.name == "muted") || oldMember.roles.cache.find(r => r.name == "Muted")
-                if(!findRoleOldMember){
-                    fetchData()
+            function checkMuted(){
+                let findRoleNewMember = newMember.roles.cache.find(r => r.name == "muted") || newMember.roles.cache.find(r => r.name == "Muted")
+                if(findRoleNewMember){
+                    let findRoleOldMember = oldMember.roles.cache.find(r => r.name == "muted") || oldMember.roles.cache.find(r => r.name == "Muted")
+                    if(!findRoleOldMember){
+                        fetchData()
+                    }
                 }
             }
-        }
 
-        function fetchData(){
-            if(executor.bot){
-                const Data = {
-                    guildID: guild.id,
-                    guildName: guild.name,
-                    userID: target.id,
-                    userName: target.username+"#"+executor.discriminator,
-                    actionType: "Mute",
-                    actionReason: `[ ${executor.username} auto mute ]`,
-                    moderator: executor.username+"#"+executor.discriminator,
-                    moderatorID: executor.id,
-                    actionLength: "∞",
+            function fetchData(){
+                if(executor.bot){
+                    const Data = {
+                        guildID: guild.id,
+                        guildName: guild.name,
+                        userID: target.id,
+                        userName: target.username+"#"+executor.discriminator,
+                        actionType: "Mute",
+                        actionReason: `[ ${executor.username} auto mute ]`,
+                        moderator: executor.username+"#"+executor.discriminator,
+                        moderatorID: executor.id,
+                        actionLength: "∞",
+                    }
+            
+                    saveData({
+                        ...Data,
+                    })
                 }
-        
-                saveData({
-                    ...Data,
-                })
             }
+        }catch(err) {
+            return console.log(err.stack)
         }
 
         // newMember.roles.cache.forEach(async (value) => {
