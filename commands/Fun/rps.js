@@ -40,7 +40,7 @@ module.exports = {
             if(players.has(message.author.id)){
                 return message.channel.send("You're already in a game")
             }else {
-                let member = new Member(message, client).getMemberWithoutErrHandle({member: args[0]})
+                let member = new Member(message, client).getMember({member: args[0]})
                 if(member == false) return
     
                 let obj = {

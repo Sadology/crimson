@@ -15,8 +15,17 @@ module.exports = {
 
             const channel = guild.channels.cache.get("920002339274891336")
     
+            let attach
+
+            if(message.attachments){
+                attach = message.attachments.find(i => i.attachment)
+            }
             if(channel){
-                channel.send(`${message.author} - ${message.author.tag} \n${message.content}`)
+                if(attach){
+                    return channel.send({content: `${message.author} - ${message.author.tag} \n${message.content}`, files: [attach.attachment]} )
+                    .catch(err => {return console.log(err.stack)}) 
+                }
+                channel.send({content: `${message.author} - ${message.author.tag} \n${message.content}`})
                 .catch(err => {return console.log(err.stack)})
             }
         }else {

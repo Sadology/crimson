@@ -5,12 +5,12 @@ module.exports = {
     event: "messageDelete",
     once: false,
     run: async(deletedMessage, client)=> {
-		if(!deletedMessage.guild.me.permissions.has("VIEW_AUDIT_LOG")){
-            return
-        }
 		try{
 			if(deletedMessage.channel.type === 'dm') return;
 			if(deletedMessage.author.bot) return;
+			
+			const clientPerm = deletedMessage.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
+			if (!clientPerm || clientPerm == false) return
 
 			if(!deletedMessage.guild.me.permissions.has("VIEW_AUDIT_LOG", "ADMINISTRATOR")){
 				return false;

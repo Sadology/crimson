@@ -6,12 +6,13 @@ module.exports = {
 	event: 'messageUpdate',
 	once: false,
 	run: async(oldMessage, newMessage, client) => {
-		if(!oldMessage.guild.me.permissions.has("VIEW_AUDIT_LOG")){
-            return
-        }
 		try{
 			if(oldMessage.channel.type === 'dm') return;
 			if(oldMessage.author.bot) return;
+			
+			const clientPerm = newMessage.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
+			if (!clientPerm || clientPerm == false) return
+
 
 			if(!oldMessage.guild.me.permissions.has("VIEW_AUDIT_LOG", "ADMINISTRATOR")){
 				return false;

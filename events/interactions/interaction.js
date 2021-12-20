@@ -86,7 +86,7 @@ async function checkPermission(command, interaction){
 async function checkBotPerms(command, interaction){
     if(command.botPermission){
         if(interaction.guild.me.roles.cache.size == 1 && interaction.guild.me.roles.cache.find(r => r.name == '@everyone')){
-            interaction.author.send({
+            interaction.user.send({
                 embeds: [
                     new Discord.MessageEmbed()
                     .setDescription(`Hey i don't have any roles to execute any commands`)

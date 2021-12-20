@@ -4,9 +4,6 @@ module.exports = {
     event: "presenceUpdate",
     once: false,
     run: async(oldPresence, newPresence, client)=> {
-        if(!newPresence.guild.me.permissions.has("VIEW_AUDIT_LOG")){
-            return
-        }
         try{
             if(newPresence == undefined) return
             if(oldPresence == undefined) return

@@ -6,10 +6,10 @@ module.exports = {
     event: "guildBanAdd",
     once: false,
     run: async(Guild, client)=> {
-        if(!Guild.guild.me.permissions.has("VIEW_AUDIT_LOG")){
-            return
-        }
         try{ 
+            const clientPerm = Guild.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
+            if (!clientPerm || clientPerm == false) return
+            
             const fetchedLogs = await Guild.guild.fetchAuditLogs({
                 limit: 1,
                 type: 'MEMBER_BAN_ADD',

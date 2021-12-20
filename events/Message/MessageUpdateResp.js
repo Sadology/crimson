@@ -9,12 +9,12 @@ module.exports = {
     event: 'messageUpdate',
     once: false,
     run: async(oldMessage, message, client) =>{
-        if(!message.guild.me.permissions.has("VIEW_AUDIT_LOG")){
-            return
-        }
         try {
             if(message.author.bot) return;
             if(message.channel.type === 'DM') return;
+            
+            const clientPerm = message.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
+            if (!clientPerm || clientPerm == false) return
     
             let settings = await Guild.findOne({guildID: message.guild.id})
     
