@@ -6,7 +6,7 @@
 //     run: async(client, message, args, prefix) =>{
 //         let mainEmbed = new discord.MessageEmbed()
 //             .setAuthor(message.author.tag, message.author.displayAvatarURL({dunamic: true, type: 'png'}))
-//             .setDescription(`Hey welcome to sad economy. So if you wanna start this **sad** economy system, smash that start button.`)
+//             .setDescription(`Oh hey 👋. So you want to start the sadbot economy. `)
 //             .setColor("WHITE")
 
 //         let startButton = new MessageActionRow()
@@ -18,27 +18,18 @@
 //                 )
 //         let Jobs = new MessageActionRow()
 //             .addComponents(
-//                 new MessageSelectMenu()
-//                     .setCustomId("JobSelector")
-//                     .setPlaceholder("Select your job")
-//                     .addOptions(
-//                         {
-//                             label: 'RepairShop worker',
-//                             description: 'Minimum wage - 10',
-//                             value: 'jobTagOn',
-//                         },
-//                         {
-//                             label: 'Bookshop worker',
-//                             description: 'Minimum wage - 10',
-//                             value: 'jobTagTw',
-//                         },
-//                         {
-//                             label: 'Discord bot dev',
-//                             description: 'Minimum wage - 20',
-//                             value: 'jobTagThr',
-//                         },
-//                     )
-//                 )
+//                 new MessageButton()
+//                     .setCustomId("jobCodeOne")
+//                     .setStyle("PRIMARY")
+//                     .setLabel("Discord Mod")
+//             )
+//             .addComponents(
+//                 new MessageButton()
+//                     .setCustomId("jobCodeTwo")
+//                     .setStyle("PRIMARY")
+//                     .setLabel("Reddit Mod")
+//             )
+                    
 //         message.channel.send({embeds: [mainEmbed], components: [startButton]}).then((msg) => {
 //             let collector = msg.createMessageComponentCollector({ time: 1000 * 60 * 10 });
 //             collector.on('collect', (b) => {

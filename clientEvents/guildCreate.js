@@ -6,7 +6,7 @@ module.exports = async client =>{
         }
         async GuildData(guild){
             await Guild.findOneAndUpdate({
-                guildID: guild.id.Active,
+                guildID: guild.id,
             }, {
                 guildName: guild.name,
                 Active: true,
@@ -80,13 +80,6 @@ module.exports = async client =>{
             .then((res) =>{
                 if(!res){
                     GuildCreate.GuildChannels(guild)
-                }else {
-                    Guild.findOneAndUpdate({
-                        Active: true,
-                        Balance: {$exists : false}
-                    }, {
-                        $set: {'Balance': 1000000}
-                    }).catch(err => {return console.log(err)})
                 }
             })
             .catch(err => {return console.log(err.stack)});
@@ -106,3 +99,10 @@ module.exports = async client =>{
     
     
 }
+
+// Guild.findOneAndUpdate({
+//     Active: true,
+//     Balance: {$exists : false}
+// }, {
+//     $set: {'Balance': 1000000}
+// }).catch(err => {return console.log(err)})
