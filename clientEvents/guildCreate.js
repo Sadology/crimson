@@ -153,6 +153,9 @@ async function createMap(client){
         if(!cmds.category || cmds.category == "Owner"){
             return
         }
+        if(cmds.category.toLowerCase() == 'ranks'){
+            moduleMap.set('ranks', new Discord.Collection())
+        }
         if(!moduleMap.has(cmds.category.toLowerCase())){
             moduleMap.set(cmds.category.toLowerCase(), new Discord.Collection())
         }
@@ -168,7 +171,7 @@ async function createMap(client){
         }
 
         let cmdData = cmdMap.get(cmds.name.toLowerCase())
-        cmdData.set("Enabled", false)
+        cmdData.set("Enabled", true)
         cmdData.set("Permissions", [])
         cmdData.set("NotAllowedRole", [])
         cmdData.set("NotAllowedChannel", [])
