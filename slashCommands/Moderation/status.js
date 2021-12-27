@@ -12,6 +12,7 @@ module.exports = {
             .setDescription("Custom message will show when someone pings you")),
     permission: ["MANAGE_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
+    category: "Slash",
     run: async(client, interaction) =>{
         interaction.deferReply()
         await new Promise(resolve => setTimeout(resolve, 1000))

@@ -13,6 +13,7 @@ module.exports = {
                 .setRequired(true)),
     permission: ["MANAGE_MESSAGES"],
     botPermission: ["MANAGE_ROLES"],
+    category: "Slash",
     run: async(client, interaction) =>{
         const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')

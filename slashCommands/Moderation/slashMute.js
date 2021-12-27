@@ -20,6 +20,7 @@ module.exports = {
                 .setDescription("Reason for mute")),
     permission: ["MANAGE_MESSAGES"],
     botPermission: ["MANAGE_ROLES", "MANAGE_CHANNELS"],
+    category: "Slash",
     run: async(client, interaction) =>{
         const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')

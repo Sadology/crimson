@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const { GuildChannel } = require('../../models')
 const { LogManager } = require('../../Functions')
 const { Messages } = require('../../localDb');
+
 module.exports = {
     event: "guildMemberAdd",
     once: false,

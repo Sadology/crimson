@@ -11,6 +11,7 @@ module.exports = {
             .setDescription('check another users profile.')),
     permission: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
+    category: "Slash",
     run: async(client, interaction) =>{
     try {
         const { options } = interaction;

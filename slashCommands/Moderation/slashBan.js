@@ -14,6 +14,7 @@ module.exports = {
                 .setDescription("Reason for Ban")),
     permission: ["BAN_MEMBERS"],
     botPermission: ["BAN_MEMBERS"],
+    category: "Slash",
     run: async(client, interaction) =>{
         const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')

@@ -11,6 +11,7 @@ module.exports = {
             .setDescription('Your lover')),
     permission: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
+    category: "Slash",
     run: async(client, interaction) =>{
         const { options } = interaction;
 

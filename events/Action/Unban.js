@@ -1,11 +1,13 @@
 const { MessageEmbed } = require('discord.js');
 const { GuildChannel, LogsDatabase } = require('../../models');
 const { LogManager } = require('../../Functions');
+const wait = require('util').promisify(setTimeout);
 module.exports = {
     event: "guildBanRemove",
     once: false,
     run: async(Guild, client)=> {
         try{ 
+            wait(1000)
             const clientPerm = Guild.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
             if (!clientPerm || clientPerm == false) return
             

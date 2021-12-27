@@ -19,6 +19,7 @@ module.exports = {
             .setDescription("Command name for command info option")),
     permission: ["MANAGE_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
+    category: "Slash",
     run: async(client, interaction) =>{
         interaction.reply('temporary disabled')
         // const { options, guild } = interaction;

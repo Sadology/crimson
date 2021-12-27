@@ -26,6 +26,7 @@ module.exports = {
             .setDescription('Mention all the roles you want to set.')),
     permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
+    category: "Slash",
     run: async(client, interaction) =>{
         const { options, guild } = interaction;
         const logOption = options.getString('options');

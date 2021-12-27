@@ -6,9 +6,12 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('user-info')
         .setDescription('User Inofrmations')
-        .addUserOption(option => option.setName('user').setDescription('Informations of another user')),
+        .addUserOption(option => 
+            option.setName('user')
+            .setDescription('Informations of another user')),
     permission: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
+    category: "Slash",
     run: async(client, interaction) =>{
         const { options } = interaction;
         const MemberID = options.getUser('user')
@@ -17,7 +20,7 @@ module.exports = {
             if(!member){
                 getInfo(interaction.member)
             }else {
-                let Member = interaction.guild.members.cache.get(member.id)
+                let Member = interaction.guild.members.resolve(member.id)
                 if(Member){
                     getInfo(Member)
                 }else {

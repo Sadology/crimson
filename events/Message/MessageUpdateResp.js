@@ -18,7 +18,9 @@ module.exports = {
     
             let settings = await Guild.findOne({guildID: message.guild.id})
     
-            const prefix = settings ? settings.prefix : config.default_prefix
+            const prefix = settings ? settings.prefix : ">"
+
+            const { Modules, Commands } = settings;
             if(!message.content.startsWith(prefix)) return
             if(!prefix) return
             if (!message.member){
@@ -36,6 +38,12 @@ module.exports = {
             if (!command) command = client.commands.get(client.aliases.get(cmd));
             
             if (command){
+                let moduleData = Modules.get(command.category.toLowerCase())
+                if(moduleData && moduleData.Enabled == false) return
+    
+                let cmdData = Commands.get(command.name.toLowerCase())
+                if(cmdData && cmdData.Enabled == false) return
+
                 const hasPermissionInChannel = message.channel
                     .permissionsFor(client.user)
                     .has('SEND_MESSAGES', false);

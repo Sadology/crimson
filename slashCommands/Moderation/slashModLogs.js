@@ -15,6 +15,7 @@ module.exports = {
                 .setRequired(true)),
     permission: ["MANAGE_MESSAGES",],
     botPermission: ["SEND_MESSAGES"],
+    category: "Slash",
     run: async(client, interaction) =>{
         const { options, guild } = interaction;
 

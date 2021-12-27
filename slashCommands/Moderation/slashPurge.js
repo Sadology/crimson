@@ -14,6 +14,7 @@ module.exports = {
             .setDescription('Purge messages of a user')),
     permission: ["MANAGE_MESSAGES"],
     botPermission: ["MANAGE_MESSAGES"],
+    category: "Slash",
     run: async(client, interaction) =>{
 
         const { options } = interaction;

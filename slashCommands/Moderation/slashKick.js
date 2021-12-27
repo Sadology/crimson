@@ -15,6 +15,7 @@ module.exports = {
                 .setDescription("Reason for kicking")),
     permission: ["KICK_MEMBERS"],
     botPermission: ["KICK_MEMBERS"],
+    category: "Slash",
     run: async(client, interaction) =>{
         const { options, guild, content, channel} = interaction;
         const User = options.getUser('user')

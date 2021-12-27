@@ -28,6 +28,20 @@ const profilesSchema = mongoose.Schema({
     Economy: {
         Balance: Number,
         Job: String,
+    },
+    Rank: {
+        Experience: Number,
+        NextLvlExp: Number,
+        Level: Number,
+        RankCard: {
+            url: String,
+            overlay: String,
+            barColor: String,
+            fontColor: String
+        },
+        CoolDown: Number,
+        TotalMsg: Number,
+        TotalExp: Number,
     }
 })
 

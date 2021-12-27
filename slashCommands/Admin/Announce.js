@@ -29,6 +29,7 @@ module.exports = {
             .setDescription('A custom message to greet/farewell members. separated by [ , ]')),
     permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
+    category: "Slash",
     run: async(client, interaction) =>{
         const { options } = interaction;
 

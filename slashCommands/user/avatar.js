@@ -6,9 +6,12 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('avatar')
         .setDescription('Check avatar in 4k')
-        .addUserOption(option => option.setName('user').setDescription('Check your friends avatar in 4k')),
+        .addUserOption(option => 
+            option.setName('user')
+            .setDescription('Check your friends avatar in 4k')),
     permission: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
+    category: "Slash",
     run: async(client, interation) =>{
         const { options } = interation;
         const MemberID = options.getUser('user')

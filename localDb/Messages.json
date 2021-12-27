@@ -7,7 +7,7 @@
             "{member.name} Just joined, heres some cookies 🍪",
             "Woah {member.name} just joined!",
             "{member.name} joined, let's start the party",
-            "Hey {member.name} 👋, welcome to ${guild}",
+            "Hey {member.name} 👋, welcome to ${server}",
             "{member.name} Joined the party, let's drop on the chat 😂",
             "Is it a bird or is it a cat, nah its just {member.name}",
             "Hey our friend {member.name} joined the server. Let's go for mining",

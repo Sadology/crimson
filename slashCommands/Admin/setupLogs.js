@@ -29,6 +29,7 @@ module.exports = {
             .setDescription('Selected log option will log into the selected channel')),
     permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
+    category: "Slash",
     run: async(client, interaction) =>{
         const { options } = interaction;
 
