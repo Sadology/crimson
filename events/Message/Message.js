@@ -69,7 +69,7 @@ module.exports = {
                     return console.log(err.stack)
                 }
             }
-
+            deleteAfterRun(command, message)
         }
     }catch(err){
         message.channel.send({
