@@ -185,7 +185,7 @@ async function createMap(client){
             moduleMap.set(slash.category.toLowerCase(), new Discord.Collection())
         }
         let moduleData = moduleMap.get(slash.category.toLowerCase())
-        moduleData.set("Enabled", false)
+        moduleData.set("Enabled", true)
     })
     client.slash.forEach(cmds => {
         if(!cmds.category){
