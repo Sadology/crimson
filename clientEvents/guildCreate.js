@@ -196,7 +196,7 @@ async function createMap(client){
         }
 
         let cmdData = cmdMap.get(cmds.data.name.toLowerCase())
-        cmdData.set("Enabled", false)
+        cmdData.set("Enabled", true)
         cmdData.set("Permissions", [])
         cmdData.set("NotAllowedRole", [])
         cmdData.set("NotAllowedChannel", [])
