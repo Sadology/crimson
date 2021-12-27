@@ -160,7 +160,7 @@ async function createMap(client){
             moduleMap.set(cmds.category.toLowerCase(), new Discord.Collection())
         }
         let moduleData = moduleMap.get(cmds.category.toLowerCase())
-        moduleData.set("Enabled", false)
+        moduleData.set("Enabled", true)
     })
     client.commands.forEach(cmds => {
         if(!cmds.category || cmds.category == "Owner"){
