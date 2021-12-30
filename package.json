@@ -11,6 +11,9 @@
   },
   "author": "shadow~",
   "license": "ISC",
+  "engines": { 
+    "node": "16.x" 
+  },
   "dependencies": {
     "@discordjs/opus": "^0.5.3",
     "@discordjs/rest": "^0.1.0-canary.0",
