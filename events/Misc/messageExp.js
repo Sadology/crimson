@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const { Guild, GuildRole, Profiles } = require('../../models');
-let config = require('../../config.json');
 const { Permissions } = require('discord.js');
 let TimeOut = {};
 const ms = require('ms')

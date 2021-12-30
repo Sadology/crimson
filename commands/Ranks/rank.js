@@ -3,18 +3,18 @@ const { Member } = require('../../Functions');
 const Canvas = require('canvas');
 const canvacord = require("canvacord");
 const { Guild, Profiles } = require('../../models');
-
+const axios = require('axios')
+const Readable = require('stream').Readable
 module.exports = {
     name: 'rank',
     aliases: ['ranks', 'level'],
     description: "check your rank in the server",
-    permissions: ["SEND_MESSAGE"],
+    permissions: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES", "ATTACH_FILES"],
     usage: "rank [ user (optional)]",
     category: "Ranks",
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-        return message.channel.send("Comming soon...")
         // let img
         // await Guild.findOne({
         //     guildID: message.guild.id,
@@ -43,6 +43,7 @@ module.exports = {
         
         //     rank.build()
         //         .then(data => {
+        //             console.log(data)
         //             const attachment = new Discord.MessageAttachment(data, "RankCard.png");
         //             message.channel.send({files: [attachment]}).catch(err => {return console.log(err.stack)})
         //         });

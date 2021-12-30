@@ -99,19 +99,26 @@ function ChannelManager(data, message){
     let allowed = data.AllowedChannel
     let ignored = data.NotAllowedChannel
 
-    let c1 = ignored.find(c => c == message.channel.id)
-    let c2 = allowed.find(c => c == message.channel.id)
-    if(c1){
-        console.log("this is c1")
-        return Errors = true
+    if(allowed.lenght){
+        let c1 = ignored.find(c => c == message.channel.id)
+        if(c1){
+            console.log("this is c1")
+            return Errors = true
+        }
     }
-    if(!c2){
-        console.log("this is c2")
-        return Errors = true
+
+    if(allowed.lenght){
+        let c2 = allowed.find(c => c == message.channel.id)
+
+        if(!c2){
+            console.log("this is c2")
+            return Errors = true
+        }
     }
 }
+
 async function PermissionManager(cmd, message){
-    if(message.guild.ownerId !== message.member.id || !message.member.permissions.has("ADMINISTRATOR")){
+    if(!message.member.permissions.has("ADMINISTRATOR")){
         if(cmd.permissions){
             ChannelManager(cmdMap, message)
             IGRole()

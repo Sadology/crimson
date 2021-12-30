@@ -1,11 +1,12 @@
 const Discord = require('discord.js');
 const { Guild, Profiles } = require('../../models');
-const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js')
+const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const { default: axios } = require('axios');
 module.exports = {
     name: 'rank-leaderboard',
     aliases: ['ranklb', 'rlb', 'rank-lb'],
     description: "check server rank board",
-    permissions: ["SEND_MESSAGE"],
+    permissions: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES", "ATTACH_FILES"],
     usage: "rank [ user (optional)]",
     category: "Ranks",

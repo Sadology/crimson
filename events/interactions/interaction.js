@@ -64,7 +64,7 @@ function ChannelManager(data, message){
 }
 
 async function PermissionManager(cmd, message){
-    if(message.guild.ownerId !== message.member.id || !message.member.permissions.has("ADMINISTRATOR")){
+    if(!message.member.permissions.has("ADMINISTRATOR")){
         if(cmd.permission){
             ChannelManager(cmdMap, message)
             IGRole()
