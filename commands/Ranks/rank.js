@@ -15,38 +15,37 @@ module.exports = {
     category: "Ranks",
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-        // let img
-        // await Guild.findOne({
-        //     guildID: message.guild.id,
-        // }).then((res) => {
-        //     if(res){
-        //         img = res.RankSettings.GuildCard
-        //     }
-        // })
+        let img
+        await Guild.findOne({
+            guildID: message.guild.id,
+        }).then((res) => {
+            if(res){
+                img = res.RankSettings.GuildCard
+            }
+        })
 
-        // await Profiles.findOne({
-        //     guildID: message.guild.id,
-        //     userID: message.author.id
-        // }).then((res) => {
-        //     const rank = new canvacord.Rank()
-        //         .setAvatar(message.author.displayAvatarURL({dynamic: false, format: 'png'}))
-        //         .setBackground("IMAGE",img)
-        //         .setOverlay('','',false)
-        //         .setCurrentXP(res.Rank.Experience ? res.Rank.Experience : 0)
-        //         .setRequiredXP(res.Rank.NextLvlExp ? res.Rank.NextLvlExp : 0)
-        //         .setLevel(res.Rank.Level ? res.Rank.Level : 0)
-        //         .setProgressBar("#9382ff", "COLOR")
-        //         .setUsername(message.author.username, "#220abf")
-        //         .setLevelColor("#82ffec", "#8288ff")
-        //         .setProgressBarTrack("#f382ff")
-        //         .setDiscriminator(message.author.discriminator);
+        await Profiles.findOne({
+            guildID: message.guild.id,
+            userID: message.author.id
+        }).then((res) => {
+            const rank = new canvacord.Rank()
+                .setAvatar(message.author.displayAvatarURL({dynamic: false, format: 'png'}))
+                .setBackground("IMAGE",img)
+                .setOverlay('','',false)
+                .setCurrentXP(res.Rank.Experience ? res.Rank.Experience : 0)
+                .setRequiredXP(res.Rank.NextLvlExp ? res.Rank.NextLvlExp : 0)
+                .setLevel(res.Rank.Level ? res.Rank.Level : 0)
+                .setProgressBar("#9382ff", "COLOR")
+                .setUsername(message.author.username, "#220abf")
+                .setLevelColor("#82ffec", "#8288ff")
+                .setProgressBarTrack("#f382ff")
+                .setDiscriminator(message.author.discriminator);
         
-        //     rank.build()
-        //         .then(data => {
-        //             console.log(data)
-        //             const attachment = new Discord.MessageAttachment(data, "RankCard.png");
-        //             message.channel.send({files: [attachment]}).catch(err => {return console.log(err.stack)})
-        //         });
-        // })
+            rank.build()
+                .then(data => {
+                    const attachment = new Discord.MessageAttachment(data, "RankCard.png");
+                    message.channel.send({files: [attachment]}).catch(err => {return console.log(err.stack)})
+                });
+        })
     }
 }

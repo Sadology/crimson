@@ -8,7 +8,7 @@ module.exports = {
     name: 'edit-card',
     aliases: ['editcard'],
     description: "check your rank in the server",
-    permissions: ["SEND_MESSAGE"],
+    permissions: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES", "ATTACH_FILES"],
     usage: "rank [ user (optional)]",
     category: "Ranks",
