@@ -15,6 +15,7 @@ module.exports = {
     category: "Ranks",
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
+        return message.channel.send("coming soon...")
         let img
         await Guild.findOne({
             guildID: message.guild.id,

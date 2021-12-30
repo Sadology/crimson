@@ -21,7 +21,7 @@ module.exports = {
         .addRoleOption(option =>
             option.setName('role')
             .setDescription('The role you want to give at specific role')),
-    permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
+    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

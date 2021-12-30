@@ -7,6 +7,7 @@ module.exports = {
     once: false,
     run: async(member, client)=> {
         try{
+            if(member.user.id == client.user.id) return
             const clientPerm = member.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
             if (!clientPerm || clientPerm == false) return
     

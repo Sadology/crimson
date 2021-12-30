@@ -18,7 +18,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName("reason")
                 .setDescription("Reason for mute")),
-    permission: ["MANAGE_MESSAGES"],
+    permissions: ["MANAGE_MESSAGES"],
     botPermission: ["MANAGE_ROLES", "MANAGE_CHANNELS"],
     category: "Slash",
     run: async(client, interaction) =>{

@@ -6,23 +6,27 @@ const wait = require('util').promisify(setTimeout);
 module.exports = {
     event: "guildBanAdd",
     once: false,
-    run: async(Guild, client)=> {
+    run: async(bannedMember, client)=> {
         try{
-            wait(1000)
-            const clientPerm = Guild.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
+            const clientPerm = bannedMember.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
             if (!clientPerm || clientPerm == false) return
             
-            const fetchedLogs = await Guild.guild.fetchAuditLogs({
+            const fetchedLogs = await bannedMember.guild.fetchAuditLogs({
                 limit: 1,
-                type: 'MEMBER_BAN_ADD',
-            });
+                type: 'MEMBER_BAN_ADD'
+            })
 
-            const BanLog = fetchedLogs.entries.first()
+            const BanLog = fetchedLogs.entries
+                .filter(e => e.target.id === bannedMember.user.id)
+                .sort((a, b) => b.createdAt - a.createdAt)
+                .first()
+
             if(!BanLog){
-                return console.log(`${member.id} was banned from ${Guild.name} but couldn't find any informations`)
+                return console.log(`${bannedMember.user.id} was banned from ${bannedMember.guild.name} but couldn't find any informations`)
             }
 
             const { executor, target, reason } = BanLog
+
             const banEmbed = {
                 color: "#fc5947",
                 author: {
@@ -55,8 +59,8 @@ module.exports = {
                 }
             }
             const Data = {
-                guildID: Guild.guild.id, 
-                guildName: Guild.guild.name,
+                guildID: bannedMember.guild.id, 
+                guildName: bannedMember.guild.name,
                 userID: target.id, 
                 userName: target.tag,
                 actionType: "Ban", 
@@ -65,19 +69,20 @@ module.exports = {
                 moderatorID: executor.id,
             }
 
-            async function CreateLog(Member){
+            async function CreateLog(){
                 try {
                     saveData({
                         ...Data,
                     })
-                    ModStatus({type: "Ban", guild: Guild.guild, member: executor, content: "Banned " + ` ${target.tag}`})
+                    if(executor.bot == true) return
+                    else ModStatus({type: "Ban", guild: bannedMember.guild, member: executor, content: "Banned " + ` ${target.tag}`})
                 } catch (err) {
                     return console.log(err)
                 }
             }
-            CreateLog(target)
+            CreateLog()
 
-            new LogManager(Guild.guild).sendData({type: 'banlog', data: banEmbed, client})
+            new LogManager(bannedMember.guild).sendData({type: 'banlog', data: banEmbed, client})
         }catch(err){
             return console.log(err)
         }

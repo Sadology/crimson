@@ -5,20 +5,24 @@ const wait = require('util').promisify(setTimeout);
 module.exports = {
     event: "guildBanRemove",
     once: false,
-    run: async(Guild, client)=> {
+    run: async(bannedMember, client)=> {
         try{ 
             wait(1000)
-            const clientPerm = Guild.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
+            const clientPerm = bannedMember.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
             if (!clientPerm || clientPerm == false) return
             
-            const fetchedLogs = await Guild.guild.fetchAuditLogs({
+            const fetchedLogs = await bannedMember.guild.fetchAuditLogs({
                 limit: 1,
-                type: 'MEMBER_BAN_REMOVE:',
+                type: 'MEMBER_BAN_REMOVE',
             });
 
-            const unBanLog = fetchedLogs.entries.first()
+            const unBanLog = fetchedLogs.entries
+                .filter(e => e.target.id === bannedMember.user.id)
+                .sort((a, b) => b.createdAt - a.createdAt)
+                .first()
+
             if(!unBanLog){
-                return console.log(`${member.id} was banned from ${guild.name} but couldn't find any informations`)
+                return console.log(`${member.user.id} was unbanned from ${bannedMember.guild.name} but couldn't find any informations`)
             }
 
             const { executor, target } = unBanLog
@@ -49,7 +53,7 @@ module.exports = {
                     text: `${target.id}`
                 }
             }
-            new LogManager(Guild.guild).sendData({type: 'banlog', data: unbanEmbed, client})
+            new LogManager(bannedMember.guild).sendData({type: 'banlog', data: unbanEmbed, client})
         }catch(err){
             return console.log(err.stack)
         }

@@ -120,7 +120,6 @@ module.exports = async client =>{
                                 'Commands': cmdMap
                             }
                         }).then(res => {
-                            console.log("Updated")
                         }).catch(err => {return console.log(err.stack)});
                     });
                 }

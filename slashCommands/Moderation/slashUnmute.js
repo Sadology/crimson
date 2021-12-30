@@ -11,7 +11,7 @@ module.exports = {
             option.setName('user')
                 .setDescription('The user you wants to unmute')
                 .setRequired(true)),
-    permission: ["MANAGE_MESSAGES"],
+    permissions: ["MANAGE_MESSAGES"],
     botPermission: ["MANAGE_ROLES"],
     category: "Slash",
     run: async(client, interaction) =>{

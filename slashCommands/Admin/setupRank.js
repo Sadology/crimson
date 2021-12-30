@@ -9,7 +9,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('setup-rank')
         .setDescription('Setup ranks on your server.'),
-    permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
+    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

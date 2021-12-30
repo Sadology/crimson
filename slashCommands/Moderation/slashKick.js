@@ -13,7 +13,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName("reason")
                 .setDescription("Reason for kicking")),
-    permission: ["KICK_MEMBERS"],
+    permissions: ["KICK_MEMBERS"],
     botPermission: ["KICK_MEMBERS"],
     category: "Slash",
     run: async(client, interaction) =>{

@@ -13,7 +13,7 @@ module.exports = {
             option.setName('user')
                 .setDescription('The user you want to check logs')
                 .setRequired(true)),
-    permission: ["MANAGE_MESSAGES",],
+    permissions: ["MANAGE_MESSAGES",],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

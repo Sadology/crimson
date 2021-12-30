@@ -10,7 +10,7 @@ module.exports = {
             option.setName("name")
             .setRequired(true)
             .setDescription("Module/Command name")),
-    permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
+    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

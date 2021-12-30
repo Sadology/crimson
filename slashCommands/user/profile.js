@@ -9,7 +9,7 @@ module.exports = {
         .addUserOption(option => 
             option.setName('member')
             .setDescription('check another users profile.')),
-    permission: ["SEND_MESSAGES"],
+    permissions: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

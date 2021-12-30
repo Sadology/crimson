@@ -21,7 +21,7 @@ module.exports = client => {
     }
   });
 
-const clientId = '874975916592332820';
+const clientId = '618434479601745950';
 const guildId = '874975341347762206';
 //applicationCommands
 //applicationGuildCommands
@@ -34,7 +34,7 @@ const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 		console.log('Started refreshing application (/) commands.');
 
 		await rest.put(
-			Routes.applicationGuildCommands(clientId, guildId),
+			Routes.applicationCommands(clientId),
 			{ body: cmds },
 		);
 

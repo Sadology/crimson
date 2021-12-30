@@ -17,7 +17,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName("name")
             .setDescription("Command name for command info option")),
-    permission: ["MANAGE_MESSAGES"],
+    permissions: ["MANAGE_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

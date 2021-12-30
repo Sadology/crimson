@@ -10,7 +10,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName('value')
             .setDescription('The new prefix value')),
-    permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
+    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

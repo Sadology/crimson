@@ -12,7 +12,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName("reason")
                 .setDescription("Reason for Ban")),
-    permission: ["BAN_MEMBERS"],
+    permissions: ["BAN_MEMBERS"],
     botPermission: ["BAN_MEMBERS"],
     category: "Slash",
     run: async(client, interaction) =>{

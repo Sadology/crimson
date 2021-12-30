@@ -12,7 +12,7 @@ module.exports = {
         .addUserOption(option => 
             option.setName('user')
             .setDescription('Purge messages of a user')),
-    permission: ["MANAGE_MESSAGES"],
+    permissions: ["MANAGE_MESSAGES"],
     botPermission: ["MANAGE_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

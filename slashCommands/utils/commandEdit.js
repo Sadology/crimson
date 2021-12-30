@@ -47,7 +47,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName("footer")
             .setDescription("Set a footer for embed")),
-    permission: ["MANAGE_GUILD", "ADMINISTRATOR"],
+    permissions: ["MANAGE_GUILD", "ADMINISTRATOR"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

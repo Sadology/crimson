@@ -27,7 +27,7 @@ module.exports = {
         .addChannelOption(option =>
             option.setName("log-channel")
             .setDescription('Selected log option will log into the selected channel')),
-    permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
+    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

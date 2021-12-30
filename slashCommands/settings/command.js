@@ -31,7 +31,7 @@ module.exports = {
         .addStringOption(options =>
             options.setName('channels')
             .setDescription("Allowed/Ignored channels [separated by ,]")), 
-    permission: ["ADMINISTRATOR", "MANAGE_GUILD"],
+    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{
@@ -64,6 +64,8 @@ module.exports = {
                     case 'rmCmd':
                         this.settings = 'removed'
                     break;
+                    case 'cmdInfo':
+                        this.settings = 'info'
                 }
             }
 
@@ -92,6 +94,8 @@ module.exports = {
                     this.saveData()
                 }else if(this.settings == 'removed'){
                     this.deleteData()
+                }else if(this.settings == 'info'){
+                    this.showData()
                 }
             }
 
@@ -169,6 +173,16 @@ module.exports = {
             }
 
             verifyRoles(data){
+                if(!data){
+                    return interaction.editReply({
+                        embeds: [
+                            new Discord.MessageEmbed()
+                            .setDescription(`Please mention the role(s) for this command \nseperated by \` ,\` if multiple)`)
+                            .setColor("RED")
+                        ]
+                    }).catch(err => {return console.log(err.stack)})
+                }
+
                 let splitData = data.split(/,\s+/g)
                 let trimData = splitData.map(function (el) {
                     return el.trim();
@@ -203,6 +217,16 @@ module.exports = {
             }
 
             verifyChannels(data){
+                if(!data){
+                    return interaction.editReply({
+                        embeds: [
+                            new Discord.MessageEmbed()
+                            .setDescription(`Please mention the channel(s) for this command \nseperated by \` ,\` if multiple)`)
+                            .setColor("RED")
+                        ]
+                    }).catch(err => {return console.log(err.stack)})
+                }
+
                 let splitData = data.split(/,\s+/g)
                 let trimData = splitData.map(function (el) {
                     return el.trim();
@@ -236,59 +260,85 @@ module.exports = {
                 }
             }
 
+            async showData(){
+                let cmdPerm = []
+                let ignoreRole = []
+                let allowedChan = []
+                let ignoreChan = []
+
+                for(let i=0;i <= this.Cmd.Permissions.length; i++){
+                    let guildRole = interaction.guild.roles.resolve(this.Cmd.Permissions[i])
+                    if(guildRole){
+                        cmdPerm.push(guildRole.toString())
+                    }
+                }
+                for(let i=0;i <= this.Cmd.NotAllowedRole.length; i++){
+                    let guildIGRole = interaction.guild.roles.resolve(this.Cmd.NotAllowedRole[i])
+                    if(guildIGRole){
+                        ignoreRole.push(guildIGRole.toString())
+                    }
+                }
+                for(let i=0;i <= this.Cmd.NotAllowedChannel.length; i++){
+                    let guildIGchan = interaction.guild.channels.resolve(this.Cmd.NotAllowedChannel[i])
+                    if(guildIGchan){
+                        ignoreChan.push(guildIGchan.toString())
+                    }
+                }
+                for(let i=0;i <= this.Cmd.AllowedChannel.length; i++){
+                    let guildchan = interaction.guild.channels.resolve(this.Cmd.AllowedChannel[i])
+                    if(guildchan){
+                        allowedChan.push(guildchan.toString())
+                    }
+                }
+
+                if(!cmdPerm.length){
+                    cmdPerm = "NONE"
+                }
+                if(!ignoreRole.length){
+                    ignoreRole = "NONE"
+                }
+                if(!allowedChan.length){
+                    allowedChan = "NONE"
+                }
+                if(!ignoreChan.length){
+                    ignoreChan = "NONE"
+                }
+
+                return interaction.editReply({
+                    embeds: [new Discord.MessageEmbed()
+                        .setAuthor("Command Info")
+                        .setDescription(`<:administration:915457421823078460> \` ${cmdname} \`\n**Enabled:** ${this.Cmd.Enabled}\n**Permissions:** ${cmdPerm}\n**Ignore Roles:** ${ignoreRole}\n**Allowed Channels:** ${allowedChan}\n**Ignore Channels:** ${ignoreChan}`)
+                        .setColor("WHITE")
+                    ]
+                })
+            }
+
             getOption(opt){
                 switch(opt){
                     case 'cmdPerm':
-                        if(!perms){
-                            return interaction.editReply({
-                                embeds: [
-                                    new Discord.MessageEmbed()
-                                    .setDescription(`Please mention the roles for this command`)
-                                    .setColor("RED")
-                                ]
-                            }).catch(err => {return console.log(err.stack)})
+                        if(cmdSett !== 'cmdInfo'){
+                            this.verifyRoles(perms)
                         }
-                        this.verifyRoles(perms)
                         this.getSettings(cmdSett)
                         this.Type = 'Permissions'
                     break;
                     case 'igRole':
-                        if(!perms){
-                            return interaction.editReply({
-                                embeds: [
-                                    new Discord.MessageEmbed()
-                                    .setDescription(`Please mention the roles for this command`)
-                                    .setColor("RED")
-                                ]
-                            }).catch(err => {return console.log(err.stack)})
+                        if(cmdSett !== 'cmdInfo'){
+                            this.verifyRoles(perms)
                         }
-                        this.verifyRoles(perms)
                         this.getSettings(cmdSett)
                         this.Type = 'NotAllowedRole'
                     break;
                     case 'allChan':
-                        if(!channels){
-                            return interaction.editReply({
-                                embeds: [
-                                    new Discord.MessageEmbed()
-                                    .setDescription(`Please mention the channels for this command`)
-                                    .setColor("RED")
-                                ]
-                            }).catch(err => {return console.log(err.stack)})
+                        if(cmdSett !== 'cmdInfo'){
+                            this.verifyChannels(channels)
                         }
-                        this.verifyChannels(channels)
                         this.getSettings(cmdSett)
                         this.Type = 'AllowedChannel'
                     break;
                     case 'igChan':
-                        if(!channels){
-                            return interaction.editReply({
-                                embeds: [
-                                    new Discord.MessageEmbed()
-                                    .setDescription(`Please mention the channels for this command`)
-                                    .setColor("RED")
-                                ]
-                            }).catch(err => {return console.log(err.stack)})
+                        if(cmdSett !== 'cmdInfo'){
+                            this.verifyChannels(channels)
                         }
                         this.verifyChannels(channels)
                         this.getSettings(cmdSett)
