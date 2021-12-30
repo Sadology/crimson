@@ -105,34 +105,46 @@ module.exports = {
                         })
                         .then(res =>{
                             if(res){
-                                let data = res.Roles.find(i => i.Name.toLowerCase() == "manager");
-                                if(!data){
-                                    if(cmd.permissions){
-                                        if(Interaction.member.permissions.any(cmd.permissions)){
-                                            return RunCommand()
-                                        }
-                                    }
-                                }else {
-                                    let rolesData = data.Roles; 
-                                    if(Interaction.member.roles.cache.some(r=> rolesData.includes(r.id))){
-                                        return RunCommand()
+                                function managerType(){
+                                    let data = res.Roles.find(i => i.Name.toLowerCase() == "manager");
+                                    if(!data){
+                                        ModType()
                                     }else {
-                                        if(cmd.permissions){
-                                            if(Interaction.member.permissions.any(cmd.permissions)){
-                                                return RunCommand()
-                                            }
+                                        let rolesData = data.Roles; 
+                                        if(Interaction.member.roles.cache.some(r=> rolesData.includes(r.id))){
+                                            return RunCommand()
+                                        }else {
+                                            checkRolePerm()
                                         }
                                     }
                                 }
-                            }else {
-                                if(cmd.permissions){
-                                    if(Interaction.member.permissions.any(cmd.permissions)){
-                                        return RunCommand()
+
+                                function ModType(){
+                                    if(cmd.category){
+                                        if(cmd.category.toLowerCase() == 'moderation'){
+                                            let data = res.Roles.find(i => i.Name.toLowerCase() == "moderator");
+                                            if(data){
+                                                RunCommand()
+                                            }
+                                        }else {
+                                            checkRolePerm()
+                                        }
                                     }
                                 }
+                                managerType()
+                            }else {
+                                checkRolePerm()
                             }
                         })
                         .catch(err => {return console.log(err.stack)})
+
+                        function checkRolePerm(){
+                            if(cmd.permissions){
+                                if(Interaction.member.permissions.any(cmd.permissions)){
+                                    return RunCommand()
+                                }
+                            }
+                        }
                     }
                 }).catch(err => {return console.log(err.stack)})
             }
