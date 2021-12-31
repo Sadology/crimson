@@ -4,6 +4,7 @@ module.exports = {
     name: 'help',
     permissions: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
+    category: 'Utils',
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         const Menu = new MessageEmbed()
