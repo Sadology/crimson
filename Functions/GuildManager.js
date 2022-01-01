@@ -1,4 +1,5 @@
 const { Guild, GuildRole, GuildChannel } = require('../models');
+const Discord = require('discord.js');
 class GuildManager{
     constructor(Client, Guild){
         this.client = Client
@@ -227,6 +228,8 @@ class GuildManager{
             res.forEach(async data => {
                 let modls = data.Modules;
                 let cmds = data.Commands;
+                if(!modls) return
+                if(!cmds) return
 
                 for(let [key] of modls){
                     let arr = []
