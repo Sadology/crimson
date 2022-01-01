@@ -7,7 +7,7 @@ module.exports = {
     aliases: ["adminlog"],
     description: "Most powerful log, view every single log in your server",
     permissions: ["ADMINISTRATOR"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "admin-log [ options ]",
     category: "Administrator",
     cooldown: 3000,

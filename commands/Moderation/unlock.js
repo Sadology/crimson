@@ -3,7 +3,7 @@ module.exports = {
     name: 'unlock',
     description: "Unlock a locked channel.",
     permissions: ["MANAGE_CHANNELS"],
-    botPermission: ["MANAGE_CHANNELS"],
+    botPermission: ["MANAGE_CHANNELS", "SEND_MESSAGES", "EMBED_LINKS"],
     usage: "unlock [ channel ]",
     category: "Moderation",
     cooldown: 1000,

@@ -17,7 +17,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName('command-name')
                 .setDescription('Help of individual commands')),
-    permissions: ["SEND_MESSAGES"],
+    permissions: ["USE_APPLICATION_COMMANDS"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

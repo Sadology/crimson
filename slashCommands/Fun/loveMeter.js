@@ -9,7 +9,7 @@ module.exports = {
             option.setName('love')
             .setRequired(true)
             .setDescription('Your lover')),
-    permissions: ["SEND_MESSAGES"],
+    permissions: ["USE_APPLICATION_COMMANDS"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

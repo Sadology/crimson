@@ -8,7 +8,7 @@ module.exports = {
     aliases: ["resetlog"],
     description: "Reset every mod logs of a user.",
     permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "reset-log [ user ]",
     category: "Administrator",
     cooldown: 3000,

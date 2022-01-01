@@ -7,7 +7,7 @@ module.exports = {
     aliases: ["deletelog"],
     description: "Delete a moderation log",
     permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "delete-log [ log ID ]",
     category: "Administrator",
     cooldown: 3000,

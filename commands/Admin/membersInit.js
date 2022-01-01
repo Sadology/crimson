@@ -7,7 +7,7 @@ module.exports = {
     aliases: ['rolemember'],
     description: "Members in a single role",
     permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "memberinit [ role ]",
     category: "Administrator",
     cooldown: 3000,

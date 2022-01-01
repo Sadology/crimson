@@ -3,7 +3,7 @@ const { MessageEmbed, MessageActionRow, MessageSelectMenu } = require('discord.j
 module.exports = {
     name: 'help',
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     category: 'Utils',
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{

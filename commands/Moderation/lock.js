@@ -6,7 +6,7 @@ module.exports = {
     name: 'lock',
     description: "Locks a channel from everyone.",
     permissions: ["MANAGE_CHANNELS"],
-    botPermission: ["MANAGE_CHANNELS"],
+    botPermission: ["MANAGE_CHANNELS", "SEND_MESSAGES", "EMBED_LINKS"],
     usage: "lock [ channel ]",
     category: "Moderation",
     cooldown: 1000,

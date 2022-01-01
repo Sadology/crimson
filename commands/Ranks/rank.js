@@ -10,7 +10,7 @@ module.exports = {
     aliases: ['ranks', 'level'],
     description: "check your rank in the server",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES", "ATTACH_FILES"],
+    botPermission: ["SEND_MESSAGES", "ATTACH_FILES", "EMBED_LINKS"],
     usage: "rank [ user (optional)]",
     category: "Ranks",
     cooldown: 3000,

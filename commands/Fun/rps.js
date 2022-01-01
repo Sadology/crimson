@@ -6,7 +6,7 @@ module.exports = {
     name: 'rps',
     description: "Rock! Paper! Scissor!",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "rps",
     category: "Fun",
     cooldown: 3000,

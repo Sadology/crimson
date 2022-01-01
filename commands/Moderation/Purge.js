@@ -5,7 +5,7 @@ module.exports = {
     aliases: ['purne'],
     description: "Purge amount of message in the channel with options",
     permissions: ['MANAGE_MESSAGES'],
-    botPermission: ["MANAGE_MESSAGES",],
+    botPermission: ["MANAGE_MESSAGES", "SEND_MESSAGES", "EMBED_LINKS"],
     usage: "purge [ amount ] [ options *optional* ]",
     category: "Moderation",
     delete: true,

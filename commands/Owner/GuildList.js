@@ -3,7 +3,7 @@ const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js')
 module.exports = {
     name: 'guild-list',
     aliases: ['guildlist'],
-    show: true,
+    category: "Owner",
     run: async(client, message, args,prefix) =>{
         if(message.author.id !== "571964900646191104"){
             return

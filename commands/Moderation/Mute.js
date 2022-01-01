@@ -8,7 +8,7 @@ module.exports = {
     name: 'mute',
     description: "Mute a member to prevent them from texting/speaking",
     permissions: ["MANAGE_MESSAGES"],
-    botPermission: ["MANAGE_ROLES", "MANAGE_CHANNELS"],
+    botPermission: ["MANAGE_ROLES", "MANAGE_CHANNELS", "SEND_MESSAGES", "EMBED_LINKS"],
     usage: "mute [ member ] [ duraion ] [ reason ]",
     category: "Moderation",
     delete: true,

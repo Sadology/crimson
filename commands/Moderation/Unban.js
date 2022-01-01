@@ -6,7 +6,7 @@ module.exports = {
     name: 'unban',
     description: "Unbans a banned member",
     permissions: ["BAN_MEMBERS"],
-    botPermission: ["BAN_MEMBERS"],
+    botPermission: ["BAN_MEMBERS", "SEND_MESSAGES", "EMBED_LINKS"],
     usage: "unban [ member ]",
     category: "Moderation",
     delete: true,

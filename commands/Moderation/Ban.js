@@ -5,7 +5,7 @@ module.exports = {
     name: 'ban',
     description: "Bans a member from the server",
     permissions: ["BAN_MEMBERS"],
-    botPermission: ["BAN_MEMBERS"],
+    botPermission: ["BAN_MEMBERS", "SEND_MESSAGES", "EMBED_LINKS"],
     usage: "ban [ member ]",
     category: "Moderation",
     delete: true,

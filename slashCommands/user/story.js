@@ -12,7 +12,7 @@ module.exports = {
         .addStringOption(option => 
             option.setName('image-link')
             .setDescription('You can add a image on your story.')),
-    permissions: ["SEND_MESSAGES"],
+    permissions: ["USE_APPLICATION_COMMANDS"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{

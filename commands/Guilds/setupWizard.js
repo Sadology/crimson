@@ -10,7 +10,7 @@ module.exports = {
     usage: "setup",
     category: "Administrator",
     permissions: ["MANAGE_GUILD", "ADMINISTRATOR"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         async function replace(type){

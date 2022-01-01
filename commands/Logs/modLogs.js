@@ -9,7 +9,7 @@ module.exports = {
     aliases: ['modlogs', 'modlog', 'log'],
     description: "Check moderation logs of a member.",
     permissions: ["MANAGE_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "logs [ member ]",
     category: "Moderation",
     cooldown: 1000,

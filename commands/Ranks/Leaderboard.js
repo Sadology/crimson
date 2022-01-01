@@ -7,7 +7,7 @@ module.exports = {
     aliases: ['ranklb', 'rlb', 'rank-lb'],
     description: "check server rank board",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES", "ATTACH_FILES"],
+    botPermission: ["SEND_MESSAGES", "ATTACH_FILES", "EMBED_LINKS"],
     usage: "rank [ user (optional)]",
     category: "Ranks",
     cooldown: 3000,

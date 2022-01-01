@@ -5,7 +5,7 @@ module.exports = {
     aliases: ['botinfo'],
     description: "checks bot informations",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "bot-info",
     category: "Utils",
     cooldown: 3000,
@@ -20,7 +20,7 @@ module.exports = {
             fields: [
                 {
                     name: "Version",
-                    value: 'Beta v1.4.1',
+                    value: 'Beta v1.4.2',
                     inline: true
                 },
                 {

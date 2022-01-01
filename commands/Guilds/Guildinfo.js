@@ -16,7 +16,7 @@ module.exports = {
     aliases: ['guild', 'serverinfo', 'guildinfo', 'server-info', 'guild-info'],
     description: "Get informations about your server.",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "server-info",
     category: "Utils",
     cooldown: 3000,
@@ -63,8 +63,6 @@ module.exports = {
         .addField('Categories:', `${Channels.filter(cc => cc.type === 'GUILD_CATEGORY').size}`.toString(), true)
         .addField("Partnered", message.guild.partnered.toString(), true)
         .addField("Verified", message.guild.verified.toString(), true)
-        .addField("Rules Channel", message.guild.rulesChannel.toString(), true)
-        .addField("Shard", message.guild.shardId.toString(), true)
         .addField("Banner", `[Banner Link](${message.guild.banner ? message.guild.banner : "https://youtu.be/dQw4w9WgXcQ"})`.toString(), true)
         .addField("Boost Tier", message.guild.premiumTier.toString(), true)
         .addField("Boosters", message.guild.premiumSubscriptionCount.toString(), true)

@@ -4,7 +4,7 @@ module.exports = {
     name: 'ping',
     description: "Ping! Pong!. Check bots ping",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "ping",
     category: "Utils",
     cooldown: 3000,

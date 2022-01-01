@@ -6,7 +6,7 @@ module.exports = {
     name: 'color',
     description: "check a color with hex code",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "color [ color code ]",
     category: "Utils",
     cooldown: 3000,

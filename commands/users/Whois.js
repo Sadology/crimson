@@ -6,7 +6,7 @@ module.exports = {
     aliases: ['userinfo', 'user-info',],
     description: "Check a members information",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     category: "Utils",
     usage: "whois [ user ]",
     cooldown: 3000,

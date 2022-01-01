@@ -5,7 +5,7 @@ module.exports = {
     aliases: ['generateme', 'makeme'],
     description: "Experimental command",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "makeme",
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{

@@ -5,7 +5,7 @@ module.exports = {
     aliases: ['findbf'],
     description: "Lonely? not anymore, bot will find the best match couple for you.",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "findgf",
     category: "Fun",
     cooldown: 3000,

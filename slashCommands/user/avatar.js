@@ -9,7 +9,7 @@ module.exports = {
         .addUserOption(option => 
             option.setName('user')
             .setDescription('Check your friends avatar in 4k')),
-    permissions: ["SEND_MESSAGES"],
+    permissions: ["USE_APPLICATION_COMMANDS"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interation) =>{

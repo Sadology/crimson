@@ -8,7 +8,7 @@ module.exports = {
     name: 'slowmode',
     aliases: ["sm", "slomo"],
     description: "Sets a slowmode in the channel.",
-    permissions: ["MANAGE_CHANNELS"],
+    permissions: ["MANAGE_CHANNELS", "SEND_MESSAGES", "EMBED_LINKS"],
     botPermission: ["MANAGE_CHANNELS"],
     usage: "sm [ limit ]",
     category: "Moderation",

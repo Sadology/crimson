@@ -4,7 +4,7 @@ module.exports = {
     aliases: ['eightball'],
     description: "Ask the 8ball any question, it will reply and remove the confusion.",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "8ball [ question ]",
     category: "Fun",
     cooldown: 3000,

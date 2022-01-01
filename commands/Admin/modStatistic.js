@@ -7,7 +7,7 @@ module.exports = {
     aliases: ["modstats"],
     description: "Moderators statistic. Moderation data of all time.",
     permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "mod-stats [ user ]",
     category: "Administrator",
     cooldown: 3000,

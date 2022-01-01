@@ -6,7 +6,7 @@ module.exports = {
     name: 'unmute',
     description: "Unmute a muted member.",
     permissions: ["MANAGE_MESSAGES"],
-    botPermission: ["MANAGE_ROLES"],
+    botPermission: ["MANAGE_ROLES", "SEND_MESSAGES", "EMBED_LINKS"],
     usage: "unmute [ member ]",
     category: "Moderation",
     delete: true,

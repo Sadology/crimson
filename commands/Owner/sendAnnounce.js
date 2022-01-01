@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const { commandUsed } = require('../../Functions/CommandUsage');
 module.exports = {
     name: 'sendannounce',
+    category: "Owner",
     run: async(client, message, args,prefix) =>{
         if(message.author.id !== "571964900646191104"){
             return

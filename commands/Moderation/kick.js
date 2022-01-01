@@ -5,7 +5,7 @@ module.exports = {
     name: 'kick',
     description: "Kick out a member from the server.",
     permissions: ["KICK_MEMBERS"],
-    botPermission: ["KICK_MEMBERS"],
+    botPermission: ["KICK_MEMBERS", "SEND_MESSAGES", "EMBED_LINKS"],
     usage: "kick [ member ]",
     category: "Moderation",
     delete: true,
