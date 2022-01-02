@@ -37,7 +37,7 @@ module.exports = {
             }else {
                 return message.reply({embeds: [
                     new Discord.MessageEmbed()
-                        .setDescription(`No logs was found by this ID: **${caseid}**`)
+                        .setDescription(`No logs were found by this ID: **${caseid}**`)
                         .setColor("RED")
                 ], ephemeral: true})
             }

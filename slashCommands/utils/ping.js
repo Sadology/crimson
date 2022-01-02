@@ -9,12 +9,17 @@ module.exports = {
     permissions: ["USE_APPLICATION_COMMANDS"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
-    run: async(client, interation) =>{
-        let choices = ["Checking pings...","Pinging...", "What's my ping?...", "Now checking..."]
-        let response = choices[Math.floor(Math.random() * choices.length)]
-        const resEmbed = new Discord.MessageEmbed()
-            .setDescription(`Api Latency: **${client.ws.ping.toString()}**`)
+    run: async(client, interaction) =>{
+        interaction.deferReply()
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
+        interaction.editReply({content: "Pinging..."}).then(i => {
+            let Ping = i.createdTimestamp - interaction.createdTimestamp
+
+            const resEmbed = new Discord.MessageEmbed()
+            .setDescription(`Bot Latency: **${Ping}** | Api Latency: **${client.ws.ping.toString()}**`)
             .setColor("#fafcff")
-        interation.reply({embeds: [resEmbed]})
+            interaction.editReply({content: "Pong", embeds: [resEmbed]})
+        })
     }
 }

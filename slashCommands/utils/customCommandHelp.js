@@ -16,121 +16,169 @@ module.exports = {
 			.addChoice('help', 'cmd_help'))
         .addStringOption(option =>
             option.setName("name")
-            .setDescription("Command name for command info option")),
+            .setDescription("Command name for info option")),
     permissions: ["MANAGE_MESSAGES"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{
-        interaction.reply('temporary disabled')
-        // const { options, guild } = interaction;
-        // const optionName = options.getString('options');
+        const { options, guild } = interaction;
+        const optionName = options.getString('options');
 
-        // interaction.deferReply({ephermal: true})
-        // await new Promise(resolve => setTimeout(resolve, 1000))
+        interaction.deferReply()
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        const row = new Discord.MessageActionRow()
+            .addComponents(
+                new Discord.MessageButton()
+                    .setCustomId("variables")
+                    .setLabel("Variables")
+                    .setStyle("PRIMARY")
+            )
+        switch(optionName){
+            case 'cmd_info':
+                let cmdName = options.getString('name')
+                if(!cmdName){
+                    return interaction.editReply({content: "Please provide the custom command name", ephemeral: true})
+                }
 
-        // switch(optionName){
-        //     case "cmd_info":
-        //         const cmdName = options.getString('name');
-        //         if(!cmdName){
-        //             interaction.editReply({embeds: [new Discord.MessageEmbed()
-        //                 .setDescription("You forgot to provide command name")
-        //                 .setColor("RED")
-        //             ]})
-        //         }
-        //         const fetchedData = await CustomCommand.findOne({ 
-        //             guildID: interaction.guild.id,
-        //             [`Data.name`] : cmdName
-        //         }) 
-        //         if(!fetchedData){
-        //             return await interaction.editReply({ content: 'Failed', components: [] , embeds: [new Discord.MessageEmbed().setDescription(`The command ${cmdName} doesn't exist.`).setColor("RED")], ephermal: true})
-        //         }else if(fetchedData){
-        //             const DataFromDB = {
-        //                 name: fetchedData.Data.Name,
-        //                 content: fetchedData.Data.Content,
-        //                 deleteC: fetchedData.Data.deleteC,
-        //                 mention: fetchedData.Data.mention,
-        //                 embed: fetchedData.Data.embed,
-        //                 permission: fetchedData.Data.permission,
-        //                 author: fetchedData.Data.author,
-        //                 description: fetchedData.Data.description,
-        //                 title: fetchedData.Data.title,
-        //                 image: fetchedData.Data.image,
-        //                 footer: fetchedData.Data.footer,
-        //                 color: fetchedData.Data.color
-        //             }
+                await CustomCommand.findOne({
+                    guildID: interaction.guild.id,
+                    Data: {$exists: true}
+                })
+                .then(res => {
+                    if(!res){
+                        return interaction.editReply({content: "Custom-Commands doesn't exist for this server. Setup now by `/custom-cmd-create`", ephemeral: true}).catch(err => {return console.log(err.stack)})
+                    }
+                    let items = res.Data.find(i => i.Name.toLowerCase() == cmdName.toLowerCase())
+                    if(!items){
+                        return interaction.editReply({content: "Couldn't find any custom command. Make sure the name is correct.", ephemeral: true}).catch(err => {return console.log(err.stack)})
+                    }
 
-        //             let rolesArr = []
-        //             DataFromDB.permission.forEach(role =>{
-        //                 let findTheRoles = interaction.guild.roles.cache.find(r => r.id == role)
-            
-        //                 if(findTheRoles){
-        //                     rolesArr.push(findTheRoles.toString())
-        //                 }
-        //             })
-        
-        //             let messageEmbed = new Discord.MessageEmbed()
-        //                 .setAuthor("Custom-command: Info")
-        //                 .setDescription(`**Name:** ${DataFromDB.name}
-        //                 **Content:** ${DataFromDB.content}
-        //                 **Delete:** ${DataFromDB.deleteC}
-        //                 **Mention:** ${DataFromDB.mention}
-        //                 **Embed:** ${DataFromDB.embed}`)
-        //                 .setColor("WHITE")
-        //                 .addField(`Roles access`, DataFromDB.permission ? rolesArr.toString() : "Error finding the roles")
-        //                 if(DataFromDB.embed === true){
-        //                     messageEmbed.addField("Embed Properties", [
-        //                         `**Author:** ${DataFromDB.author == null ? "None" : DataFromDB.author}`,
-        //                         `\n**Description:** ${DataFromDB.description == null ? "None" : DataFromDB.description}`,
-        //                         `\n**Title:** ${DataFromDB.title == null ? "None" : DataFromDB.title}`,
-        //                         `\n**Color:** ${DataFromDB.color == null ? "None": DataFromDB.color}`,
-        //                         `\n**Image:** [Image URL](${DataFromDB.image == null ? "https://youtu.be/dQw4w9WgXcQ" : DataFromDB.image})`,
-        //                         `\n**Footer:** ${DataFromDB.footer == null ? "None" : DataFromDB.footer}`,
-        //                     ].toString())
-        //                 }
+                    let Data = {
+                        Name: items.Name ? items.Name : "<:error:921057346891939840>",
+                        Content: items.Content ? items.Content : "<:error:921057346891939840>",
+                        Embed: items.Embed ? items.Embed : "False",
+                        DeleteCmd: items.DeleteCmd ? items.DeleteCmd : "False",
+                        Mention: items.Mention ? items.Mention : "False",
+                        Description: items.Description ? items.Description : "<:error:921057346891939840>",
+                        Author: items.Author ? items.Author : "<:error:921057346891939840>",
+                        Title: items.Title ? items.Title : "<:error:921057346891939840>",
+                        Image: items.Image ? items.Image : "<:error:921057346891939840>",
+                        Color: items.Color ? items.Color : "Sadbot Role Color",
+                        Footer: items.Footer ? items.Footer : "<:error:921057346891939840>",
+                        Permission: items.Permission ? items.Permission : null,
+                    }
 
-        //             interaction.editReply({embeds: [messageEmbed]})
-        //         }
-        //     break;
+                    let roleArr = ["<:error:921057346891939840>"]
+                    if(Data.Permission){
+                        roleArr.pop()
+                        Data.Permission.forEach(perms => {
+                            let guildrole = interaction.guild.roles.resolve(perms)
+                            if(guildrole){
+                                roleArr.push(guildrole.toString())
+                            }
+                        })
+                    }
 
-        //     case "cmd_list":
-        //         try {
-        //             await CustomCommand.find({
-        //                 guildID: interaction.guild.id,
-        //             }).sort([
-        //                 ['Data.Name','ascending']
-        //             ]).exec(async(err, res) => {
-        //                 if(err){
-        //                     console.log(err)
-        //                 }
-    
-        //                 if(res.length == 0) {
-        //                     return interaction.editReply({embeds: [new Discord.MessageEmbed()
-        //                         .setAuthor("Custom-command: List")
-        //                         .setDescription(`No commands found. Create now by /command-create`)
-        //                         .setColor("#fc5947")
-        //                     ], ephermal: true
-        //                     })
-        //                 }
-                        
-        //                 const embed = new Discord.MessageEmbed()
-        //                     .setDescription(`Custom-command: List`)
-        //                     .setColor("#fffafa")
-        //                     .setFooter("/custom-command [ info ] [ command-name ] to learn more")
-    
-        //                 for (i = 0; i < res.length; i++){
-        //                     embed.addField(`**${i + 1}**• [ ${res[i] && res[i].Data.Name} ]`,[
-        //                         `\`\`\`Content - ${res[i] && res[i].Data.Content}\`\`\``
-        //                     ].toString())
-        //                 } 
-        //                 await interaction.editReply({embeds: [embed]})
-        //             })
-        //         } catch (err){
-        //             console.log(err);
-        //         }
-        //     break;
-        //     case "cmd_help":
-        //         interaction.editReply({content: "Coming soon", ephermal: true})
-        //     break;
-        // }
+                    let infoEmbed = new Discord.MessageEmbed()
+                    .setAuthor("Custom Command - "+Data.Name)
+                        .setDescription(`
+                        **Name:** ${Data.Name}
+                        **Content:** ${Data.Content}
+                        **Embed:** ${Data.Embed}
+                        **Delete cmd:** ${Data.DeleteCmd}
+                        **Require mention:** ${Data.Mention}
+                        __Embed Side__
+                        **Author:** ${Data.Author}
+                        **Title:** ${Data.Title}
+                        **Description:** ${Data.Description}
+                        **Footer:** ${Data.Footer}
+                        **Color:** ${Data.Color}
+                        **Images:** ${Data.Image.join(", ")}
+                        __Permissions__
+                        ${roleArr.join(', ')}
+                    `)
+                    .setColor("WHITE")
+
+                    interaction.editReply({embeds: [infoEmbed]}).catch(err => {return console.log(err.stack)})
+                }).catch(err => {return console.log(err.stack)})
+            break;
+
+            case 'cmd_list':
+                await CustomCommand.findOne({
+                    guildID: interaction.guild.id,
+                    Data: {$exists: true}
+                })
+                .then(res => {
+                    if(!res){
+                        return interaction.editReply({content: "Custom-Commands doesn't exist for this server. Setup now by `/custom-cmd-create`", ephemeral: true}).catch(err => {return console.log(err.stack)})
+                    }
+
+                    let cmds = []
+                    res.Data.forEach(data => {
+                        cmds.push(`\` - \` **Cmd Name:** ${data.Name ? data.Name : "<:error:921057346891939840>"}`)
+                    })
+
+                    let listEmbed = new Discord.MessageEmbed()
+                        .setDescription(`<:reply:897083777703084035>__Custom Commands__\n${cmds.join(" \n")}`)
+                        .setColor("WHITE")
+
+                    interaction.editReply({embeds: [listEmbed]}).catch(err => {return console.log(err.stack)})
+                })
+            break;
+
+            case 'cmd_help':
+                let helpEmbed = new Discord.MessageEmbed()
+                    .setAuthor(interaction.user.tag, interaction.user.displayAvatarURL({format: 'png'}))
+                    .setDescription("Custom Command Help")
+                    .addField("Name", `Name of the custom command. Name will trigger and respond with the command. Example: \`>hello\`. Hello is now a command and everytime a person type *hello* with prefix, bot will respond back to them. **Note:** Command name can't be longer than 5 characters.`)
+                    .addField("Content", "Content of the message. Bot will send the message in text channel (normal message, not embed). **Note:** Content can't exceed 200 words.")
+                    .addField("Embed", "If Embed is set to true, Bot will send message in Embed. Else bot will respond with just normal message.")
+                    .addField("Delete", "If Delete is set to true then Bot will delete the command after it respond. Else it won't delete the command if set to false.")
+                    .addField("Mention", "If Mention set to true, member will require to mention someone to trigger the command. Bot won't respond unless they mention someone on the command. If set to false then it won't require to mention someone.")
+                    .addField("Author", "Author of the embed. **Note:** Author can't exceed 50 words.")
+                    .addField("Title", "Title of the embed. **Note:** Title can't exceed 50 words.")
+                    .addField("Description", "Description of the embed. **Note:** Description can't exceed 200 words.")
+                    .addField("Images", "You can send image in both embed and normal message. You can add multiple images and bot will send random images **(separate each links with ` , `)**. **Note:** Use image/gif address cause discord embed doesn't support links")
+                    .addField("Color", "Color off the embed. Bot will use its highest role color if color isn't specified. **Note:** Must use HEX color code (google *color picker*)")
+                    .addField("Footer", "Footer of the embed. **Note:** Footer can't exceed 50 words.")
+                    .addField("Permissions", "Member with the role will be able to use the command. If the member don't have any of the roles. bot won't response to the command. **Note:** Separate each role with ` , `")
+                    .setColor("WHITE")
+
+                interaction.editReply({embeds: [helpEmbed], components: [row]})
+                .then((int) => {
+                    let collector = int.createMessageComponentCollector({time: 1000 * 60 * 5})
+                    collector.on('collect', (b)=>{
+                        if(b.customId == 'variables'){
+                            let varEmbed = new Discord.MessageEmbed()
+                                .setDescription(`Exapmle: {author} said hello to {server}\nExapmle: ${interaction.user} said hello to ${interaction.guild.name}`)
+                                .addField("Variables", [
+                                    `{member} - It will mention the member if Mention is set to true`,
+                                    `{member.id} - Mentioned member ID`,
+                                    `{member.tag} - Mentioned member tag aka discriminator`,
+                                    `{member.name} - Mentioned member discord user name`,
+                                    `{author} - It will mentioned the user who just used the command`,
+                                    `{author.id} - Command users ID`,
+                                    `{author.tag} - Command users tag aka discriminator`,
+                                    `{author.name} - Command users discord user name`,
+                                    `{channel} - Current channel`,
+                                    `{channel.id} - Current channel ID`,
+                                    `{server} - Server name`,
+                                    `{server.id} - Server ID`,
+                                    `{empty} - If you want to remove any field or keep it clean`,
+                                ].toString().split(",").join(' \n'))
+                                .setColor("WHITE")
+                            b.reply({embeds: [varEmbed], ephemeral: true}).catch(err => {return console.log(err.stack)})
+                        }
+                    })
+                    collector.on('end', () => {
+                        row.components[0].setDisabled(true)
+                        interaction.editReply({components: [row]}).catch(err => {return console.log(err.stack)})
+                    })
+
+                })
+                .catch(err => {return console.log(err.stack)})
+            break;
+
+        }
     }
 }

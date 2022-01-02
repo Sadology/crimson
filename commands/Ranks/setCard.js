@@ -14,6 +14,6 @@ module.exports = {
     category: "Ranks",
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-        return message.channel.send("comming soon")
+        return message.channel.send("Coming soon...")
     }
 }

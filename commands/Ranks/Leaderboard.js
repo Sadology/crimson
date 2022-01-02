@@ -12,7 +12,7 @@ module.exports = {
     category: "Ranks",
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-        return message.channel.send("coming soon...")
+        return message.channel.send("Coming soon...")
         const row = new MessageActionRow()
         .addComponents(
             new MessageButton()
@@ -70,7 +70,7 @@ module.exports = {
 
                 let arr = []
                 for (i = 0; i < current.length; i++){
-                    arr.push(`${start + i + 1}: __${current[i].name}__ **${current[i].Rank.Level}** \`${current[i].Rank.Experience}\``)
+                    arr.push(`${start + i + 1}: ${current[i].name} **${current[i].Rank.Level}** \`${current[i].Rank.Experience}\``)
                 }
                 Embed.setDescription(arr.join(' \n'))
 

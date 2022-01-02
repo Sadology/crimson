@@ -36,9 +36,9 @@ module.exports = {
                 .setAuthor("Command Status", client.user.displayAvatarURL({format: 'png'}))
                 for(let [key, val] of data.Commands){
                     if(val.Enabled == true){
-                        cmdarr.push(`<:online:926939036562628658>${key}: Enabled`)
+                        cmdarr.push(`<:online:926939036562628658>**${key}**: \` Enabled \``)
                     }else if(val.Enabled == false){
-                        cmdarr.push(`<:dnd:926939036281610300>${key}: Disabled`)
+                        cmdarr.push(`<:dnd:926939036281610300>**${key}**: \` Disabled \``)
                     }
                 }
                 cmdEmbed.setDescription(cmdarr.join('\n '))
@@ -52,9 +52,9 @@ module.exports = {
                 .setAuthor("Module Status", client.user.displayAvatarURL({format: 'png'}))
                 for(let [key, val] of data.Modules){
                     if(val.Enabled == true){
-                        modarr.push(`<:online:926939036562628658>${key}: Enabled`)
+                        modarr.push(`<:online:926939036562628658>**${key}**: \` Enabled \``)
                     }else if(val.Enabled == false){
-                        modarr.push(`<:dnd:926939036281610300>${key}: Disabled`)
+                        modarr.push(`<:dnd:926939036281610300>**${key}**: \` Disabled \``)
                     }
                 }
                 modEmbed.setDescription(modarr.join('\n '))
