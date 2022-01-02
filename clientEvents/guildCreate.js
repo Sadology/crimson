@@ -25,7 +25,7 @@ module.exports = async client =>{
             data.setupRanks();
             data.deleteJunk()
 
-            setTimeout(GuildDataCheck, 1000 * 60 ) 
+            setTimeout(GuildDataCheck, 1000 * 60 * 30) 
         }
         GuildDataCheck()
     })
