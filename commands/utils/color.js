@@ -12,7 +12,7 @@ module.exports = {
     cooldown: 3000,
 
     run: async(client, message, args, prefix)=> {
-        if(!args.length || !args[0]){
+        if(!args.length || !args[0] || !args[0].startsWith("#")){
             return message.channel.send({
                 embeds: [new Discord.MessageEmbed()
                     .setDescription(`Find a color with Hex codes \n\nUsage: \`${prefix}color [ hex code ]\`\nExample: \`${prefix}color #ffffaf\``)
@@ -27,7 +27,6 @@ module.exports = {
             let rgba = res.data.rgb.value
             let name = res.data.name.value
 
-            console.log(col)
             const canvas = Canvas.createCanvas(250, 200);
             const context = canvas.getContext('2d');
     
@@ -49,7 +48,7 @@ module.exports = {
                 .addField("Hex Code", col ? col : "Unknown")
                 .addField("Rgb", rgba ? rgba : "Unknown")
                 .setThumbnail('attachment://sadbotcolor.png');
-            message.channel.send({ embeds: [Embed], files: [attachment] });
+            message.channel.send({ embeds: [Embed], files: [attachment] }).catch(err => {return console.log(err.stack)})
         })
     }
 }

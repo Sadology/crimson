@@ -55,9 +55,13 @@ class GuildManager{
 
     async slashUpdate(){
         await Guild.findOne({
-            guildID: this.guild.id
+            guildID: this.guild.id,
+            Commands: {$exists : true},
         })
         .then(data => {
+            if(!data){
+                return this.FillMissing('Commands')
+            }
             this.client.slash.forEach(cmds => {
                 if(!cmds.data || !cmds.data.name) return;
                 if(!cmds.category) return;
@@ -231,7 +235,10 @@ class GuildManager{
     }
 
     async deleteJunk(){
-        await Guild.find({})
+        await Guild.find({
+            Modules: {$exists : true},
+            Commands: {$exists : true},
+        })
         .then(res => {
             res.forEach(async data => {
                 let modls = data.Modules;
