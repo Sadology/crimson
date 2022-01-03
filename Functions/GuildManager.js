@@ -82,9 +82,13 @@ class GuildManager{
 
     async CommandUpdate(){
         await Guild.findOne({
-            guildID: this.guild.id
+            guildID: this.guild.id,
+            Commands: {$exists : true},
         })
         .then(data => {
+            if(!data){
+                return this.FillMissing('Commands')
+            }
             this.client.commands.forEach(cmds => {
                 if(!cmds.name) return;
                 if(!cmds.category|| cmds.category.toLowerCase() == 'owner') return;
@@ -108,9 +112,13 @@ class GuildManager{
 
     async ModuleUpdate(){
         await Guild.findOne({
-            guildID: this.guild.id
+            guildID: this.guild.id,
+            Modules: {$exists : true},
         })
         .then(data => {
+            if(!data){
+                return this.FillMissing('Modules')
+            }
             this.client.commands.forEach(async cmds => {
                 if(!cmds.category || cmds.category.toLowerCase() == 'owner') return
                 if(!data.Modules){

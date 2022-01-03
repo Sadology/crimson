@@ -4,6 +4,7 @@ const { Routes } = require('discord-api-types/v9');
 const cmds = []
 module.exports = client => {
   readdirSync("./slashCommands/").forEach(dir => {
+
     const commands = readdirSync(`./slashCommands/${dir}/`).filter(file =>
       file.endsWith(".js")
     );
@@ -14,7 +15,7 @@ module.exports = client => {
         client.slash.set(pull.data.name, pull);
         cmds.push(pull.data.toJSON())
       } else {
-        console.log('Missing name')
+          console.log('Missing name')
         continue;
       }
     }
