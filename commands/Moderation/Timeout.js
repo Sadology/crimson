@@ -7,7 +7,7 @@ const { saveData, sendLogData, ModStatus } = require('../../Functions/functions'
 module.exports = {
     name: 'timeout',
     aliases: ['to'],
-    description: "Timeout a member to prevent them from accessing tect channels and voice channels",
+    description: "Timeout a member to prevent them from accessing text and voice channels",
     permissions: ["MANAGE_MESSAGES"],
     botPermission: ["MODERATE_MEMBERS", "SEND_MESSAGES", "EMBED_LINKS"],
     usage: "timeout [ member ] [ duraion ] [ reason ]",
@@ -20,7 +20,7 @@ module.exports = {
         if(!args.length){
             return message.channel.send( {embeds: [
                 new Discord.MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({type: 'png', dynamic: false}))
+                    .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({type: 'png', dynamic: false})})
                     .setDescription( `<:error:921057346891939840> Please mention a member \n\n**Usage**: \`${prefix}timeout [ Member ] [ duration ] [ reason ]\`` )
                     .setColor( "#fffafa" )
             ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))

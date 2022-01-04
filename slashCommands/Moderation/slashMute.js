@@ -227,7 +227,7 @@ module.exports = {
                 })
                 .setTimestamp()
 
-                let logmanager = new LogManager(interaction.guild);
+                let logmanager = new LogManager(interaction.guild, client);
                 logmanager.logCreate({data: Data, user: Member});
                 logmanager.sendData({type: 'actionlog', data: muteEmbed, client});
 

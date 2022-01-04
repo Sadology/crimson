@@ -53,7 +53,7 @@ module.exports = {
                     moderatorID: logs.executor.id,
                 }
 
-                let logmanager = new LogManager(newMember.guild);
+                let logmanager = new LogManager(newMember.guild, client);
                 logmanager.logCreate({data: Data, user: newMember});
                 logmanager.sendData({type: 'actionlog', data: timeAddEmbed, client});
             }

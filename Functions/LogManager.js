@@ -139,6 +139,7 @@ class LogManager{
     }
 
     async LogLimit(Member){
+        if(!this.client) return
         const FetchData = await LogsDatabase.findOne({
             guildID: this.Guild.id,
             userID: Member.user.id

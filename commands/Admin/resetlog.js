@@ -50,7 +50,7 @@ module.exports = {
         function confirmation (member){
             message.channel.send({ content: "Do you you wish to reset logs? (confirm/cancel)",embeds: [
                 new Discord.MessageEmbed()
-                    .setDescription(`⚠ \` Danger \` \n${member}'s every log will be permanently erased from the database and you can't recover it later. \n\n<:online:926939036562628658> Procced \n<:dnd:926939036281610300> Cancel`)
+                    .setDescription(`⚠ \` Danger \` \n${member}'s every log will be permanently erased from the database and you can't recover it later. \n\n<:dnd:926939036281610300> Procced \n<:online:926939036562628658> Cancel`)
                     .setColor("RED")
             ], components: [row]}).then(async msg => {
                 const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
