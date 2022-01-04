@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const ms = require('ms');
 const { LogsDatabase } = require('../../models');
-const { Member } = require('../../Functions');
+const { Member, LogManager } = require('../../Functions');
 const { saveData, sendLogData, ModStatus } = require('../../Functions/functions');
 
 module.exports = {
@@ -49,8 +49,12 @@ module.exports = {
                 const mentionHighestRole = Member.roles.highest.position;
 
                 if(Member.id === message.author.id){
-                    return message.channel.send({embeds: [MemberError]})
-                    .then(m=>setTimeout(() => m.delete(), 1000 * 10))
+                    return message.channel.send({embeds: [
+                        new Discord.MessageEmbed()
+                            .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
+                            .setDescription("You can't mute yourself.")
+                            .setColor("RED")
+                    ]}).then(m=>setTimeout(() => m.delete(), 1000 * 20))
                     .catch(err => {return console.log(err)})
                 }else if(Member.permissions.any(["MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_GUILD", "ADMINISTRATOR"], { checkAdmin: true, checkOwner: true })){
                     return message.channel.send({embeds: [
@@ -206,10 +210,25 @@ module.exports = {
 
         async function CreateLog(Member){
             try {
-                saveData({
-                    ...Data,
+                let muteEmbed = new Discord.MessageEmbed()
+                .setAuthor({
+                    name: "Mute",
+                    iconURL: Member.user.displayAvatarURL({format: 'png'})
                 })
-                sendLogData({data: Data, client: client, Member: Member, guild: guild})
+                .addField("User", `\`\`\` ${Member.user.tag} \`\`\``.toString(), true)
+                .addField("Moderator", `\`\`\` ${message.author.tag} \`\`\``.toString(), true)
+                .addField("Duration", `\`\`\` ${Data.actionLength} \`\`\``.toString(), true)
+                .addField("Reason", `\`\`\` ${Data.actionReason} \`\`\``)
+                .setColor("RED")
+                .setFooter({
+                    text: `User ID: ${Member.user.id}`
+                })
+                .setTimestamp()
+
+                let logmanager = new LogManager(message.guild, client);
+                logmanager.logCreate({data: Data, user: Member});
+                logmanager.sendData({type: 'actionlog', data: muteEmbed, client});
+
                 ModStatus({type: "Mute", guild: message.guild, member: message.author, content: content})
             } catch (err) {
                 return console.log(err)

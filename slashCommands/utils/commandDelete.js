@@ -56,7 +56,7 @@ module.exports = {
                     \n**Description:** ${Data.Description}
                     \n**Author:** ${Data.Author}
                     \n**Title:** ${Data.Title}
-                    \n**Image:** [URL](${Data.Image == null ? "https://youtu.be/dQw4w9WgXcQ": Data.Image})
+                    \n**Images:** ${Data.Image == null ? "[URL](https://youtu.be/dQw4w9WgXcQ)": Data.Image}
                     \n**Footer:** ${Data.Footer}
                     \n**Color:** ${Data.Color}
                     \n**Permission:** ${Data.Permission}

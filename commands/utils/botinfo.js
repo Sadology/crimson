@@ -45,7 +45,7 @@ module.exports = {
                 },
                 {
                     name: "Devs",
-                    value: `<@571964900646191104>`,
+                    value: `shadow~#8363`,
                     inline: true
                 },
             ],

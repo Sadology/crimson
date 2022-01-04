@@ -1,5 +1,4 @@
 const { MessageEmbed } = require('discord.js');
-const { GuildChannel, LogsDatabase } = require('../../models');
 const { LogManager } = require('../../Functions');
 const wait = require('util').promisify(setTimeout);
 module.exports = {

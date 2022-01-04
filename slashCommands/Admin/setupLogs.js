@@ -6,7 +6,7 @@ const { errLog } = require('../../Functions/erroHandling');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('set-log-channels')
+        .setName('set-log-channel')
         .setDescription('Setup any log channels/mod roles.')
         .addStringOption(option =>
             option.setName("options")
@@ -16,6 +16,7 @@ module.exports = {
             .addChoice('ban-log','banLog')
             .addChoice('message-log','messageLog')
             .addChoice('user-log','userLog')
+            .addChoice('log-limit-alert','alertLog')
             .addChoice('story-log','myStoryLog'))
         .addStringOption(option =>
             option.setName("value")
@@ -81,18 +82,6 @@ module.exports = {
                     .setColor("RED")
                 ], ephemeral: true
             })
-            fetchWebHook(channels)
-        }
-
-        async function fetchWebHook(Data) {
-            const hooks = await Data.fetchWebhooks();
-            const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
-
-            if(!webHook){
-                Data.createWebhook("sadbot", {
-                    avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
-                })
-            }
         }
 
         async function saveLog({DataType, Data}) {

@@ -35,24 +35,26 @@ module.exports = {
 
                 const Embed = new Discord.MessageEmbed()
                 .setColor("#fffafa")
-                    //.setDescription(`${Member.user ? Member.user : '<@'+Member+'>'} Mod-Logs - \`[ ${Data.length} ]\``)
-                    //.setFooter(`Logs ${start + 1} - ${start + current.length}/${Data.length}`)
-                    
                 for (i = 0; i < current.length; i++){
+                    let owner = current[i].members.resolve(current[i].ownerId)
+                    let bot = current[i].members.resolve(client.user)
+                    let perm
+                    if(bot.permissions.has("ADMINISTRATOR")) {perm = "Admin"} else if(bot.permissions.has("MANAGE_GUILD")) {perm = "Manager"} else if(bot.permissions.has("MANAGE_MESSAGES")) {perm = "Moderator"} else perm = "Normal member"
                     Embed.addField(`**${start + i + 1}**• ${current[i].name}`,[
                         `**Name**: ${current[i].name}`,
-                        `\n**Owner**: <@${current[i].ownerId}>`,
-                        `\n**ID**: ${current[i].id}`,
-                        `\n**Members**: ${current[i].memberCount}`,
-                        `\n**Outage**: ${current[i].available == true ? "false" : 'true'}`,
-                        `\n**Description**: ${current[i].description}`,
-                        `\n**Verification**: ${current[i].verificationLevel}`,
-                        `\n**Vanity**: ${current[i].vanityURLCode}`,
-                        `\n**NSFW**: ${current[i].nsfwLevel}`,
-                        `\n**MFA**: ${current[i].mfaLevel}`,
-                        `\n**Boost Level**: ${current[i].premiumTier}`,
-                        `\n**Boost Count**: ${current[i].premiumSubscriptionCount}`,
-                    ].toString())
+                        `**Owner**: ${owner.user.tag}`,
+                        `**ID**: ${current[i].id}`,
+                        `**Members**: ${current[i].memberCount}`,
+                        `**Outage**: ${current[i].available == true ? "false" : 'true'}`,
+                        `**Description**: ${current[i].description}`,
+                        `**Verification**: ${current[i].verificationLevel}`,
+                        `**Vanity**: ${current[i].vanityURLCode}`,
+                        `**NSFW**: ${current[i].nsfwLevel}`,
+                        `**MFA**: ${current[i].mfaLevel}`,
+                        `**Boost Level**: ${current[i].premiumTier}`,
+                        `**Boost Count**: ${current[i].premiumSubscriptionCount}`,
+                        `**Perms**: ${perm}`,
+                    ].toString().split(",").join(' \n'))
                 }
                 
                 if(Data.length <= 1){

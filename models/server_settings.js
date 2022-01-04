@@ -10,6 +10,7 @@ const serverSchema = mongoose.Schema({
     botOwnerGuild: String,
     WelcomeMessage: String,
     Balance: Number,
+    Settings: Map,
     RankSettings: {
         Channel: String,
         NoExpRole: String,

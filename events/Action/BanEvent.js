@@ -1,5 +1,4 @@
 const { MessageEmbed } = require('discord.js');
-const { GuildChannel, LogsDatabase } = require('../../models');
 const { LogManager } = require('../../Functions');
 const { saveData, sendLogData, ModStatus } = require('../../Functions/functions');
 const wait = require('util').promisify(setTimeout);
@@ -71,9 +70,10 @@ module.exports = {
 
             async function CreateLog(){
                 try {
-                    saveData({
-                        ...Data,
-                    })
+                    let logmanager = new LogManager(bannedMember.guild, client);
+                    logmanager.logCreate({data: Data, user: bannedMember});
+                    logmanager.sendData({type: 'banlog', data: banEmbed, client});
+
                     if(executor.bot == true) return
                     else ModStatus({type: "Ban", guild: bannedMember.guild, member: executor, content: "Banned " + ` ${target.tag}`})
                 } catch (err) {
@@ -81,8 +81,6 @@ module.exports = {
                 }
             }
             CreateLog()
-
-            new LogManager(bannedMember.guild).sendData({type: 'banlog', data: banEmbed, client})
         }catch(err){
             return console.log(err)
         }

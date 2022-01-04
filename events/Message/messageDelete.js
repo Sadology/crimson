@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const { MessageEmbed } = require('discord.js');
 const { LogManager } = require('../../Functions');
+const wait = require('util').promisify(setTimeout);
 module.exports = {
     event: "messageDelete",
     once: false,
@@ -17,13 +18,15 @@ module.exports = {
 			}
 
 			if(deletedMessage.cleanContent.length >= 1000) return
-			await Discord.Util.delayFor(900);
+			wait(1000);
 
 			const Embed = new MessageEmbed()
 				.setAuthor(`${deletedMessage.author.tag} - Message Deleted`, deletedMessage.author.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
 				.setDescription(`**User** - ${deletedMessage.author} \`${deletedMessage.author.tag}\` \n**Channel** - ${deletedMessage.channel} \`${deletedMessage.channel.name}\` \n${deletedMessage}`)
 				.setTimestamp()
-				.setFooter(`User ID: ${deletedMessage.author.id}`)
+				.setFooter({
+					text: `User ID: ${deletedMessage.author.id}`
+				})
 				.setColor("#fa5757")
 
 			if(deletedMessage.attachments){

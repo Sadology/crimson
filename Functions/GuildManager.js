@@ -19,7 +19,8 @@ class GuildManager{
     async guildCreate(){
         let schema = {
            prefix: ">",
-           ownerID: this.guild.ownerId
+           ownerID: this.guild.ownerId,
+           Settings: new Discord.Collection()
         }
 
         await Guild.findOne({

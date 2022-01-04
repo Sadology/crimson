@@ -35,23 +35,28 @@ module.exports = {
                 let items = data.Action.find(i => i.caseID == caseid)
                 confirmation(items, caseid) 
             }else {
-                return message.reply({embeds: [
+                return message.channel.send({embeds: [
                     new Discord.MessageEmbed()
                         .setDescription(`No logs were found by this ID: **${caseid}**`)
                         .setColor("RED")
-                ], ephemeral: true})
+                ]}).catch(err => {return console.log(err.stack)})
             }
         }
 
         function confirmation (data, id){
-            message.channel.send({ content: "You you wish to delete this log? (yes/no)",embeds: [
+            message.channel.send({ content: "Do you you wish to delete this log? (yes/no)",embeds: [
                 new Discord.MessageEmbed()
-                    .setDescription(`**CaseID - **${data.caseID}
-                    **Name - **${data.userName}
-                    **Reason - **${data.actionReason}
-                    **Type - **${data.actionType}
-                    **Duration - **${data.actionLength}
-                    **Moderator - **${data.moderator}
+                    .setAuthor({
+                        name: "Delete log",
+                        iconURL: client.user.displayAvatarURL({format: 'png'})
+                    })
+                    .setDescription(`
+                    **Log-ID: **${data.caseID}
+                    **Name: **${data.userName}
+                    **Reason: **${data.actionReason}
+                    **Type: **${data.actionType}
+                    **Duration: **${data.actionLength}
+                    **Moderator: **${data.moderator}
                     `)
                     .setColor("RED")
             ], components: [row]}).then(async msg => {
@@ -71,7 +76,7 @@ module.exports = {
                     if(b.customId === "cancelDeleteLog"){
                         row.components[0].setDisabled(true)
                         row.components[1].setDisabled(true)
-                        await b.update({content: "Canceled the command (timeout)", components: [row]})
+                        await b.update({content: "Canceled the command", components: [row]})
 
                         collector.stop();
                     }
@@ -87,7 +92,7 @@ module.exports = {
         }
 
         async function DeleteData(id) {
-            await LogsDatabase.findOneAndUpdate({
+            await LogsDatabase.updateOne({
                 guildID: message.guild.id,
                 [`Action.caseID`]: id
             }, {
@@ -99,10 +104,10 @@ module.exports = {
             }).catch(err => {return console.log(err.stack)})
         }
 
-        if(!args.length || !args[0]) return message.reply({
+        if(!args.length || !args[0]) return message.channel.send({
             embeds: [
                 new Discord.MessageEmbed()
-                    .setDescription(`Please provide the case ID you want to delete \n\n**Usage: ** \`${prefix}delete-log [ case ID ]\``)
+                    .setDescription(`Please provide the Log-ID you'd like to delete \n\n**Usage:** \`${prefix}delete-log [ Log-ID ]\``)
                     .setColor("WHITE")
             ]}).catch(err => {return console.log(err.stack)})
 

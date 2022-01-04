@@ -2,12 +2,13 @@ const Discord = require('discord.js');
 const sourcebin = require('sourcebin')
 const { MessageEmbed } = require('discord.js');
 const { LogManager } = require('../../Functions');
+const wait = require('util').promisify(setTimeout);
 module.exports = {
     event: "messageDeleteBulk",
     once: false,
     run: async(deletedMessage, client)=> {
 	    try{
-            await Discord.Util.delayFor(900);
+            wait(1000);
             let ID = deletedMessage.first().guildId;
             let guild = client.guilds.cache.get(ID)
 

@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 const ms = require('ms');
 const { LogsDatabase } = require('../../models');
 const { saveData, sendLogData, ModStatus } = require('../../Functions/functions');
+const { LogManager } = require('../../Functions');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -211,13 +212,28 @@ module.exports = {
 
         async function CreateLog(Member){
             try {
-                saveData({
-                    ...Data,
+                let muteEmbed = new Discord.MessageEmbed()
+                .setAuthor({
+                    name: "Mute",
+                    iconURL: Member.user.displayAvatarURL({format: 'png'})
                 })
-                sendLogData({data: Data, client: client, Member: Member, guild: guild})
-                ModStatus({type: "Mute", guild: interaction.guild, member: interaction.user, content: `/mute ${Member}`})
+                .addField("User", `\`\`\` ${Member.user.tag} \`\`\``.toString(), true)
+                .addField("Moderator", `\`\`\` ${interaction.user.tag} \`\`\``.toString(), true)
+                .addField("Duration", `\`\`\` ${Data.actionLength} \`\`\``.toString(), true)
+                .addField("Reason", `\`\`\` ${Data.actionReason} \`\`\``)
+                .setColor("RED")
+                .setFooter({
+                    text: `User ID: ${Member.user.id}`
+                })
+                .setTimestamp()
+
+                let logmanager = new LogManager(interaction.guild);
+                logmanager.logCreate({data: Data, user: Member});
+                logmanager.sendData({type: 'actionlog', data: muteEmbed, client});
+
+                ModStatus({type: "Mute", guild: interaction.guild, member: interaction.user, content: `/Mute ${Member.user.tag}`})
             } catch (err) {
-                console.log(err)
+                return console.log(err)
             }
         }
 

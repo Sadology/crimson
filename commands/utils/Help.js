@@ -8,7 +8,7 @@ module.exports = {
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         const Menu = new MessageEmbed()
-            .setAuthor(`${client.user.username} - Help Menu`, client.user.avatarURL({dynamic: true, size: 1024, type: 'png'}))
+            .setAuthor({name: `${client.user.username} - Help Menu`,iconURL: client.user.avatarURL({dynamic: true, size: 1024, format: 'png'})})
             .setDescription(
                 "Select a category from the select menu you would like to visit \n\n<:administration:915457421823078460> - Administration\n<:moderation:915457421831462922> - Moderation\n🎮 - Fun\n<:utility:915457793618739331> - Utility\n<:slashCmds:915458597801062461> - slash commands \n\n[Invite Me](https://discordbotlist.com/bots/sadbot) • [Support Server](https://discord.gg/DfmQmqWJmA) • [Website](https://d2x3xhvgiqkx42.cloudfront.net/12345678-1234-1234-1234-1234567890ab/9432a2ad-f01d-4a3d-ae53-370c37e15e62/2018/01/16/4b638361-3888-4e77-b1ea-af956fa98d7f.png)",
             )

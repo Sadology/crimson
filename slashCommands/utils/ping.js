@@ -17,7 +17,7 @@ module.exports = {
             let Ping = i.createdTimestamp - interaction.createdTimestamp
 
             const resEmbed = new Discord.MessageEmbed()
-            .setDescription(`Bot Latency: **${Ping}** | Api Latency: **${client.ws.ping.toString()}**`)
+            .setDescription(`Bot Latency: **${Ping} ms** | Api Latency: **${client.ws.ping.toString()} ms**`)
             .setColor("#fafcff")
             interaction.editReply({content: "Pong", embeds: [resEmbed]})
         })

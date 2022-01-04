@@ -12,7 +12,7 @@ module.exports = {
         await message.channel.send({content: "Pinging..."
         }).then(async (m) =>{
             let Ping = m.createdTimestamp - message.createdTimestamp
-            await m.edit({content: `Pong \`${Ping}\``})
+            await m.edit({content: `Pong \`${Ping} ms\``})
         })
     }
 }
