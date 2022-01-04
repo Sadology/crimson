@@ -49,17 +49,17 @@ module.exports = {
                 let messageEmbed = new Discord.MessageEmbed()
                 .setDescription(
                     `**Name:** ${Data.Name}
-                    \n**Content:** ${Data.Content}
-                    \n**Delete-cmd:** ${Data.DeleteCmd}
-                    \n**Mention:** ${Data.Mention}
-                    \n**Embed:** ${Data.Embed}
-                    \n**Description:** ${Data.Description}
-                    \n**Author:** ${Data.Author}
-                    \n**Title:** ${Data.Title}
-                    \n**Images:** ${Data.Image == null ? "[URL](https://youtu.be/dQw4w9WgXcQ)": Data.Image}
-                    \n**Footer:** ${Data.Footer}
-                    \n**Color:** ${Data.Color}
-                    \n**Permission:** ${Data.Permission}
+                    **Content:** ${Data.Content}
+                    **Delete-cmd:** ${Data.DeleteCmd}
+                    **Mention:** ${Data.Mention}
+                    **Embed:** ${Data.Embed}
+                    **Description:** ${Data.Description}
+                    **Author:** ${Data.Author}
+                    **Title:** ${Data.Title}
+                    **Images:** ${Data.Image == null ? "[URL](https://youtu.be/dQw4w9WgXcQ)": Data.Image}
+                    **Footer:** ${Data.Footer}
+                    **Color:** ${Data.Color}
+                    **Permission:** ${Data.Permission}
                     `
                 )
                 .setColor("RED")

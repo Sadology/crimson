@@ -184,7 +184,7 @@ module.exports = {
             function name(name) {
                 if(name){
                     let filterName = name.replace(/\s+/g, '')
-                    let finalize = filterName.slice(0, 5)
+                    let finalize = filterName.slice(0, 10)
                     Data.setName(finalize.toLowerCase())
                 }else {
                     errorEmbed.setDescription("Please specify a name for the command. You can't use the command without name.")
