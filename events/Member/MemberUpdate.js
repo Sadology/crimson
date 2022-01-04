@@ -36,7 +36,7 @@ module.exports = {
                 .addField("Reason", `\`\`\` ${logs.reason} \`\`\``)
                 .setColor("RED")
                 .setFooter({
-                    text: `User ID: ${Member.user.id}`
+                    text: `User ID: ${newMember.user.id}`
                 })
                 .setTimestamp()
 

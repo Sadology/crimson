@@ -163,9 +163,7 @@ class LogManager{
             if(!res.Settings.has('loglimit')) return
 
             let data = res.Settings.get('loglimit')
-            console.log(Number(count), Number(data))
             if(count >= data){
-                console.log("YES")
                 this.findData("alertLog").then(async i => {
                     if(!i || i == null) return;
                     
