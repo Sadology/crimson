@@ -18,8 +18,6 @@ module.exports = {
                 data.slashUpdate();
                 data.setupRanks();
                 data.deleteJunk()
-    
-                setTimeout(GuildDataCheck, 1000 * 60 * 30) 
             }
             GuildDataCheck()
         })
