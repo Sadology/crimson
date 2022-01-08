@@ -12,13 +12,13 @@ module.exports = {
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         let member
-        if(!args.lenght){
+        if(!args.length){
             member = message.member
         }
         member = new Member(message, client).getMemberWithoutErrHandle({member: args[0]})
-        if(member == false){
-            member = await message.channel.guild.members.fetch({cache : true}).then(members=>members.find(member=>member.user.tag.split(" ").join('').toLowerCase() == message.content.split(" ").slice(1).join('').toLowerCase())) || message.member
-        }
+        if(member == false) member = await message.channel.guild.members.fetch({cache : true}).then(members=>members.find(member=>member.user.tag.split(" ").join('').toLowerCase() == message.content.split(" ").slice(1).join('').toLowerCase()))
+        
+        if(!member) member = message.member
 
         getInfo(member)
 
