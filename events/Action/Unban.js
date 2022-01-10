@@ -6,17 +6,17 @@ module.exports = {
     once: false,
     run: async(bannedMember, client)=> {
         try{ 
-            wait(1000)
             const clientPerm = bannedMember.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
             if (!clientPerm || clientPerm == false) return
             
+            wait(2000)
             const fetchedLogs = await bannedMember.guild.fetchAuditLogs({
-                limit: 1,
+                limit: 5,
                 type: 'MEMBER_BAN_REMOVE',
             });
 
             const unBanLog = fetchedLogs.entries
-                .filter(e => e.target.id === bannedMember.user.id)
+                .filter(e => e.target.id == bannedMember.user.id)
                 .sort((a, b) => b.createdAt - a.createdAt)
                 .first()
 
