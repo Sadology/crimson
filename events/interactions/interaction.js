@@ -7,7 +7,6 @@ module.exports = {
     event: 'interactionCreate',
     once: false,
     run: async(interaction, client) =>{
-        return
         if(!interaction.isCommand()) return;
         let slashCmd = client.slash.get(interaction.commandName)
         if(!slashCmd) return client.slash.delete(interaction.commandName)

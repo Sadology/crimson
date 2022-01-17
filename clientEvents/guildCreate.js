@@ -17,7 +17,7 @@ module.exports = async client =>{
             data.setGuildRoles();
             data.deleteJunk()
 
-            setTimeout(GuildDataCheck, 1000 * 10 ) 
+            setTimeout(GuildDataCheck, 1000 * 60 * 30 ) 
         }
         GuildDataCheck()
     })

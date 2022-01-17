@@ -8,7 +8,6 @@ module.exports = {
     event: 'messageCreate',
     once: false,
     run: async(message, client) =>{
-        return
     try {
         if(message.author.bot) return;
         if(message.channel.type === 'DM') return;

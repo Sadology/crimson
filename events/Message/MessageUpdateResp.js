@@ -7,7 +7,6 @@ module.exports = {
     event: 'messageUpdate',
     once: false,
     run: async(oldMessage, message, client) =>{
-        return
     try {
         if(message.author.bot) return;
         if(message.channel.type === 'DM') return;
