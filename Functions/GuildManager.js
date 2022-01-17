@@ -20,7 +20,9 @@ class GuildManager{
         let schema = {
            prefix: ">",
            ownerID: this.guild.ownerId,
-           Settings: new Discord.Collection()
+           Settings: new Discord.Collection(),
+           Modules: new Discord.Collection(),
+           Commands: new Discord.Collection()
         }
 
         await Guild.findOne({
@@ -36,6 +38,8 @@ class GuildManager{
                     prefix: ">",
                     ownerID: this.guild.ownerId,
                     Balance: 100000,
+                    Modules: new Discord.Collection(),
+                    Commands: new Discord.Collection(),
                 }, {upsert: true})
                 .catch(err => {return console.log(err.stack)})
             }else {
@@ -54,183 +58,72 @@ class GuildManager{
         return this
     }
 
-    async slashUpdate(){
-        await Guild.findOne({
-            guildID: this.guild.id,
-            Commands: {$exists : true},
-        })
-        .then(data => {
-            if(!data){
-                return this.FillMissing('Commands')
-            }
-            this.client.slash.forEach(cmds => {
-                if(!cmds.data || !cmds.data.name) return;
-                if(!cmds.category) return;
-                if(!data.Commands){
-                    return this.FillMissing('Commands')
-                }
-
-                if(!data.Commands.has(cmds.data.name.toLowerCase())){
-                    data.Commands.set(cmds.data.name.toLowerCase(), new Discord.Collection())
-                    let newItem = data.Commands.get(cmds.data.name.toLowerCase())
-                        newItem.set("Enabled", true)
-                        newItem.set("Permissions", [])
-                        newItem.set("NotAllowedRole", [])
-                        newItem.set("NotAllowedChannel", [])
-                        newItem.set("AllowedChannel", [])
-                    this.saveData(data.Commands, 'Commands')
-                }
-            })
-        }).catch(err => {return console.log(err.stack)})
-        return this
-    }
-
-    async CommandUpdate(){
-        await Guild.findOne({
-            guildID: this.guild.id,
-            Commands: {$exists : true},
-        })
-        .then(data => {
-            if(!data){
-                return this.FillMissing('Commands')
-            }
-            this.client.commands.forEach(cmds => {
-                if(!cmds.name) return;
-                if(!cmds.category|| cmds.category.toLowerCase() == 'owner') return;
-                if(!data.Commands){
-                    return this.FillMissing('Commands')
-                }
-                if(!data.Commands.has(cmds.name.toLowerCase())){
-                    data.Commands.set(cmds.name.toLowerCase(), new Discord.Collection())
-                    let newItem = data.Commands.get(cmds.name.toLowerCase())
-                        newItem.set("Enabled", true)
-                        newItem.set("Permissions", [])
-                        newItem.set("NotAllowedRole", [])
-                        newItem.set("NotAllowedChannel", [])
-                        newItem.set("AllowedChannel", [])
-                    this.saveData(data.Commands, 'Commands')
-                }
-            })
-        }).catch(err => {return console.log(err.stack)})
-        return this
-    }
-
-    async ModuleUpdate(){
-        await Guild.findOne({
-            guildID: this.guild.id,
-            Modules: {$exists : true},
-        })
-        .then(data => {
-            if(!data){
-                return this.FillMissing('Modules')
-            }
-            this.client.commands.forEach(async cmds => {
-                if(!cmds.category || cmds.category.toLowerCase() == 'owner') return
-                if(!data.Modules){
-                    return this.FillMissing('Modules')
-                }
-                if(!data.Modules.has(cmds.category.toLowerCase())){
-                    data.Modules.set(cmds.category.toLowerCase(), new Discord.Collection())
-                    let newItem = data.Modules.get(cmds.category.toLowerCase())
-                    newItem.set("Enabled", true)
-                    this.saveData(data.Modules, "Modules")
-                }
-            })
-
-            this.client.slash.forEach(async cmds => {
-                if(!cmds.category) return;
-                if(!data.Modules){
-                    return this.FillMissing('Modules')
-                }
-                if(!data.Modules.has(cmds.category.toLowerCase())){
-                    data.Modules.set(cmds.category.toLowerCase(), new Discord.Collection())
-                    let newItem = data.Modules.get(cmds.category.toLowerCase())
-                    newItem.set("Enabled", true)
-                    this.saveData(data.Modules, "Modules")
-                }
-            })
-        }).catch(err => {return console.log(err.stack)})
-        return this
-    }
-
-    async FillMissing(type){
-        switch(type){
-            case 'Modules':
-                await Guild.updateOne({
-                    guildID: this.guild.id
-                }, {
-                    $set: {
-                        "Modules": new Discord.Collection()
-                    }
-                }).catch(err => {return console.log(err.stack)})
-                this.ModuleUpdate()
-            break;
-            case 'Commands':
-                await Guild.updateOne({
-                    guildID: this.guild.id
-                }, {
-                    $set: {
-                        "Commands": new Discord.Collection()
-                    }
-                }).catch(err => {return console.log(err.stack)})
-                this.CommandUpdate()
-            break;
-        }
-    }
-
-    async setupRanks(){
-        await Guild.findOneAndUpdate({
-            guildID: this.guild.id,
-            RankSettings: {$exists : false},
-        }, {
-            RankSettings: {
-                Channel: '',
-                NoExpRole: 'noexp',
-                NoExpChannel: [],
-                MinExp: 10,
-                MaxExp: 25,
-                ExpCD: 60000,
-                ExpMulti: 1,
-                GuildCard: "https://media.discordapp.net/attachments/880768542482509874/923233761523544095/sadbotRankcard.png",
-                LvlupMsg: "GG {member}, you have reached level {level} 🎉",
-            },
-        })
-        .catch(err => {return console.log(err.stack)})
-        return this
-    }
-
     async setGuildChannels(){
         await GuildChannel.findOne({
-            guildID: this.guild.id
+            guildID: this.guild.id,
+            Data: {$exists: true}
         })
         .then(async res => {
-            if(!res){
-                await GuildChannel.updateOne({
-                    guildID: this.guild.id
-                }, {
-                    guildName: this.guild.name,
-                    Active: true
-                }, {upsert: true})
-                .catch(err => {return console.log(err.stack)})
-            }
+            if(!res) return
+
+            res.Data.forEach(data => {
+                if(data.name.toLowerCase() == 'banlog'){
+                    this.updateData('Logchannels', 'banlog', data.channel)
+                }
+                if(data.name.toLowerCase() == 'messagelog'){
+                    this.updateData('Logchannels', 'messagelog', data.channel)
+                }
+                if(data.name.toLowerCase() == 'userlog'){
+                    this.updateData('Logchannels', 'userlog', data.channel)
+                }
+                if(data.name.toLowerCase() == 'myStoryLog'){
+                    this.updateData('Logchannels', 'storylog', data.channel)
+                }
+                if(data.name.toLowerCase() == 'alertlog'){
+                    this.updateData('Logchannels', 'alertlog', data.channel)
+                }
+            })
         }).catch(err => {return console.log(err.stack)})
         return this
+    }
+
+    async updateData(option ,type, data){
+        await Guild.findOne({
+            guildID: this.guild.id,
+            [`${option}.${type}`]: {$exists: false}
+        })
+        .then(async res => {
+            if(!res) return;
+
+            await Guild.updateOne({
+                guildID: this.guild.id,
+                [`${option}.${type}`]: {$exists: false}
+            }, {
+                $set: {
+                    [`${option}.${type}`]: data
+                }
+            })
+            .catch(err => {return console.log(err.stack)});
+        })
+        .catch(err => {return console.log(err.stack)});
     }
 
     async setGuildRoles(){
         await GuildRole.findOne({
-            guildID: this.guild.id
+            guildID: this.guild.id,
+            Roles: {$exists: true}
         })
         .then(async res => {
-            if(!res){
-                await GuildRole.updateOne({
-                    guildID: this.guild.id
-                }, {
-                    guildName: this.guild.name,
-                    Active: true
-                }, {upsert: true})
-                .catch(err => {return console.log(err.stack)})
-            }
+            if(!res) return
+
+            res.Roles.forEach(data => {
+                if(data.Name.toLowerCase() == 'manager'){
+                    this.updateData('Roles', 'manager', data.Roles)
+                }
+                if(data.Name.toLowerCase() == 'moderator'){
+                    this.updateData('Roles', 'moderator', data.Roles)
+                }
+            })
         }).catch(err => {return console.log(err.stack)})
         return this
     }
@@ -268,9 +161,16 @@ class GuildManager{
                             }
                         }).catch(err => {return console.log(err.stack)})
                     }
+                    await Guild.updateMany({
+                        [`Modules.${key}.Enabled`]: true
+                    }, {
+                        $unset: {
+                            [`Modules.${key}`]: {$exists: true}
+                        }
+                    }).catch(err => {return console.log(err.stack)})
                 }
 
-                for(let [key] of cmds){
+                for(let [key, value] of cmds){
                     let arr = []
                     this.client.commands.forEach(data => {
                         if(!data.name) return
@@ -282,6 +182,18 @@ class GuildManager{
                         arr.push(slash.data.name.toLowerCase())
                     })
 
+                    await Guild.updateMany({
+                        [`Commands.${key}.Enabled`]: true,
+                        [`Commands.${key}.Permissions`]: [],
+                        [`Commands.${key}.NotAllowedRole`]: [],
+                        [`Commands.${key}.NotAllowedChannel`]: [],
+                        [`Commands.${key}.AllowedChannel`]: [],
+                    }, {
+                        $unset: {
+                            [`Commands.${key}`]: '',
+                        }
+                    }).catch(err => {return console.log(err.stack)})
+
                     if(!arr.includes(key.toLowerCase())){
                         await Guild.updateMany({
                             [`Commands.${key}`]: {$exists: true}
@@ -289,10 +201,18 @@ class GuildManager{
                             $unset: {
                                 [`Commands.${key}`]: {$exists: true}
                             }
-                        })
+                        }).catch(err => {return console.log(err.stack)})
                     }
                 }
             })
+        }).catch(err => {return console.log(err.stack)})
+
+        await Guild.updateMany({
+            [`RankSettings`]: {$exists: true}
+        }, {
+            $unset: {
+                [`RankSettings`]: {$exists: true}
+            }
         }).catch(err => {return console.log(err.stack)})
     }
 }

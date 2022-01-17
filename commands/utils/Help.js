@@ -73,8 +73,8 @@ module.exports = {
             let Data = []
             let HelpMenu = new MessageEmbed()
                 .setColor('#fffafa')
-                .setFooter("/help command-name: [ cmd name ] to check individual commands")
-                .setAuthor(client.user.username+ " - Help Menu", client.user.avatarURL({dynamic: true, size: 1024, type: 'png'}))
+                .setFooter({text: "/help command-name: [ cmd name ] to check individual commands"})
+                .setAuthor({name: client.user.username+ " - Help Menu", iconURL: client.user.avatarURL({dynamic: true, size: 1024, type: 'png'})})
             switch(type){
                 case 'modOption':
                     client.commands.forEach(cmds =>{

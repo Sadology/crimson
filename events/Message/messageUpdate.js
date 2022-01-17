@@ -14,7 +14,7 @@ module.exports = {
 			if (!clientPerm || clientPerm == false) return
 
 
-			if(!oldMessage.guild.me.permissions.has("VIEW_AUDIT_LOG", "ADMINISTRATOR")){
+			if(!oldMessage.guild.me.permissions.any("VIEW_AUDIT_LOG", "ADMINISTRATOR")){
 				return false;
 			}
 
@@ -24,14 +24,14 @@ module.exports = {
 			const { guild } = oldMessage;
 
 			const Embed = new MessageEmbed()
-				.setAuthor(`${newMessage.author.tag} - Message Edited`, newMessage.author.displayAvatarURL({dynamic: false, type: "png", size: 1024}))
-				.setDescription(`User ${newMessage.author} \`${newMessage.author.tag}\` in ${oldMessage.channel} \`${oldMessage.channel.name}\``)
+				.setAuthor({name: `${newMessage.author.tag} - Message Edited`, iconURL: newMessage.author.displayAvatarURL({dynamic: false, type: "png", size: 1024})})
+				.setDescription(`User ${newMessage.author} \`${newMessage.author.tag}\` in ${oldMessage.channel} \`${oldMessage.channel.name}\`
+				<:reply:897083777703084035> [Jump](https://discord.com/channels/${oldMessage.guild.id}/${oldMessage.channel.id}/${oldMessage.id})`)
 				.addField("Before", `${oldMessage}`.toString())
 				.addField("After", `${newMessage}`.toString())
 				.setTimestamp()
-				.setFooter(`User ID: ${oldMessage.author.id}`)
+				.setFooter({text: `User ID: ${oldMessage.author.id}`})
 				.setColor('YELLOW')
-
 			new LogManager(guild).sendData({type: 'messagelog', data: Embed, client})
 		}catch(err){
 			return console.log(err.stack)

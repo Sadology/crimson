@@ -7,10 +7,6 @@ module.exports = async client =>{
         guildCreate.guildCreate();
         guildCreate.setGuildChannels();
         guildCreate.setGuildRoles();
-        guildCreate.CommandUpdate();
-        guildCreate.ModuleUpdate();
-        guildCreate.slashUpdate();
-        guildCreate.setupRanks();
     });
 
     client.guilds.cache.forEach(async (guild) =>{
@@ -19,13 +15,9 @@ module.exports = async client =>{
             data.guildCreate();
             data.setGuildChannels();
             data.setGuildRoles();
-            data.CommandUpdate();
-            data.ModuleUpdate();
-            data.slashUpdate();
-            data.setupRanks();
             data.deleteJunk()
 
-            setTimeout(GuildDataCheck, 1000 * 60 * 30) 
+            setTimeout(GuildDataCheck, 1000 * 60 ) 
         }
         GuildDataCheck()
     })

@@ -13,7 +13,7 @@ module.exports = {
 			const clientPerm = deletedMessage.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
 			if (!clientPerm || clientPerm == false) return
 
-			if(!deletedMessage.guild.me.permissions.has("VIEW_AUDIT_LOG", "ADMINISTRATOR")){
+			if(!deletedMessage.guild.me.permissions.any("VIEW_AUDIT_LOG", "ADMINISTRATOR")){
 				return false;
 			}
 

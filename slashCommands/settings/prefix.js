@@ -20,7 +20,6 @@ module.exports = {
         async function fetchData() {
             await Guild.findOne({
                 guildID: interaction.guild.id,
-                Active: true
             })
             .then(res => {
                 if(!res) return

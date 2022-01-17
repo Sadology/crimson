@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
-const { saveData} = require('../../Functions/functions');
-const { LogManager } = require('../../Functions');
+const { LogsDatabase } = require('../../models')
 module.exports = {
     event: "guildMemberUpdate",
     once: false,
@@ -37,6 +36,14 @@ module.exports = {
 
             function fetchData(){
                 if(executor.bot){
+                    function caseID() {
+                        var text = "";
+                        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                        for (var i = 0; i < 10; i++)
+                            text += possible.charAt(Math.floor(Math.random() * possible.length));
+                        return text;
+                    }
+
                     const Data = {
                         guildID: guild.id,
                         guildName: guild.name,
@@ -47,12 +54,28 @@ module.exports = {
                         moderator: executor.username+"#"+executor.discriminator,
                         moderatorID: executor.id,
                         actionLength: "∞",
+                        caseID: caseID()
                     }
-            
-                    saveData({
-                        ...Data,
-                    })
+                    saveData(Data)
                 }
+            }
+
+            async function saveData(data){
+                await LogsDatabase.updateOne({
+                    guildID: guild.id,
+                    userID: target.id
+                }, {
+                    guildName: guild.name,
+                    $push: {
+                        [`Action`]: {
+                            ...data
+                        }
+                    }
+                },{
+                    upsert: true,
+                }).catch(err => {
+                    return console.log(err.stack)
+                })
             }
         }catch(err) {
             return console.log(err.stack)

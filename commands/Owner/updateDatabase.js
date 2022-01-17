@@ -10,16 +10,11 @@ module.exports = {
         client.guilds.cache.forEach(async (guild) =>{
             const GuildDataCheck = async () =>{
                 let data = new GuildManager(client, guild)
-                data.guildCreate();
-                data.setGuildChannels();
-                data.setGuildRoles();
-                data.CommandUpdate();
-                data.ModuleUpdate();
-                data.slashUpdate();
-                data.setupRanks();
                 data.deleteJunk()
             }
             GuildDataCheck()
         })
+
+        message.channel.send("DONE")
     }
 }

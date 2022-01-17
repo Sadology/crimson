@@ -3,7 +3,7 @@ const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js')
 const { LogsDatabase } = require('../../models')
 const moment = require('moment');
 const { Member } = require('../../Functions');
-
+const { LogCreate } = require('../Logs/modLogs')
 module.exports = {
     name: 'seek',
     aliases: ["fetch",],
@@ -37,6 +37,13 @@ module.exports = {
             .setLabel("More Info")
             .setCustomId("Info")
             .setEmoji("❔")
+        )
+        .addComponents(
+            new MessageButton()
+            .setStyle("PRIMARY")
+            .setLabel("Logs")
+            .setCustomId("seekLogs")
+            .setEmoji("<:logs:921093310368596008>")   
         )
 
         async function fetchBanList(Member){
@@ -75,11 +82,11 @@ module.exports = {
                 count = 0
             }
             const Embed = new MessageEmbed()
-                .setAuthor(`${Member.user.tag}`, Member.user.displayAvatarURL({
+                .setAuthor({name: `${Member.user.tag}`, iconURL: Member.user.displayAvatarURL({
                     dynamic: true, 
-                    type: 'png', 
+                    format: 'png', 
                     size: 1024
-                }))
+                })})
                 .setThumbnail(Member.user.displayAvatarURL({
                     dynamic: true,
                     type: 'png',
@@ -110,8 +117,13 @@ module.exports = {
                         if(b.user.id !== message.author.id) return
                         if(b.customId === "Info"){
                             row.components[0].setDisabled(true)
-                            collector.stop()
                             return b.update({content: `${Member.user}`,embeds: [newEmbed], components: [row]})
+                            .catch(err => {return console.log(err.stack)})
+                        }
+                        else if(b.customId == 'seekLogs'){
+                            new LogCreate(client, message, message.guild, Member)
+                            row.components[1].setDisabled(true)
+                            return b.update({components: [row]})
                             .catch(err => {return console.log(err.stack)})
                         }
                     });
@@ -147,7 +159,10 @@ module.exports = {
                 "MANAGE_WEBHOOKS",
                 "MANAGE_EMOJIS",
                 "ADD_REACTIONS",
-                "VIEW_AUDIT_LOG"
+                "VIEW_AUDIT_LOG",
+                "MENTION_EVERYONE",
+                "MODERATE_MEMBERS",
+                "MANAGE_WEBHOOKS"
             ]
             const perms = array.filter( i => permFlag.includes(i))
             const permArr = perms.join(", ")

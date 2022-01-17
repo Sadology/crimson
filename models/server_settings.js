@@ -22,6 +22,7 @@ const serverSchema = mongoose.Schema({
         GuildCard: String,
         LvlupMsg: String,
     },
+    Logchannels: Map,
     Roles: Map,
     Modules: Map,
     Commands: Map

@@ -1,33 +1,35 @@
 const { SlashCommandBuilder, roleMention } = require('@discordjs/builders');
 const wait = require('util').promisify(setTimeout);
 const Discord = require('discord.js');
-const { GuildChannel } = require('../../models');
+const { GuildChannel, Guild } = require('../../models');
 const { errLog } = require('../../Functions/erroHandling');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('set-log-channel')
+        .setName('set-channel')
         .setDescription('Setup any log channels/mod roles.')
         .addStringOption(option =>
             option.setName("options")
-            .setDescription("Options you would like to change.")
+            .setDescription("Different log channel options")
             .setRequired(true)
-            .addChoice('action-log','actionLog')
-            .addChoice('ban-log','banLog')
-            .addChoice('message-log','messageLog')
-            .addChoice('user-log','userLog')
-            .addChoice('log-limit-alert','alertLog')
-            .addChoice('story-log','myStoryLog'))
+            .addChoice('action-log','actionlog')
+            .addChoice('ban-log','banlog')
+            .addChoice('message-log','messagelog')
+            .addChoice('user-log','userlog')
+            .addChoice('log-limit','alertlog')
+            .addChoice('welcome','welcomelog')
+            .addChoice('goodbye','byelog')
+            .addChoice('story-log','storylog'))
         .addStringOption(option =>
-            option.setName("value")
-            .setDescription("Enable/disable or reset a log channel.")
+            option.setName("settings")
+            .setDescription("Enable/disable a log channel.")
             .setRequired(true)
-            .addChoice('enable', 'enableLog')
-            .addChoice('disable', 'disableLog')
-            .addChoice('info', 'information'))
+            .addChoice('enable', 'enablelog')
+            .addChoice('disable', 'disablelog')
+            .addChoice('info', 'informations'))
         .addChannelOption(option =>
-            option.setName("log-channel")
-            .setDescription('Selected log option will log into the selected channel')),
+            option.setName("channels")
+            .setDescription('The log channel')),
     permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
@@ -35,171 +37,138 @@ module.exports = {
         const { options } = interaction;
 
         const logOption = options.getString('options');
-        const value = options.getString('value');
-        const channels = options.getChannel('log-channel');
-
-        async function fetchData() {
-            const data = await GuildChannel.findOne({
-                guildID: interaction.guild.id,
-                Active: true
-            })
-
-            if(data){
-                optionConfig()
-            }else {
-                return
-            }
-        }
-        fetchData()
+        const value = options.getString('settings');
+        const channels = options.getChannel('channels');
 
         function optionConfig() {
             if(!value) return interaction.reply({
                 embeds: [
                     new Discord.MessageEmbed()
-                    .setDescription("Please select a log option")
+                    .setDescription("Please select a log option to setup")
                     .setColor("RED")
                 ], ephemeral: true
             })
             switch(value){
-                case 'enableLog':
+                case 'enablelog':
                     verifyChannel()
-                    saveLog({DataType: logOption, Data: channels})
+                    saveLog()
                 break;
-                case 'disableLog':
-                    deleteData(logOption)
+                case 'disablelog':
+                    deleteData()
                 break;
-                case "information":
-                    info()
+                case "informations":
+                    logInfo()
                 break;
             }
         }
+        optionConfig()
 
         function verifyChannel() {
             if(!channels) return interaction.reply({
                 embeds: [
                     new Discord.MessageEmbed()
-                    .setDescription("please mention a channel")
+                    .setDescription("please mention channel to set as logging channel.")
                     .setColor("RED")
                 ], ephemeral: true
             })
         }
 
-        async function saveLog({DataType, Data}) {
-            const items = {
-                name: DataType,
-                channel: Data,
-            }
-
-            let oldData = await GuildChannel.findOne({
-                guildID: interaction.guild.id,
-                Active: true,
-                [`Data.name`]: DataType
-            }).catch(err => {
-                return console.log(err)
-            })
-
-            if(oldData){
-                await GuildChannel.findOneAndUpdate({
-                    guildID: interaction.guild.id,
-                    Active: true,
-                    [`Data.name`]: DataType
-                },{
-                    $pull: {
-                       Data: {
-                           name: DataType
-                       }
-                    },
-                }, {upsert: true})
-            }
-
-            await GuildChannel.findOneAndUpdate({
-                guildID: interaction.guild.id,
-                Active: true,
-            },{
-                guildName: interaction.guild.name,
-                $push: {
-                    [`Data`]: {
-                        ...items
-                    }
+        async function saveLog() {
+            if(!channels) return
+            await Guild.updateOne({
+                guildID: interaction.guild.id
+            }, {
+                $set: {
+                    [`Logchannels.${logOption.toLowerCase()}`]: channels
                 }
-            },{
-                upsert: true,
             })
             .then(() => {
                 return interaction.reply({embeds: [
                     new Discord.MessageEmbed()
-                        .setDescription(`**${DataType}** set to ${Data}`)
+                        .setDescription(`<:online:926939036562628658> **${filteranme(logOption.toLowerCase())}** has been __Enabled__\n<:reply:897083777703084035> \`Channel:\` ${channels}`)
                         .setColor("GREEN")
                 ]})
             })
             .catch(err => {
-                return console.log (err)
+                return console.log(err.stack)
             })
         }
+        function filteranme(data){
+            return data
+            .replace("actionlog", "Action-log")
+            .replace("banlog", "Ban-log")
+            .replace("messagelog", "Message-log")
+            .replace("userlog", "User-log")
+            .replace("alertlog", "Log-limit-log")
+            .replace("storylog", "Story-log")
+            .replace("welcomelog", "Welcome-channel")
+            .replace("byelog", "Goodbye-channel")
+        }
 
-        async function deleteData(DataType) {
-            let fetchData = await GuildChannel.findOne({
-                guildID: interaction.guild.id,
-                Active: true,
-                [`Data.name`]: DataType
-            }).catch(err => {
-                return console.log(err)
-            })
-
-            if(!fetchData){
-                return interaction.reply({embeds: [
-                    new Discord.MessageEmbed()
-                        .setDescription("This log channel does not exist. Set up now by `/set-logchannel`")
-                        .setColor("RED")
-                ], ephemeral: true})
-            }
-
-            await GuildChannel.findOneAndUpdate({
-                guildID: interaction.guild.id,
-                Active: true,
-                [`Data.name`]: DataType
-            },{
-                $pull: {
-                   Data: {
-                       name: DataType
-                   }
-                },
+        async function deleteData() {
+            await Guild.updateOne({
+                guildID: interaction.guild.id
+            }, {
+                $unset: {
+                    [`Logchannels.${logOption.toLowerCase()}`]: ''
+                }
             })
             .then(() => {
                 return interaction.reply({embeds: [
                     new Discord.MessageEmbed()
-                        .setDescription(`${DataType} has been disabled.`)
-                        .setColor('GREEN')
+                        .setDescription(`<:dnd:926939036281610300> **${filteranme(logOption.toLowerCase())}** has been __Disabled__\n`)
+                        .setColor("GREEN")
                 ]})
             })
             .catch(err => {
-                return console.log(err)
+                interaction.reply({embeds: [
+                    new Discord.MessageEmbed()
+                        .setDescription(`Please setup this log channel before disabling it`)
+                        .setColor("RED")
+                ]}).catch(err => {return console.log(err.stack)})
+                return console.log(err.stack)
             })
         }
 
-        async function info() {
-            let ifLogChannel = await GuildChannel.findOne({
-                guildID: interaction.guild.id,
-                Active: true,
-                [`Data.name`]: logOption
+        async function logInfo(){
+            await Guild.findOne({
+                guildID: interaction.guild.id
             })
+            .then((res) => {
+                if(!res.Logchannels?.has(logOption.toLowerCase())){
+                    return interaction.reply({embeds: [
+                        new Discord.MessageEmbed()
+                            .setAuthor({
+                                name: 'Log Channels',
+                                iconURL: client.user.displayAvatarURL({format: 'png'})
+                            })
+                            .setDescription(`
+                            Type - \`${filteranme(logOption.toLowerCase())}\`
+                            **Enabled** \` ⥋ \` false
+                            **Channel** \` ⥋ \` None`)
+                            .setColor("WHITE")
+                    ]}).catch(err => {return console.log(err.stack)})
+                }else {
+                    let data = res.Logchannels?.get(logOption.toLowerCase())
 
-            if(ifLogChannel){
-                let data = ifLogChannel.Data.find(i => i.name == logOption) 
-                return interaction.reply({
-                    embeds: [new Discord.MessageEmbed()
-                        .setAuthor("LogChannels", interaction.user.displayAvatarURL({dynamic: true, size: 1024, type: 'png'}))
-                        .setDescription(`**${data.name}:** <#${data.channel}>`)
-                        .setColor("WHITE")
-                    ]
-                })
-            }else {
-                return interaction.reply({embeds: [
-                    new Discord.MessageEmbed()
-                        .setDescription("This log channel does not exist. Set up now by `/set-logchannel`")
-                        .setColor("RED")
-                ], ephemeral: true})
-            }
+                    let channel = interaction.guild.channels.resolve(data)
+                    return interaction.reply({embeds: [
+                        new Discord.MessageEmbed()
+                            .setAuthor({
+                                name: 'Log Channels',
+                                iconURL: client.user.displayAvatarURL({format: 'png'})
+                            })
+                            .setDescription(`
+                            Type - \` ${filteranme(logOption)} \`
+                            **Enabled** \` ⥋ \` ${data ? 'true': 'false'}
+                            **Channel** \` ⥋ \` ${channel ? channel.toString() : "None"}`)
+                            .setColor("WHITE")
+                    ]}).catch(err => {return console.log(err.stack)})
+                }
+            })
+            .catch(err => {
+                return console.log(err.stack)
+            })
         }
     }
 }

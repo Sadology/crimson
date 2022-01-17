@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js')
 const moment = require('moment')
+const ms = require('ms')
 module.exports = {
     name: 'bot-info',
     aliases: ['botinfo'],
@@ -11,7 +12,13 @@ module.exports = {
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         const guilds = client.guilds.cache.size
+        let totalmember = 0;
 
+        client.guilds.cache.forEach(g => {
+            totalmember += parseInt(g.memberCount);
+        })
+
+        let uptime = ms(client.uptime, {long: true})
         const Embeds = {
             author: {
                 name: "Sadbot",
@@ -39,6 +46,16 @@ module.exports = {
                     inline: true
                 },
                 {
+                    name: "Uptime",
+                    value: `${uptime}`,
+                    inline: true
+                },
+                {
+                    name: "Total users",
+                    value: `${totalmember}`,
+                    inline: true
+                },
+                {
                     name: "Creation Date",
                     value: `${moment(client.user.createdAt).format('MMMM Do YYYY')} - ${moment(client.user.createdAt, "YYYYMMDD").fromNow()}`.toString(),
                     inline: true
@@ -55,6 +72,6 @@ module.exports = {
             }
         }
 
-        return message.channel.send({embeds: [Embeds]})
+        return message.channel.send({embeds: [Embeds]}).catch(err => {return console.log(err.stack)})
     }
 }

@@ -1,150 +1,176 @@
 const Discord = require('discord.js');
-const { errLog } = require('../../Functions/erroHandling');
-const { CustomCommand, Guild, GuildRole } = require('../../models');
-let cmdMap
+const { Guild } = require('../../models');
+let cmdMap;
+let rolemap;
+
 module.exports = {
     event: 'interactionCreate',
     once: false,
     run: async(interaction, client) =>{
+        return
         if(!interaction.isCommand()) return;
         let slashCmd = client.slash.get(interaction.commandName)
-        
         if(!slashCmd) return client.slash.delete(interaction.commandName)
 
         let settings = await Guild.findOne({
             guildID: interaction.guild.id
         })
 
-        const { Modules, Commands } = settings;
+        const { Modules, Commands, Roles} = settings;
         cmdMap = Commands.get(slashCmd.data.name.toLowerCase());
-        ModuleManager(slashCmd, Modules, Commands, interaction)
-        .catch(err => {return console.log(err.stack)})
 
+        if(Roles){
+            rolemap = Roles
+        }
+
+        if( ModuleManager(slashCmd, Modules, Commands) == false ) return;
+        if( BotManager(slashCmd, interaction, client) == false ) return;
+        if( PermissionManager(slashCmd, interaction) == false ) return;
+        if( ChannelManager(interaction) == false) return;
+
+        RunCommand()
         function RunCommand(){
             try {
                 slashCmd.run(client, interaction)
             }catch(err) {
-                interaction.channel.send({
-                    embeds: [
+                interaction.channel.send({embeds: [
                     new Discord.MessageEmbed()
                     .setDescription(err.message)
                     .setColor("RED")
-                    ]
-                }).catch(err => {return console.log(err.stack)})
+                    ]}).catch(err => {return console.log(err.stack)})
                 return console.log(err.stack)
             }
         }
+    }
+}
 
-        async function ChannelManager(Interaction){
-            let allowed = cmdMap.AllowedChannel
-            let ignored = cmdMap.NotAllowedChannel
-            let data = true
-        
-            if(ignored.length){
-                let c1 = ignored.find(c => c == Interaction.channel.id)
-                if(c1){
-                    data = false
-                }
-            }
-        
-            if(allowed.length){
-                let c2 = allowed.find(c => c == Interaction.channel.id)
-                if(!c2){
-                    data = false
-                }
-            }
-        
-            return data
+function ChannelManager(interaction){
+    if(interaction.member.permissions.has(["ADMINISTRATOR"])){
+        return true
+    }
+    else if(cmdMap){
+        let allowed = cmdMap.AllowedChannel
+        let ignored = cmdMap.NotAllowedChannel
+
+        if(ignored && ignored.length){
+            if(ignored.includes(interaction.channel.id)) return false
         }
-        
-        async function PermissionManager(cmd, Interaction){
-            if(Interaction.member.permissions.has(["ADMINISTRATOR"])){
-                RunCommand()
-            }
-            else if(!Interaction.member.roles.cache.some(r => cmdMap.NotAllowedRole.includes(r.id))){
-                ChannelManager(Interaction).then(async data => {
-                    if(data == false) return
-        
-                    if(Interaction.member.roles.cache.some(r => cmdMap.Permissions.includes(r.id))){
-                        return RunCommand()
-                    }else {
-                        await GuildRole.findOne({
-                            guildID: Interaction.guild.id,
-                        })
-                        .then(res =>{
-                            if(res){
-                                let data = res.Roles.find(i => i.Name.toLowerCase() == "manager");
-                                if(!data){
-                                    if(cmd.permissions){
-                                        if(Interaction.member.permissions.any(cmd.permissions)){
-                                            return RunCommand()
-                                        }
-                                    }
-                                }else {
-                                    let rolesData = data.Roles; 
-                                    if(Interaction.member.roles.cache.some(r=> rolesData.includes(r.id))){
-                                        return RunCommand()
-                                    }else {
-                                        if(cmd.permissions){
-                                            if(Interaction.member.permissions.any(cmd.permissions)){
-                                                return RunCommand()
-                                            }
-                                        }
-                                    }
-                                }
-                            }else {
-                                if(cmd.permissions){
-                                    if(Interaction.member.permissions.any(cmd.permissions)){
-                                        return RunCommand()
-                                    }
-                                }
-                            }
-                        })
-                        .catch(err => {return console.log(err.stack)})
-                    }
-                }).catch(err => {return console.log(err.stack)})
-            }
+        if(allowed && allowed.length){
+            if(allowed.includes(interaction.channel.id)) return true
+            else return false
         }
-        
-        async function BotManager(cmd, Interaction){
-            if(cmd.botPermission){
-                if(Interaction.guild.me.roles.cache.size == 1 && Interaction.guild.me.roles.cache.find(r => r.name == '@everyone')){
-                    Interaction.reply({
-                        embeds: [
-                            new Discord.MessageEmbed()
-                            .setDescription(`Missing my discord assigned \`sadbot\` role to execute any commands 😔`)
-                            .setColor("RED")
-                        ]
-                    }).catch(err => {return console.log(err.stack)})
-                }
-                if(!Interaction.guild.me.permissions.has(cmd.botPermission)){
-                    Interaction.channel.send({
-                        embeds: [
-                            new Discord.MessageEmbed()
-                            .setDescription(`Bot Require following permissions to execute this command \n\n${cmd.botPermission.join(", ").toLowerCase()}`)
-                            .setColor("RED")
-                        ]
-                    }).catch(err => {return console.log(err.stack)})
-                }else {
-                    return PermissionManager(cmd, Interaction)
-                }
+
+        else return true
+    }else return true
+}
+
+function PermissionManager(cmd, interaction){
+    if(interaction.member.permissions.has(["ADMINISTRATOR"])){
+        return true
+    }
+    if(!cmdMap){
+        if(interaction.member.permissions.has(cmd.permissions, false)){
+            return true
+        }else if(interaction.channel.permissionsFor(interaction.member).has(cmd.permissions, false)){
+            return true
+        }else {
+            return additionalPerms(cmd, interaction)
+        }
+    }
+
+    else {
+        if(interaction.member.roles.cache.some(r => cmdMap.NotAllowedRole?.includes(r.id))){
+            if(interaction.member.roles.cache.some(r => cmdMap.Permissions?.includes(r.id))){
+                return true
+            }else return false
+        }
+        else if(interaction.member.roles.cache.some(r => cmdMap.Permissions?.includes(r.id))){
+            return true
+        }
+        else if(interaction.member.permissions.has(cmd.permissions, false)){
+            return true
+        }
+        else if(interaction.channel.permissionsFor(interaction.member).has(cmd.permissions, false)){
+            return true
+        }
+        else {
+            return additionalPerms(cmd, interaction)
+        }
+    }
+}
+
+function additionalPerms(cmd, interaction){
+    if(rolemap){
+        if(rolemap.has('manager')){
+            let managerData = rolemap.get('manager')
+
+            if(interaction.member.roles.cache.some(r => managerData?.includes(r.id))){
+                return true
+            }else {
+                if(cmd.category.toLowerCase() == 'moderation'){
+                    if(!rolemap.has('moderator')) return false
+
+                    let moderData = rolemap.get('moderator')
+                    if(interaction.member.roles.cache.some(r => moderData?.includes(r.id))){
+                        return true
+                    }else return false
+                }else return false
+            }
+        }else {
+            if(cmd.category.toLowerCase() == 'moderation'){
+                if(!rolemap.has('moderator')) return false
+
+                let moderData = rolemap.get('moderator')
+                if(interaction.member.roles.cache.some(r => moderData?.includes(r.id))){
+                    return true
+                }else return false
             }
         }
-        
-        async function ModuleManager(cmd, modules, commands, Interaction){
-            if(cmd.category){
-                let moduleData = modules.get(cmd.category.toLowerCase())
-                if(moduleData){
-                    if(moduleData.Enabled == true){    
-                        let cmdData = commands.get(cmd.data.name.toLowerCase())
-                        if(cmdData) {
-                            if( cmdData.Enabled == true){
-                                BotManager(cmd, Interaction)
-                            }
-                        }
-                    }
-                }
+    }else return false
+}
+
+function BotManager(cmd, interaction, client){
+    if(cmd.botPermission){
+        if(!interaction.guild.me.permissions.has(cmd.botPermission)){
+            if(interaction.channel.permissionsFor(client.user).has(cmd.botPermission, false)){
+                return true
             }
+            let missings = interaction.guild.me.permissions.missing(cmd.botPermission)
+            interaction.reply({
+                embeds: [
+                    new Discord.MessageEmbed()
+                    .setDescription(`<:error:921057346891939840> Missing Permissions\n\n> ${missings.join(", ").toLowerCase()}`)
+                    .setColor("RED")
+                ]
+            }).catch(err => {
+                interaction.reply(err.message).catch(err => {return console.log(err.stack)})
+                return console.log(err.stack)
+            })
+            return false
+        }else return true
+    }else return true
+}
+
+function ModuleManager(cmd, modules, commands){
+    if(cmd.category){
+        if(cmd.category.toLowerCase() == 'owner'){
+            return true
         }
+        if(modules.has(cmd.category.toLowerCase())){
+            let moduleData = modules.get(cmd.category.toLowerCase())
+            if(moduleData.Enabled == false){
+                return false
+            }else return true
+        }
+        if(commands.has(cmd.data.name.toLowerCase())){
+            let cmdData = commands.get(cmd.data.name.toLowerCase())
+            if(cmdData.Enabled == false){
+                return false
+            }else return true 
+        }else {
+            return true
+        }
+    }else {
+        return false
     }
 }

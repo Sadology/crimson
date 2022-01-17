@@ -71,25 +71,25 @@ module.exports = {
     
             function sendData(opt) {
                 let Embed = new Discord.MessageEmbed()
-                    .setAuthor(`${member.user.tag} - ${guild.memberCount.toLocaleString()}` , `${member.user.displayAvatarURL({
+                    .setAuthor({name: `${member.user.tag} - ${guild.memberCount.toLocaleString()}` , iconURL: `${member.user.displayAvatarURL({
                         dynamic: true, 
                         format: 'png'
-                    })}`)
+                    })}`})
                     .setThumbnail(`${member.user.displayAvatarURL({
                         dynamic: true , type: 'png', size: 1024
                     })}`)
-                    .setFooter(member.user.id)
+                    .setFooter({text: member.user.id})
                     .setTimestamp()
                     .setColor(guild.me.displayColor)
     
                 switch(opt){
                     case 'db':
                         Embed.setDescription(`${convertValue(GreetMessage, 'db')}`)
-                        new LogManager(guild).sendData({type: 'leftlog', data: Embed, client})
+                        new LogManager(guild).sendData({type: 'byelog', data: Embed, client})
                     break;
                     case 'local':
                         Embed.setDescription(`\`\`\`${convertValue(GreetMessage, 'local')}\`\`\``)
-                        new LogManager(guild).sendData({type: 'leftlog', data: Embed, client})
+                        new LogManager(guild).sendData({type: 'byelog', data: Embed, client})
                     break;
                 }
             }

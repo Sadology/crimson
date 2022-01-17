@@ -190,6 +190,7 @@ module.exports = {
         
         function individualData(){
             let Data = client.commands.find(cmd => cmd.name == cmdName || cmd.aliases == cmdName)
+            if(!Data) Data = client.slash.find(cmd => cmd.data.name == cmdName)
             if(!Data.category || Data.category == "Owner"){
                 return interaction.editReply({embeds: [
                     new MessageEmbed()
@@ -197,35 +198,58 @@ module.exports = {
                         .setColor("RED")
                 ]})
             }
-            if(Data){
-                let name = Data.name ? Data.name : "Not found";
-                let desc = Data.description ?Data.description : "No descriptions avaiable :(";
-                let alias = Data.aliases ? Data.aliases : "None";
-                let perms = Data.permissions ? Data.permissions : "None";
-                let usage = Data.usage ? Data.usage : "None";
-                let categ = Data.category ? Data.category : "None";
-                let botperms = Data.botPermission ? Data.botPermission : "None";
-                let cooldown = Data.cooldown ? ms(Data.cooldown, {long: true}) : "None";
 
-                let commandEmbed = new Discord.MessageEmbed()
-                    .setAuthor(`Command - ${name}`)
-                    .setDescription(`\`\`\`${desc}\`\`\``)
-                    .addField("Aliases", `\`\`\`${alias}\`\`\``.toString(), true)
-                    .addField("Category", `\`\`\`${categ}\`\`\``.toString(), true)
-                    .addField("Usage", `\`\`\`${usage}\`\`\``.toString(), true)
-                    .addField("Permissions", `\`\`\`${perms}\`\`\``.toString(), true)
-                    .addField("Bot Permission", `\`\`\`${botperms}\`\`\``.toString(), true)
-                    .addField("Cooldown", `\`\`\`${cooldown}\`\`\``.toString(), true)
-                    .setColor('#fffafa')
-
-                return interaction.editReply({embeds: [commandEmbed]})
-            }else {
+            if(!Data){
                 return interaction.editReply({embeds: [
                     new MessageEmbed()
                         .setDescription("No command exist by this name")
                         .setColor("RED")
-                ]})
+                ]})  
             }
+            let cmdData = {
+                Name: "Not found",
+                desc: "No descriptions avaiable :(",
+                alias: "None",
+                perms: "None",
+                usage: "None",
+                categ: "None",
+                botperms: "None",
+                cooldown: "None",
+            }
+
+            if(Data.data){
+                cmdData.Name = Data.data.name ? Data.data.name : "Not found";
+                cmdData.desc = Data.description ?Data.description : "No descriptions avaiable :(";
+                cmdData.alias = Data.aliases ? Data.aliases : "None";
+                cmdData.perms = Data.permissions ? Data.permissions.join(", ") : "None";
+                cmdData.usage = Data.usage ? Data.usage : "None";
+                cmdData.categ = Data.category ? Data.category : "None";
+                cmdData.botperms = Data.botPermission ? Data.botPermission.join(", ") : "None";
+                cmdData.cooldown = Data.cooldown ? ms(Data.cooldown, {long: true}) : "None";
+            }
+            else {
+                cmdData.Name = Data.name ? Data.name : "Not found";
+                cmdData.desc = Data.description ?Data.description : "No descriptions avaiable :(";
+                cmdData.alias = Data.aliases ? Data.aliases : "None";
+                cmdData.perms = Data.permissions ? Data.permissions.join(", ") : "None";
+                cmdData.usage = Data.usage ? Data.usage : "None";
+                cmdData.categ = Data.category ? Data.category : "None";
+                cmdData.botperms = Data.botPermission ? Data.botPermission.join(", ") : "None";
+                cmdData.cooldown = Data.cooldown ? ms(Data.cooldown, {long: true}) : "None";
+            }
+
+            let commandEmbed = new Discord.MessageEmbed()
+                .setAuthor({name: `Command - ${cmdData.Name}`})
+                .setDescription(`\`\`\`${cmdData.desc}\`\`\``)
+                .addField("Aliases", `\`\`\`${cmdData.alias}\`\`\``.toString(), true)
+                .addField("Category", `\`\`\`${cmdData.categ}\`\`\``.toString(), true)
+                .addField("Usage", `\`\`\`${cmdData.usage}\`\`\``.toString(), true)
+                .addField("Permissions", `\`\`\`${cmdData.perms}\`\`\``.toString(), true)
+                .addField("Bot Permission", `\`\`\`${cmdData.botperms}\`\`\``.toString(), true)
+                .addField("Cooldown", `\`\`\`${cmdData.cooldown}\`\`\``.toString(), true)
+                .setColor('#fffafa')
+
+            return interaction.editReply({embeds: [commandEmbed]})
         }
     }
 }

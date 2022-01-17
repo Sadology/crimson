@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { Profiles } = require('../../models');
+const { Profiles, Guild } = require('../../models');
 const moment = require("moment");
 const session = new Map()
 module.exports = {
@@ -15,6 +15,10 @@ module.exports = {
                 message.content.includes('@everyone')
             ) return false;
             if(user.id === message.author.id) return false;
+
+            if(user.id == client.user.id){
+                clientPrefix(message);
+            }
 
             fetchData()
             async function fetchData() {
@@ -54,4 +58,20 @@ module.exports = {
         return console.log(err)
     }
     }
+}
+
+async function clientPrefix(message){
+    await Guild.findOne({
+        guildID: message.guild.id
+    })
+    .then(res => {
+        if(!res) return;
+
+        if(!res.prefix) return
+
+        message.channel.send({content: `My prefix for ${message.guild.name}: \` ${res.prefix} \` | \` ${res.prefix}help \``})
+    })
+    .catch(err => {
+        return console.log(err.stack)
+    })
 }

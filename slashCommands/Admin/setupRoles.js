@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, roleMention } = require('@discordjs/builders');
 const wait = require('util').promisify(setTimeout);
 const Discord = require('discord.js');
-const { GuildRole } = require('../../models');
+const { GuildRole, Guild } = require('../../models');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,46 +9,33 @@ module.exports = {
         .setDescription('setup different roles.')
         .addStringOption(option =>
             option.setName("options")
-            .setDescription("Options you would like to change.")
+            .setDescription("Moderation roles")
             .setRequired(true)
             .addChoice('moderator','moderator')
-            .addChoice('manager','manager'))
+            .addChoice('bot-manager','manager'))
         .addStringOption(option =>
-            option.setName("value")
-            .setDescription("Enable/disable roles.")
+            option.setName("settings")
+            .setDescription("Enable/disable roles")
             .setRequired(true)
-            .addChoice('enable', 'enableRoles',)
-            .addChoice('disable', 'disableRoles')
-            .addChoice('remove', 'removeRoles')
-            .addChoice('info', 'information'))
+            .addChoice('enable', 'enableroles',)
+            .addChoice('disable', 'disableroles')
+            .addChoice('remove', 'removeroles')
+            .addChoice('info', 'informations'))
         .addStringOption(option =>
             option.setName("roles")
-            .setDescription('Mention all the roles you want to set.')),
+            .setDescription('Role(s) for the moderation roles')),
     permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{
         const { options, guild } = interaction;
         const logOption = options.getString('options');
-        const value = options.getString('value');
+        const value = options.getString('settings');
         const roles = options.getString('roles');
         const RolesData = []
         const RolesName = []
 
-        async function fetchData() {
-            await GuildRole.findOne({
-                guildID: interaction.guild.id,
-                Active: true
-            }).then(res => {
-                if(res){
-                    optionConfig();
-                }else {
-                    return;
-                };
-            })
-        }
-        fetchData()
-
+        optionConfig()
         function optionConfig() {
             if(!value) return interaction.reply({
                 embeds: [
@@ -58,23 +45,22 @@ module.exports = {
                 ], ephemeral: true
             })
             switch(value){
-                case 'enableRoles':
+                case 'enableroles':
                     checkRoles(roles, 'enable')
                 break;
-                case 'disableRoles':
-                    disableData(logOption)
+                case 'disableroles':
+                    disableData(logOption.toLowerCase())
                 break;
-                case "removeRoles":
+                case "removeroles":
                     checkRoles(roles, 'remove')
                 break;
-                case "information":
+                case "informations":
                     info()
                 break;
             }
         }
 
         let errorEmbed = new Discord.MessageEmbed()
-        let rolesName = []
         function checkRoles(data, opt) {
             if(!data){
                 return interaction.reply({
@@ -111,125 +97,90 @@ module.exports = {
             if(undefinedRole.length){
                 errorEmbed.setDescription(`Can't find this following roles: \n${undefinedRole}`)
                 errorEmbed.setColor("RED")
-                return interaction.reply({embeds: [errorEmbed]})
+                return interaction.reply({embeds: [errorEmbed], ephemeral: true})
             }
             sortRoles(opt)
         }
 
         async function sortRoles(opt) {
-            let items = {
-                Roles: [...RolesData],
-                Name: logOption,
-                Enabled: true
+            let Data;
+            await Guild.findOne({
+                guildID: interaction.guild.id,
+            }).then(res => {
+                if(!res) return
+                Data = res.Roles
+            })
+
+            if(Data && Data.has(logOption.toLowerCase())){
+                let oldData = Data.get(logOption.toLowerCase())
+                if(oldData.length){
+                    newData = RolesData.concat(oldData)
+                }else {
+                    newData = RolesData
+                }
+            }else {
+                newData = RolesData
             }
 
-            await GuildRole.findOne({
-                guildID: interaction.guild.id,
-                Active: true,
-                ['Roles.Name']: logOption 
-            })
-            .then(res => {
-                if(res){
-                    let data = res.Roles.find(i => i.Name == logOption)
-                    let b = [...data.Roles, ...items.Roles]
-
-                    deleteExisting().then(() => {
-                        switch(opt){
-                            case 'enable':
-                                let uniq = b.reduce(function(a,b){
-                                    if (a.indexOf(b) < 0 ) a.push(b);
-                                    return a;
-                                },[]);
-
-                                items.Roles = uniq
-                                saveRoleData(items)
-                            break;
-                            case 'remove':
-                                let sortedRoles = b.filter(function(val) {
-                                    return RolesData.indexOf(val) == -1;
-                                });
-
-                                let removeDupe = sortedRoles.reduce(function(a,b){
-                                    if (a.indexOf(b) < 0 ) a.push(b);
-                                    return a;
-                                },[]);
-                                items.Roles = removeDupe
-
-                                removeData(items)
-                            break;
-                        }
-                    })
-                }else {
-                    let b = [...items.Roles]
-                    let uniq = b.reduce(function(a,b){
+            switch(opt){
+                case 'enable':
+                    let filterRoles = newData.reduce(function(a,b){
                         if (a.indexOf(b) < 0 ) a.push(b);
                         return a;
                     },[]);
 
-                    items.Roles = uniq
+                    saveData(filterRoles, "Added")
+                break;
+                case 'remove':
+                    let sortedRoles = newData.filter(function(val) {
+                        return RolesData.indexOf(val) == -1;
+                    });
 
-                    saveRoleData(items)
-                }
-            })
+                    let dupelicatesFilter = sortedRoles.reduce(function(a,b){
+                        if (a.indexOf(b) < 0 ) a.push(b);
+                        return a;
+                    },[]);
+
+                    saveData(dupelicatesFilter, "Removed")
+                break;
+            }
         }
 
-        async function deleteExisting() {
-            await GuildRole.findOneAndUpdate({
-                guildID: interaction.guild.id,
-                Active: true,
-                [`Roles.Name`]: logOption
-            },{
-                $pull: {
-                    Roles: {
-                       Name: logOption
-                    }
+        async function saveData(data, type){
+            await Guild.updateOne({
+                guildID: interaction.guild.id
+            }, {
+                $set: {
+                    [`Roles.${logOption.toLowerCase()}`]: data
                 }
             })
             .then(() => {
-                return true
-            })
-            .catch(err => {
-                return console.log(err)
-            })
-        }
-
-        async function saveRoleData(data) {
-            await GuildRole.findOneAndUpdate({
-                guildID: interaction.guild.id,
-                Active: true,
-            }, {
-                $push: {
-                    ["Roles"]: {
-                        ...data
-                    }
-                }
-            }, {
-                upsert: true
-            })
-            .then(() =>{
                 return interaction.reply({
                     embeds: [new Discord.MessageEmbed()
-                        .setDescription(`__${logOption}__ has been bound to the following roles: \n\n${RolesName}`)
+                        .setDescription(`<:online:926939036562628658> __${filterName(logOption)}__ has been updated\n<:reply:897083777703084035>\`${type}\`: ${RolesName}`)
                         .setColor("GREEN")    
                     ]
                 })
             })
-            .catch(err => {
-                return console.log(err)
-            })
+        }
+        function filterName(data){
+            return data
+            .replace("moderator", "Moderator")
+            .replace("manager", "Bot-Manager")
         }
 
-        async function disableData(DataType) {
-            await GuildRole.findOneAndUpdate({
-                guildID: interaction.guild.id,
-                Active: true,
-                [`Roles.Name`]: DataType
+        async function disableData() {
+            await Guild.updateOne({
+                guildID: interaction.guild.id
             }, {
-                ['Roles.$.Enabled']: false
-            }).then(() =>{
+                $unset: {
+                    [`Roles.${logOption.toLowerCase()}`]: ''
+                }
+            })
+            .then(() => {
                 return interaction.reply({
                     embeds: [new Discord.MessageEmbed()
-                        .setDescription(`__${logOption}__ has been disabled`)
+                        .setDescription(`<:dnd:926939036281610300> __${filterName(logOption)}__ has been disabled`)
                         .setColor("GREEN")    
                     ]
                 })
@@ -240,65 +191,69 @@ module.exports = {
                         .setDescription("This role does not exist. Set up now by `/set-roles`")
                         .setColor("RED")
                 ], ephemeral: true})
-                return console.log(err)
-            })
-        }
-
-        async function removeData(data) {
-            await GuildRole.findOneAndUpdate({
-                guildID: interaction.guild.id,
-                Active: true,
-            }, {
-                $push: {
-                    ["Roles"]: {
-                        ...data
-                    }
-                }
-            }, {
-                upsert: true
-            })
-            .then(() =>{
-                return interaction.reply({
-                    embeds: [new Discord.MessageEmbed()
-                        .setDescription(`__${logOption}__ has been removed from the following roles: \n\n${RolesName}`)
-                        .setColor("GREEN")    
-                    ]
-                })
-            })
-            .catch(err => {
-                return console.log(err)
+                return console.log(err.stack)
             })
         }
 
         async function info() {
-            await GuildRole.findOne({
+            await Guild.findOne({
                 guildID: interaction.guild.id,
-                Active: true,
-                ['Roles.Name']: logOption
             })
             .then((res) => {
-                if(res){
-                    let data = res.Roles.find(i => i.Name == logOption)
-                    data.Roles.forEach(item => {
-                        RolesName.push("<@&"+item+">")
-                    })
-                    return interaction.reply({
-                        embeds: [new Discord.MessageEmbed()
-                            .setAuthor("LogChannels", interaction.user.displayAvatarURL({dynamic: true, size: 1024, type: 'png'}))
-                            .setDescription(`**Name:** ${data.Name} \n**Enabled:** ${data.Enabled} \n**Roles:** ${RolesName}`)
-                            .setColor("WHITE")
-                        ]
-                    })
-                }else {
+                if(!res) return
+
+                let Data = {
+                    Enabled: false,
+                    Roles: []
+                }
+                if(!res.Roles.has(logOption.toLowerCase())){
                     return interaction.reply({embeds: [
                         new Discord.MessageEmbed()
-                            .setDescription(`__${logOption}__ role hasn't setup yet not exist. Set up now by \`/set-role\``)
-                            .setColor("RED")
-                    ], ephemeral: true})
+                            .setAuthor({
+                                name: "Role Settings",
+                                iconURL: client.user.displayAvatarURL({format: 'png'})
+                            })
+                            .setDescription(`
+                            \` ${filterName(logOption.toLowerCase())} \`
+                            **Enabled** \` ⥋ \` ${Data.Enabled}
+                            **Roles** \` ⥋ \` ${Data.Roles}
+                            `)
+                            .setColor("WHITE")
+                        ]
+                    }).catch(err => {return console.log(err.stack)})
+                }else {
+                    let fetchData = res.Roles.get(logOption.toLowerCase())
+
+                    if(!fetchData) return
+                    if(fetchData.length){
+                        fetchData.forEach(d => {
+                            let roledata = interaction.guild.roles.resolve(d)
+                            if(roledata){
+                                Data.Roles.push(roledata)
+                            }
+                        })
+                    }
+
+                    Data.Enabled = true
+
+                    return interaction.reply({embeds: [
+                        new Discord.MessageEmbed()
+                            .setAuthor({
+                                name: "Role Settings",
+                                iconURL: client.user.displayAvatarURL({format: 'png'})
+                            })
+                            .setDescription(`
+                            Type - \` ${filterName(logOption)} \`
+                            **Enabled** \` ⥋ \` ${Data.Enabled}
+                            **Roles** \` ⥋ \` ${Data.Roles}
+                            `)
+                            .setColor("WHITE")
+                        ]
+                    }).catch(err => {return console.log(err.stack)})
                 }
             })
             .catch(err => {
-                return console.log(err)
+                return console.log(err.stack)
             })
         }
     }

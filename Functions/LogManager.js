@@ -1,4 +1,4 @@
-const { GuildChannel, LogsDatabase, Guild  } = require('../models')
+const { LogsDatabase, Guild  } = require('../models')
 const Discord = require('discord.js')
 class LogManager{
     constructor(guild, client){
@@ -8,12 +8,17 @@ class LogManager{
 
     async findData(type){
         let items = null
-        await GuildChannel.findOne({
+        await Guild.findOne({
             guildID: this.Guild.id,
         }).then((res) => {
-            if(res){
-                let data = res.Data.find(i => i.name.toLowerCase() == type.toLowerCase())
+            if(!res) return
+
+            if(!res.Logchannels?.has(type.toLowerCase())){
+                return null
+            }else {
+                let data = res.Logchannels.get(type.toLowerCase())
                 if(!data) return
+
                 else items = data
             }
         })
@@ -24,9 +29,8 @@ class LogManager{
         if(!type || !data) return
         this.findData(type).then(async i => {
             if(!i || i == null) return;
-            
-            if(i.enabled == false) return
-            const channel = await this.Guild.channels.resolve(i.channel)
+
+            const channel = await this.Guild.channels.resolve(i)
 
             if(!channel) return
 
@@ -65,8 +69,7 @@ class LogManager{
         this.findData(type).then(async i => {
             if(!i || i == null) return;
             
-            if(i.enabled == false) return
-            const channel = await this.Guild.channels.cache.get(i.channel)
+            const channel = await this.Guild.channels.cache.get(i)
 
             if(channel){
                 return channel;
@@ -165,10 +168,10 @@ class LogManager{
 
             let data = res.Settings.get('loglimit')
             if(count >= data){
-                this.findData("alertLog").then(async i => {
+                this.findData("alertlog").then(async i => {
                     if(!i || i == null) return;
                     
-                    const channel = await this.Guild.channels.resolve(i.channel)
+                    const channel = await this.Guild.channels.resolve(i)
                     if(!channel) return
         
                     if(!this.Guild.me.permissions.any("MANAGE_WEBHOOKS")){

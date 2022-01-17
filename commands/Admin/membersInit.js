@@ -4,7 +4,7 @@ const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 
 module.exports = {
     name: 'membersinit',
-    aliases: ['rolemember'],
+    aliases: ['rolemember', 'inrole', 'in-role', 'memberinit', 'role-member'],
     description: "Members in a single role",
     permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],

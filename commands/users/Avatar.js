@@ -6,7 +6,7 @@ module.exports = {
     aliases: ["av"],
     description: "check a members avatar",
     permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
+    botPermission: ["SEND_MESSAGES", "EMBED_LINKS", "ATTACH_FILES"],
     category: "Utils",
     usage: "avatar [ user ]",
     cooldown: 3000,

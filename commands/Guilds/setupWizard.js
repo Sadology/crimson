@@ -13,97 +13,23 @@ module.exports = {
     botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
-        async function replace(type){
-            switch(type){
-                case 'actionlog':
-                    return 'actionLog'
-                break;
-                case 'userlog':
-                    return 'userLog'
-                break;
-                case 'banlog':
-                    return 'banLog'
-                break;
-                case 'messagelog':
-                    return 'messageLog'
-                break;
-                case 'moderator':
-                    return 'moderator'
-                break;
-                case 'Bot manager':
-                    return 'manager'
-                break;
-            }
-        }
-
         class setupWizard{
             constructor(){
             }
             async setPrefix(data){
                 await Guild.findOneAndUpdate({
                     guildID: message.guild.id,
-                    Active: true
                 }, {
                     prefix: data
                 }).catch(err => {return console.log(err)})
             }
 
             async setLog(data, logType){
-                this.type = logType
-                this.type = this.type.split(" ").join('')
-                this.type = this.type.toLowerCase()
-                
-                let dataName;
-                replace(this.type).then((item) => {
-                    dataName = item
-                })
-                await GuildChannel.findOne({
-                    guildID: message.guild.id,
-                    Active: true,
-                })
-                .then(async (res) => {
-                    if(res){
-                        let oldData = res.Data.find(item => item.name == dataName)
-                        if(oldData){
-                            await GuildChannel.findOneAndUpdate({
-                                guildID: message.guild.id,
-                                Active: true,
-                                [`Data.name`]: dataName
-                            },{
-                                $pull: {
-                                    Data: {
-                                       name: dataName
-                                    }
-                                },
-                            })
-                            .catch(err => {return console.log(err)})
-
-                            await GuildChannel.findOneAndUpdate({
-                                guildID: message.guild.id,
-                                Active: true,
-                            },{
-                                $push: {
-                                    Data: {
-                                       name: dataName,
-                                       channel: data.id,
-                                       enabled: true
-                                    }
-                                },
-                            }).catch(err => {return console.log(err)})
-                        }else {
-                            await GuildChannel.findOneAndUpdate({
-                                guildID: message.guild.id,
-                                Active: true,
-                            },{
-                                $push: {
-                                    Data: {
-                                       name: dataName,
-                                       channel: data.id,
-                                       enabled: true
-                                    }
-                                },
-                            }).catch(err => {return console.log(err)})
-                        }
+                await Guild.updateOne({
+                    guildID: message.guild.id
+                }, {
+                    $set: {
+                        [`Logchannels.${logType}`]: data.id
                     }
                 })
                 .catch(err => {
@@ -112,73 +38,11 @@ module.exports = {
             }
 
             async setRoles(data, type){
-                this.RoleData = data;
-                this.type = type;
-                this.type = this.type.split(" ").join('')
-                this.type = this.type.toLowerCase()
-
-                let dataName;
-                replace(this.type).then((item) => {
-                    dataName = item
-                })
-                await GuildRole.findOne({
-                    guildID: message.guild.id,
-                    Active: true,
-                })
-                .then(async (res) => {
-                    if(res){
-                        let oldData = res.Roles.find(item => item.Name == dataName)
-                        let mergeArr = [...oldData.Roles, ...this.RoleData]
-
-                        let uniq = mergeArr.reduce(function(a,b){
-                            if (a.indexOf(b) < 0 ) a.push(b);
-                            return a;
-                        },[]);
-
-                        if(oldData){
-                            await GuildRole.findOneAndUpdate({
-                                guildID: message.guild.id,
-                                Active: true
-                            },{
-                                $pull: {
-                                    Roles: {
-                                       Name: dataName
-                                    }
-                                },
-                            })
-                            .catch(err => {return console.log(err)})
-
-                            await GuildRole.findOneAndUpdate({
-                                guildID: message.guild.id,
-                                Active: true,
-                            },{
-                                $push: {
-                                    Roles: {
-                                       Name: dataName,
-                                       Roles: uniq,
-                                       Enabled: true
-                                    }
-                                },
-                            }).catch(err => {return console.log(err)})
-                        }else {
-                            let roleItem = [...this.RoleData]
-                            let uniq = roleItem.reduce(function(a,b){
-                                if (a.indexOf(b) < 0 ) a.push(b);
-                                return a;
-                            },[]);
-                            await GuildRole.findOneAndUpdate({
-                                guildID: message.guild.id,
-                                Active: true,
-                            },{
-                                $push: {
-                                    Roles: {
-                                       Name: dataName,
-                                       Roles: uniq,
-                                       Enabled: true
-                                    }
-                                },
-                            }).catch(err => {return console.log(err)})
-                        }
+                await Guild.updateOne({
+                    guildID: message.guild.id
+                }, {
+                    $set: {
+                        [`Roles.${type}`]: data
                     }
                 })
                 .catch(err => {
@@ -224,26 +88,50 @@ module.exports = {
                 {
                     label: 'Action Log',
                     description: 'Mute/unmute/warn log channel',
-                    value: 'actionLogOpt',
+                    value: 'actionlog',
                     emoji: '🔇'
                 },
                 {
                     label: 'Message Log',
                     description: 'Message delete/edit log',
-                    value: 'msgLogOpt',
+                    value: 'messagelog',
                     emoji: '📃'
                 },
                 {
                     label: 'Ban Log',
                     description: 'Ban/unban log',
-                    value: 'banLogOpt',
+                    value: 'banlog',
                     emoji: '<:banHammer:921094864073011221>'
                 },
                 {
                     label: 'User Log',
-                    description: 'user update log',
-                    value: 'userLogOpt',
+                    description: 'User name/avatar update log',
+                    value: 'userlog',
                     emoji: '<:user:921095589997977632>'
+                },
+                {
+                    label: "Limit-log",
+                    description: "Log limit reached alert log channel",
+                    value: 'alertlog',
+                    emoji: '⚠'
+                },
+                {
+                    label: "Welcome",
+                    description: "New member greeting log channel",
+                    value: 'welcomelog',
+                    emoji: '👋'
+                },
+                {
+                    label: "Goodbye",
+                    description: "Farewell for the member who left log channel",
+                    value: 'byelog',
+                    emoji: '🙋‍♀️🙋‍♂️'
+                },
+                {
+                    label: "Story-log",
+                    description: "Story command message log channel",
+                    value: 'storylog',
+                    emoji: '📕'
                 },
             ]),
         )
@@ -257,13 +145,13 @@ module.exports = {
                 {
                     label: 'Moderator',
                     description: 'Server moderator',
-                    value: 'moderatorOpt',
+                    value: 'moderator',
                     emoji: '<:moderation:915457421831462922>'
                 },
                 {
                     label: 'Manager',
                     description: 'Bot manager',
-                    value: 'managerOpt',
+                    value: 'manager',
                     emoji: '<:administration:915457421823078460>'
                 },
             ]),
@@ -298,18 +186,18 @@ module.exports = {
                 collector.stop()
                 row.components[0].setDisabled(true)
                 cancelButton.components[0].setDisabled(true)
-                await b.update({content: "Canceled the command", components: [cancelButton, row]})
+                await b.update({content: "Canceled the command", components: [cancelButton, row]}).catch(err => {return console.log(err.stack)})
                 
             }else if(b.customId === "mainSettingOpt"){
                 if(session == true){
                     return b.reply({
                         embeds: [
                             new MessageEmbed()
-                            .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: 'png'}))
+                            .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: false, type: 'png'})})
                             .setDescription("You're already changing a data | Please finish it to change other options")
                             .setColor("RED")
                         ]
-                    })
+                    }).catch(err => {return console.log(err.stack)})
                 }else {
                     getData(b.values.join(" "), b)
                     session = true
@@ -336,7 +224,7 @@ module.exports = {
             msg.reply({embeds: [new MessageEmbed()
                 .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: "png"}))
                 .setDescription("Please type a new prefix for the bot")
-                .setFooter("Note: Prefix must be less than 5 characters long")
+                .setFooter({text: "Note: Prefix must be less than 5 characters long"})
                 .setColor("WHITE")
             ], components: [logDoneButton]}).then(() => {
                 session = true
@@ -350,14 +238,16 @@ module.exports = {
                             .setColor("RED")
                         ]})
                         .then((m) =>setTimeout(() => m.delete(), 1000 * 3))
-                        .catch(err => {return console.log(err)})
+                        .catch(err => {return console.log(err)});
                     }else {
-                        saveToData.setPrefix(m.content.substring(0, 5))
-                        prefixCollector.stop()
+                        saveToData.setPrefix(m.content.substring(0, 5));
+                        prefixCollector.stop();
+                        backButtonCollector.stop();
+
                         logDoneButton.components[0].setDisabled(true)
                         await msg.editReply({embeds: [
                             new MessageEmbed()
-                            .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: "png"}))
+                            .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: false, type: "png"})})
                             .setDescription("Prefix updated")
                             .addField("Prefix", `${m.content.substring(0, 5)}`)
                             .setColor("GREEN")
@@ -383,7 +273,7 @@ module.exports = {
         async function logSetupFunction(messages){
             await messages.channel.send({embeds: [
                 new MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: "png"}))
+                    .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: false, type: "png"})})
                     .setDescription("Please select a log category\n\n🔇 Action log ` - ` Mute/Unmute/Warn logs\n<:banHammer:921094864073011221> Ban log ` - ` Ban/Unban logs\n<:user:921095589997977632> User log ` - ` User updates logs\n📃 Message log ` - ` Message Update/Delete logs")
                     .setFooter("Note: Press \"Back\" to go back")
                     .setColor("WHITE")
@@ -400,7 +290,7 @@ module.exports = {
                             return b.reply({
                                 embeds: [
                                     new MessageEmbed()
-                                    .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: 'png'}))
+                                    .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: false, type: 'png'})})
                                     .setDescription("You're already changing a data | Please finish it to change other options")
                                     .setColor("RED")
                                 ]
@@ -408,7 +298,8 @@ module.exports = {
                             .then(() =>setTimeout(() => b.deleteReply(), 1000 * 3))
                             .catch(err => {return console.log(err)})
                         }else {
-                            logDataTypes(b.values.join(" "), b)
+                            let name = LogName(b.values.join(" "))
+                            logDataSetupFunction(b, name, b.values.join(" "))
                             logSession = true
                         }
                     }
@@ -417,33 +308,10 @@ module.exports = {
             .catch(err => {return console.log(err)})
         }
 
-        function logDataTypes(type, message){
-            switch (type){
-                case 'actionLogOpt':
-                    logDataSetupFunction(message, "Action Log")
-                break;
-                case 'msgLogOpt':
-                    logDataSetupFunction(message, "Message Log")
-                break;
-                case 'banLogOpt':
-                    logDataSetupFunction(message, "Ban Log")
-                break;
-                case 'userLogOpt':
-                    logDataSetupFunction(message, "User Log")
-                break;
-                case 'moderatorOpt':
-                    roleDataSetupFunction(message, "Moderator")
-                break;
-                case 'managerOpt':
-                    roleDataSetupFunction(message, "Bot manager")
-                break;
-            }
-        }
-
-        function logDataSetupFunction(msg, type) {
+        function logDataSetupFunction(msg, type, typename) {
             msg.reply({embeds: [
                 new MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: "png"}))
+                    .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: false, type: "png"})})
                     .setDescription("Please mention a valid channel to set as "+" __"+type+"__")
                     .setColor("GREEN")
             ], components: [logDoneButton]}).then(() => {
@@ -452,14 +320,16 @@ module.exports = {
                 LogCollector.on('collect', async(m) => {
                     verifyChannel(m.content, m).then(async d => {
                         if(d !== false){
-                            LogCollector.stop()
-                            saveToData.setLog(d, type)
+                            LogCollector.stop();
+                            saveToData.setLog(d, typename);
+                            backButtonCollector.stop();
+                            logDoneButton.components[0].setDisabled(true);
 
                             await msg.editReply({embeds: [
                                 new MessageEmbed()
                                 .setDescription(`__${type}__ updatated ${d}`)
                                 .setColor("GREEN")
-                            ]})
+                            ], components: [logDoneButton]})
                             .then(() =>setTimeout(() => msg.deleteReply(), 1000 * 5))
                             .catch(err => {return console.log(err)})
                             logSession = false
@@ -504,9 +374,9 @@ module.exports = {
         async function roleSetupFunction(messages){
             await messages.channel.send({embeds: [
                 new MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: "png"}))
+                    .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: false, type: "png"})})
                     .setDescription("Please select a role category\n\n<:moderation:915457421831462922> Moderator ` - ` Can use any moderation type commands.\n<:administration:915457421823078460> Manager ` - ` This role users can use any commands.")
-                    .setFooter("Note: Press \"Back\" to go back")
+                    .setFooter({text: "Note: Press \"Back\" to go back"})
                     .setColor("WHITE")
                 ], components: [logDoneButton, rolesRow]}).then((msg) => {
                 const roleCollector = msg.createMessageComponentCollector({ time: 1000 * 60 * 10  });
@@ -521,7 +391,7 @@ module.exports = {
                             return b.reply({
                                 embeds: [
                                     new MessageEmbed()
-                                    .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: 'png'}))
+                                    .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: false, type: 'png'})})
                                     .setDescription("You're already changing a data | Please finish it to change other options")
                                     .setColor("RED")
                                 ]
@@ -529,7 +399,8 @@ module.exports = {
                             .then(() =>setTimeout(() => b.deleteReply(), 1000 * 3))
                             .catch(err => {return console.log(err)})
                         }else {
-                            logDataTypes(b.values.join(" "), b)
+                            let name = RoleName(b.values.join(" "))
+                            roleDataSetupFunction(b, name, b.values.join(" "))
                             roleSession = true
                         }
                     }
@@ -538,12 +409,12 @@ module.exports = {
             .catch(err => {return console.log(err)})
         }
 
-        async function roleDataSetupFunction(msg, type){
+        async function roleDataSetupFunction(msg, type, typename){
             msg.reply({embeds: [
                 new MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: "png"}))
-                    .setDescription(`"Please mention the roles you'd like to bind to __${type}__`)
-                    .setFooter("Note: Use \",\" to separate each roles.")
+                    .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: false, type: "png"})})
+                    .setDescription(`Please mention the role(s) you'd like to set as __${type}__`)
+                    .setFooter({text: "Note: Use \",\" to separate each roles."})
                     .setColor("GREEN")
             ], components: [logDoneButton]}).then(() => {
                 let rolesDataCollector = msg.channel.createMessageCollector({filter, time: 1000 * 60 * 10})
@@ -552,12 +423,15 @@ module.exports = {
                     verifyRoles(m.content, m).then(async (val) => {
                         if(val !== false){
                             rolesDataCollector.stop()
-                            saveToData.setRoles(val.ID, type)
+                            backButtonCollector.stop()
+
+                            logDoneButton.components[0].setDisabled(true)
+                            saveToData.setRoles(val.ID, typename)
                             await msg.editReply({embeds: [
                                 new MessageEmbed()
                                 .setDescription(`__${type}__ updatated ${val.Name}`)
                                 .setColor("GREEN")
-                            ]})
+                            ], components: [logDoneButton]})
                             .then(() =>setTimeout(() => msg.deleteReply(), 1000 * 5))
                             .catch(err => {return console.log(err)})
                             roleSession = false
@@ -605,7 +479,7 @@ module.exports = {
 
             if(undefinedRole.length){
                 let errorEmbed = new MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, type: "png"}))
+                    .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: false, type: "png"})})
                     .setDescription(`Couldn't find the following roles: \n${undefinedRole}`)
                     .setColor("RED")
                 msg.reply({embeds: [errorEmbed]})
@@ -615,6 +489,23 @@ module.exports = {
             }else {
                 return {ID: RolesData, Name: RolesName}
             }
+        }
+
+        function LogName(data){
+            return data
+                .replace("actionlog", "Action-log")
+                .replace("banlog", "Ban-log")
+                .replace("messagelog", "Message-log")
+                .replace("userlog", "User-log")
+                .replace("alertlog", "Log-limit-log")
+                .replace("storylog", "Story-log")
+                .replace("welcomelog", "Welcome-channel")
+                .replace("byelog", "Goodbye-channel")
+        }
+        function RoleName(data){
+            return data
+            .replace("moderator", "Moderator")
+            .replace("manager", "Bot-Manager")
         }
     }
 }

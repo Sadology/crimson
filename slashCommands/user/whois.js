@@ -91,9 +91,12 @@ module.exports = {
                         value: `${roles}`
                     }
                     )
+                .setFooter({text: "User ID: "+Member.user.id})
                 .setColor(Member.displayColor)
 
-            interaction.reply({embeds: [ Embed ]})
+            interaction.reply({embeds: [ Embed ]}).catch(err =>{
+                return console.log(err.stack)
+            })
         }
         fetchMember(MemberID)
     }

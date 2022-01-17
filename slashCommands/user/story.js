@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const wait = require('util').promisify(setTimeout);
 const Discord = require('discord.js');
-const { GuildChannel, Profiles } = require('../../models/');
+const { GuildChannel, Profiles, Guild } = require('../../models/');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('my-story')
@@ -11,7 +11,7 @@ module.exports = {
             .setDescription('Post sweet messages :)'))
         .addStringOption(option => 
             option.setName('image-link')
-            .setDescription('You can add a image on your story.')),
+            .setDescription('You can add a image on your story')),
     permissions: ["USE_APPLICATION_COMMANDS"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",
@@ -31,25 +31,52 @@ module.exports = {
             }
             findLogChannel()
             async function findLogChannel() {
-                let ifLogChannel = await GuildChannel.findOne({
+                await Guild.findOne({
                     guildID: interaction.guild.id,
-                    Active: true,
-                    [`Data.name`]: "myStoryLog"
-                });
+                })
+                .then(res => {
+                    if(!res) return;
 
-                if(!ifLogChannel){
-                    return interaction.reply({embeds: [
-                        new Discord.MessageEmbed()
-                            .setDescription(`This server doesn't have story plugin enabled.`)
-                            .setColor("RED")
-                        ], ephemeral: true
+                    if(!res.Logchannels?.has('storylog')){
+                        return interaction.reply({embeds: [
+                            new Discord.MessageEmbed()
+                                .setDescription(`This server doesn't have story module enabled.`)
+                                .setColor("RED")
+                            ], ephemeral: true
+                        })
+                    }
+
+                    let data = res.Logchannels?.get('storylog')
+                    if(!data){
+                        return interaction.reply({embeds: [
+                            new Discord.MessageEmbed()
+                                .setDescription(`This server doesn't have story module enabled.`)
+                                .setColor("RED")
+                            ], ephemeral: true
+                        })  
+                    }
+
+                    let chan = interaction.guild.channels.resolve(data);
+                    if(!chan){
+                        return interaction.reply({embeds: [
+                            new Discord.MessageEmbed()
+                                .setDescription(`Story channel was deleted`)
+                                .setColor("RED")
+                            ], ephemeral: true
+                        })  
+                    }
+
+                    checkCooldown(chan)
+                })
+                .catch(err => {
+                    interaction.reply({
+                        embeds: [new Discord.MessageEmbed()
+                            .setDescription("Something unexpected happened")
+                            .setColor("RED")    
+                        ]
                     })
-                }
-
-                let data = ifLogChannel.Data.find(i => i.name == "myStoryLog");
-                let c = interaction.guild.channels.cache.get(data.channel);
-
-                checkCooldown(c)
+                    return console.log(err.stack)
+                })
             }
 
             async function checkCooldown(c) {
@@ -85,11 +112,17 @@ module.exports = {
             }
 
             async function sendData(c) {
+
+                if(!interaction.guild.me.permissions.any("MANAGE_WEBHOOKS")){
+                    return interaction.reply("Hey i don't have permission to send webhook story. Please provide me \`Manage Webhooks\` permission")
+                    .catch(err => {return console.log(err.stack)})
+                }
+
                 const hooks = await c.fetchWebhooks();
                 const webHook = hooks.find(i => i.owner.id == client.user.id && i.name == 'sadbot')
 
                 let Embed = new Discord.MessageEmbed()
-                    .setAuthor(`${interaction.user.tag}'s story`, interaction.user.displayAvatarURL({dynamic: true, size: 1024, type: "png"}))
+                    .setAuthor({name: `${interaction.user.tag}'s story`, iconURL: interaction.user.displayAvatarURL({dynamic: true, size: 1024, type: "png"})})
                     .setColor(interaction.member.displayColor)
                     if(message){
                         Embed.setDescription(message)
