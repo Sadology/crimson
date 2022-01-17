@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { LogManager } = require('../../Functions');
-const { saveData, sendLogData, ModStatus } = require('../../Functions/functions');
+const { ModStatus } = require('../../Functions/functions');
 const wait = require('util').promisify(setTimeout);
 module.exports = {
     event: "guildBanAdd",
@@ -10,7 +10,7 @@ module.exports = {
             const clientPerm = bannedMember.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
             if (!clientPerm || clientPerm == false) return
             
-            wait(2000)
+            await wait(2000)
             const fetchedLogs = await bannedMember.guild.fetchAuditLogs({
                 limit: 5,
                 type: 'MEMBER_BAN_ADD'
@@ -18,7 +18,6 @@ module.exports = {
 
             const BanLog = fetchedLogs.entries
                 .filter(e => e.target.id == bannedMember.user.id)
-                .sort((a, b) => b.createdAt - a.createdAt)
                 .first()
 
             if(!BanLog){
