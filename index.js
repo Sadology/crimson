@@ -37,9 +37,9 @@ client.on('ready', async() => {
   if(client.user.id == "874975916592332820"){
     client.user.setPresence({ activities: [{ name: 'Im very SUS' }], status: 'online'});
   }else if(client.user.id == "618434479601745950"){
-    client.user.setPresence({ activities: [{ name: '>help | Crying in shadows~ basement' }], status: 'online'});
+    client.user.setPresence({ activities: [{ name: 'CURRENTLY DOWN FOR MAINTENANCE' }], status: 'online'});
   }
-  
+  //>help | Crying in shadows~ basement
   console.log("ONLINE MY MASTER")
 
   fs.readdir("./clientEvents/", (err, files) => {

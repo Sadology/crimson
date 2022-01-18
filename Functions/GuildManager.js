@@ -90,6 +90,26 @@ class GuildManager{
     async updateData(option ,type, data){
         await Guild.findOne({
             guildID: this.guild.id,
+            [`${option}.${type}`]: {$exists: true}
+        })
+        .then(async res => {
+            if(!res) return
+
+            switch(type){
+                case 'manager':
+                case 'moderator':
+                    GuildRole.deleteMany({
+                        guildID: this.guild.id,
+                    })
+                break;
+                default:
+                    GuildChannel.deleteMany({
+                        guildID: this.guild.id,
+                    })
+            }
+        })
+        await Guild.findOne({
+            guildID: this.guild.id,
             [`${option}.${type}`]: {$exists: false}
         })
         .then(async res => {
@@ -169,7 +189,6 @@ class GuildManager{
                         }
                     }).catch(err => {return console.log(err.stack)})
                 }
-
                 for(let [key, value] of cmds){
                     let arr = []
                     this.client.commands.forEach(data => {
@@ -205,14 +224,6 @@ class GuildManager{
                     }
                 }
             })
-        }).catch(err => {return console.log(err.stack)})
-
-        await Guild.updateMany({
-            [`RankSettings`]: {$exists: true}
-        }, {
-            $unset: {
-                [`RankSettings`]: {$exists: true}
-            }
         }).catch(err => {return console.log(err.stack)})
     }
 }
