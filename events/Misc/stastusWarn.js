@@ -39,9 +39,9 @@ module.exports = {
                 } else {
                     let Time = moment(data.Status.Time).format("lll") + ' - ' +moment(data.Status.Time, "YYYYMMDD").fromNow()
                     const EMBED = new Discord.MessageEmbed()
-                        .setAuthor(user.tag, user.displayAvatarURL({
-                            dynamic: true , type: 'png'
-                        }))
+                        .setAuthor({name: user.tag, iconURL: user.displayAvatarURL({
+                            dynamic: true , format: 'png'
+                        })})
                         .setDescription(`> ${data.Status.MSG}`)
                         .setColor("#fffafa")
                         .setFooter(Time)
@@ -61,6 +61,8 @@ module.exports = {
 }
 
 async function clientPrefix(message){
+    let shorten = message.content.split(/ +/g)
+    if(shorten[1]) return
     await Guild.findOne({
         guildID: message.guild.id
     })

@@ -182,13 +182,17 @@ class GuildManager{
                         arr.push(slash.data.name.toLowerCase())
                     })
 
-                    // await Guild.updateMany({
-                    //     [`Commands.${key}`]: {$exists: true}
-                    // }, {
-                    //     $unset: {
-                    //         [`Commands.${key}`]: {$exists: true},
-                    //     }
-                    // }).catch(err => {return console.log(err.stack)})
+                    await Guild.updateMany({
+                        [`Commands.${key}.Enabled`]: true,
+                        [`Commands.${key}.Permissions`]: [],
+                        [`Commands.${key}.NotAllowedRole`]: [],
+                        [`Commands.${key}.NotAllowedChannel`]: [],
+                        [`Commands.${key}.AllowedChannel`]: [],
+                    }, {
+                        $unset: {
+                            [`Commands.${key}`]: {$exists: true},
+                        }
+                    }).catch(err => {return console.log(err.stack)})
 
                     if(!arr.includes(key.toLowerCase())){
                         await Guild.updateMany({
