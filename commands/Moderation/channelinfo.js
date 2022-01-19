@@ -25,7 +25,6 @@ module.exports = {
         }
 
         async function constructData(channel){
-            console.log(channel)
             let Embed = new Discord.MessageEmbed()
                 .addField("Name", `\`\`\`${channel.name}\`\`\``, true)
                 .addField("Position", `\`\`\`${channel.rawPosition}\`\`\``, true)
