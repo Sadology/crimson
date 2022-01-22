@@ -7,6 +7,7 @@ module.exports = {
     permissions: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
     usage: "makeme",
+    category: 'Fun',
     cooldown: 3000,
     run: async(client, message, args,prefix) =>{
         axios.get("https://api.namefake.com/").then(function(res){
@@ -30,7 +31,7 @@ module.exports = {
                         inline: true
                     },
                     {
-                        name: "Work At",
+                        name: "Works At",
                         value: res.data.company,
                         inline: true
                     },

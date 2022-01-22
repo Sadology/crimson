@@ -1,9 +1,9 @@
 const Discord = require('discord.js');
 const { Guild, GuildChannel, GuildRole } = require('../../models');
 const { MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
-let session = false;
-let logSession = false;
-let roleSession = false;
+let session = new Map();
+let logSession = new Map();
+let roleSession = new Map();
 module.exports = {
     name: 'setup',
     description: "setup sadbot on your server",
@@ -125,7 +125,7 @@ module.exports = {
                     label: "Goodbye",
                     description: "Farewell for the member who left log channel",
                     value: 'byelog',
-                    emoji: '🙋‍♀️🙋‍♂️'
+                    emoji: '👋'
                 },
                 {
                     label: "Story-log",
@@ -189,18 +189,18 @@ module.exports = {
                 await b.update({content: "Canceled the command", components: [cancelButton, row]}).catch(err => {return console.log(err.stack)})
                 
             }else if(b.customId === "mainSettingOpt"){
-                if(session == true){
+                if(session.has(message.guild.id)){
                     return b.reply({
                         embeds: [
                             new MessageEmbed()
                             .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: false, type: 'png'})})
-                            .setDescription("You're already changing a data | Please finish it to change other options")
+                            .setDescription("Someone already changing a data | please wait until they are done setting up.")
                             .setColor("RED")
                         ]
                     }).catch(err => {return console.log(err.stack)})
                 }else {
                     getData(b.values.join(" "), b)
-                    session = true
+                    session.set(message.guild.id)
                 }
             }
         });
@@ -227,7 +227,7 @@ module.exports = {
                 .setFooter({text: "Note: Prefix must be less than 5 characters long"})
                 .setColor("WHITE")
             ], components: [logDoneButton]}).then(() => {
-                session = true
+                session.set(message.guild.id)
                 let backButtonCollector = msg.channel.createMessageComponentCollector({ time: 1000 * 60 * 10  });
                 let prefixCollector = msg.channel.createMessageCollector({filter, time: 1000 * 60 * 10})
                 prefixCollector.on('collect', async(m) => {
@@ -254,7 +254,7 @@ module.exports = {
                         ], components: [logDoneButton]})
                         .then(() =>setTimeout(() => msg.deleteReply(), 1000 * 5))
                         .catch(err => {return console.log(err)})
-                        session = false
+                        session.delete(message.guild.id)
                     }
                 })
                 backButtonCollector.on('collect', (b) => {
@@ -263,7 +263,7 @@ module.exports = {
                         backButtonCollector.stop()
                         prefixCollector.stop()
                         msg.deleteReply().catch(err => {return console.log(err)})
-                        session = false
+                        session.delete(message.guild.id)
                     }
                 })
             })
@@ -284,9 +284,9 @@ module.exports = {
                     if(b.customId === 'setupLogFinished'){
                         LogOptCollector.stop()
                         msg.delete().catch(err => {return console.log(err)})
-                        session = false
+                        session.delete(message.guild.id)
                     }else if(b.customId === "LogSettingOpt"){
-                        if(logSession === true){
+                        if(logSession.has(message.guild.id)){
                             return b.reply({
                                 embeds: [
                                     new MessageEmbed()
@@ -300,7 +300,7 @@ module.exports = {
                         }else {
                             let name = LogName(b.values.join(" "))
                             logDataSetupFunction(b, name, b.values.join(" "))
-                            logSession = true
+                            logSession.set(message.guild.id)
                         }
                     }
                 });
@@ -332,7 +332,7 @@ module.exports = {
                             ], components: [logDoneButton]})
                             .then(() =>setTimeout(() => msg.deleteReply(), 1000 * 5))
                             .catch(err => {return console.log(err)})
-                            logSession = false
+                            logSession.delete(message.guild.id)
                         }
                     })
                 })
@@ -342,7 +342,7 @@ module.exports = {
                         LogCollector.stop()
                         backButtonCollector.stop()
                         msg.deleteReply().catch(err => {return console.log(err)})
-                        logSession = false
+                        logSession.delete(message.guild.id)
                     }
                 })
             })
@@ -385,7 +385,7 @@ module.exports = {
                     if(b.customId === 'setupLogFinished'){
                         roleCollector.stop()
                         msg.delete().catch(err => {return console.log(err)})
-                        session = false
+                        session.delete(message.guild.id)
                     }else if(b.customId === "roleSettingOpt"){
                         if(roleSession === true){
                             return b.reply({
@@ -401,7 +401,7 @@ module.exports = {
                         }else {
                             let name = RoleName(b.values.join(" "))
                             roleDataSetupFunction(b, name, b.values.join(" "))
-                            roleSession = true
+                            roleSession.set(message.guild.id)
                         }
                     }
                 });
@@ -434,7 +434,7 @@ module.exports = {
                             ], components: [logDoneButton]})
                             .then(() =>setTimeout(() => msg.deleteReply(), 1000 * 5))
                             .catch(err => {return console.log(err)})
-                            roleSession = false
+                            roleSession.set(message.guild.id)
                         }
                     })
                 })
@@ -444,7 +444,7 @@ module.exports = {
                         rolesDataCollector.stop()
                         backButtonCollector.stop()
                         msg.deleteReply().catch(err => {return console.log(err)})
-                        roleSession = false
+                        roleSession.set(message.guild.id)
                     }
                 })
             })
