@@ -68,7 +68,7 @@ function PermissionManager(cmd, interaction){
         return true
     }
     if(!cmdMap){
-        if(interaction.member.permissions.has(cmd.permissions, false)){
+        if(interaction.member.permissions.any(cmd.permissions, false)){
             return true
         }else if(interaction.channel.permissionsFor(interaction.member).has(cmd.permissions, false)){
             return true
@@ -86,10 +86,10 @@ function PermissionManager(cmd, interaction){
         else if(interaction.member.roles.cache.some(r => cmdMap.Permissions?.includes(r.id))){
             return true
         }
-        else if(interaction.member.permissions.has(cmd.permissions, false)){
+        else if(interaction.member.permissions.any(cmd.permissions, false)){
             return true
         }
-        else if(interaction.channel.permissionsFor(interaction.member).has(cmd.permissions, false)){
+        else if(interaction.channel.permissionsFor(interaction.member).any(cmd.permissions, false)){
             return true
         }
         else {

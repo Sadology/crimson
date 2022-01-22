@@ -39,35 +39,50 @@ module.exports = {
             .slice(0, -1)
             .join(', ') || "No roles in this server yet"
 
-        const Emojis = message.guild.emojis.cache
-            .sort((a,b) => b.position - a.position)
-            .map(e => e)
-            .join(', ') || "No emojis in this server yet"
-        
-        const Stickers = message.guild.stickers.cache
-            .sort((a,b) => b.position - a.position)
-            .map(s => s)
-            .join(', ') || "No stickers in this server yet"
+        let Data = {
+            Name: message.guild.name,
+            Owner: message.guild.members.resolve(message.guild.ownerId),
+            Member: message.guild.memberCount,
+            Description: message.guild.description ? message.guild.description : "This is a cool server",
+            Text: message.guild.channels.cache.filter(c => c.type === 'GUILD_TEXT').size,
+            Voice: message.guild.channels.cache.filter(c => c.type === 'GUILD_VOICE').size,
+            Category: message.guild.channels.cache.filter(c => c.type === 'GUILD_CATEGORY').size,
+            Partner: message.guild.partnered == true ? "Yes" : "No",
+            Verified: message.guild.verified == true ? "Yes" : "No",
+            Boost: message.guild.premiumSubscriptionCount,
+            Tier: replaceTier(message.guild.premiumTier),
+            Banner: message.guild.banner ? message.guild.banner : "https://youtu.be/dQw4w9WgXcQ",
+            Vanity: message.guild.vanityURLCode ? `https://discord.gg/${message.guild.vanityURLCode}`: "None",
+            Creation: moment(message.guild.createdTimestamp).format("LL")
+        }
+
+        function replaceTier(data){
+            return data
+            .replace("NONE", "No level")
+            .replace("TIER_1", "Level 1")
+            .replace("TIER_2", "Level 2")
+            .replace("TIER_3", "Level 3")
+        }
 
         serverInfo = new Discord.MessageEmbed()
-        .setAuthor(message.guild.name, message.guild.displayAvatarURL)
+        .setAuthor({name: message.guild.name, iconURL: message.guild.iconURL({format: 'png', dynamic: true})})
         .setThumbnail(message.guild.iconURL({
             dynamic: true , format: 'png' , size:1024
         }))
-        .setDescription(message.guild.description ? message.guild.description : "Server description not available")
-        .addField('Server name:', message.guild.name.toString(), true)
-        .addField('Owner:', `<@${message.guild.ownerId}>`.toString(), true)
-        .addField('Total-Members:', message.guild.memberCount.toString())
-        .addField('Text-Channels:', `${Channels.filter(c => c.type === 'GUILD_TEXT').size}`.toString(), true)
-        .addField('Voice-Channels:', `${Channels.filter(vc => vc.type === 'GUILD_VOICE').size}`.toString(), true)
-        .addField('Categories:', `${Channels.filter(cc => cc.type === 'GUILD_CATEGORY').size}`.toString(), true)
-        .addField("Partnered", message.guild.partnered.toString(), true)
-        .addField("Verified", message.guild.verified.toString(), true)
-        .addField("Banner", `[Banner Link](${message.guild.banner ? message.guild.banner : "https://youtu.be/dQw4w9WgXcQ"})`.toString(), true)
-        .addField("Boost Tier", message.guild.premiumTier.toString(), true)
-        .addField("Boosters", message.guild.premiumSubscriptionCount.toString(), true)
-        .addField("Vanity URL",`${message.guild.vanityURLCode ? message.guild.vanityURLCode : "None"}`.toString(), true)
-        .setFooter(`Created at: ${moment(message.guild.createdTimestamp).format("LL")} | server ID: ${message.guild.id}`)
+        .setDescription(Data.Description)
+        .addField('Name', `${Data.Name}`, true)
+        .addField('Owner', `${Data.Owner}`, true)
+        .addField('Total-Members', `${Data.Member}`, true)
+        .addField('Text-Channels', `${Data.Text}`, true)
+        .addField('Voice-Channels', `${Data.Voice}`, true)
+        .addField('Categories', `${Data.Category}`, true)
+        .addField("Partnered", `${Data.Partner}`, true)
+        .addField("Verified", `${Data.Verified}`, true)
+        .addField("Banner", `[BANNER](${Data.Banner})`, true)
+        .addField("Boost Level", `${Data.Tier}`, true)
+        .addField("Boost Amount", `${Data.Boost}`, true)
+        .addField("Vanity URL",`${Data.Vanity}`, true)
+        .setFooter(`Created at: ${Data.Creation} | server ID: ${message.guild.id}`)
         .setColor("#fffafa")
                 
         message.channel.send({embeds: [serverInfo], components: [row]}).then(msg =>{

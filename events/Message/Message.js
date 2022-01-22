@@ -159,13 +159,16 @@ function ChannelManager(message){
 }
 
 function PermissionManager(cmd, message){
+    if(cmd.category?.toLowerCase() == 'owner'){
+        return true
+    }
     if(message.member.permissions.has(["ADMINISTRATOR"])){
         return true
     }
     if(!cmdMap){
-        if(message.member.permissions.has(cmd.permissions, false)){
+        if(message.member.permissions.any(cmd.permissions, false)){
             return true
-        }else if(message.channel.permissionsFor(message.member).has(cmd.permissions, false)){
+        }else if(message.channel.permissionsFor(message.member).any(cmd.permissions, false)){
             return true
         }else {
             return additionalPerms(cmd, message)
@@ -181,10 +184,10 @@ function PermissionManager(cmd, message){
         else if(message.member.roles.cache.some(r => cmdMap.Permissions?.includes(r.id))){
             return true
         }
-        else if(message.member.permissions.has(cmd.permissions, false)){
+        else if(message.member.permissions.any(cmd.permissions, false)){
             return true
         }
-        else if(message.channel.permissionsFor(message.member).has(cmd.permissions, false)){
+        else if(message.channel.permissionsFor(message.member).any(cmd.permissions, false)){
             return true
         }
         else {

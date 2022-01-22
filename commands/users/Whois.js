@@ -26,9 +26,9 @@ module.exports = {
             let isOwner;
             let device = "None";
             if(message.guild.ownerId === Member.user.id){
-                isOwner = true
+                isOwner = "Yes"
             }else {
-                isOwner = false
+                isOwner = "No"
             }
 
             if(Member.presence){
@@ -40,53 +40,21 @@ module.exports = {
                 .map(role => role.toString())
                 .slice(0, -1)
                 .join(', ') || "None"
+
             let Embed = new Discord.MessageEmbed()
                 .setAuthor({name: Member.user.tag, iconURL: Member.user.displayAvatarURL({dynamic: true, size: 1024, type: 'png'})})
                 .setThumbnail(Member.user.avatarURL({dynamic: true, size: 1024, type: 'png'}) ? Member.user.avatarURL({dynamic: true, size: 1024, type: 'png'}) : Member.user.displayAvatarURL({dynamic: true, size: 1024, type: 'png'}))
-                .addFields(
-                    {
-                        name: "Join Date",
-                        value: `${moment(Member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.joinedAt, "YYYYMMDD").fromNow()}`.toString(),
-                        inline: true
-                    },
-                    {
-                        name: "Creation Date",
-                        value: `${moment(Member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.user.createdAt, "YYYYMMDD").fromNow()}`.toString(),
-                        inline: true  
-                    },
-                    {
-                        name: "Nitro booster",
-                        value: `${Member.premiumSince ? moment(Member.premiumSince).format('MMMM Do YYYY, h:mm:ss a') : "Not a booster"}`.toString(),
-                        inline: true
-                    },
-                    {
-                        name:"Owner",
-                        value: isOwner.toString(),
-                        inline: true
-                    },
-                    {
-                        name:"Avatar URL",
-                        value: `[URL](${Member.user.displayAvatarURL()})`.toString(),
-                        inline: true
-                    },
-                    {
-                        name:"Presence",
-                        value: `${Member.presence ? Member.presence.status : "offline"}`.toString(),
-                        inline: true
-                    },
-                    {
-                        name:"Current device",
-                        value: `${device}`.toString(),
-                        inline: true
-                    },
-                    {
-                        name: `Roles [${Member.roles.cache.size - 1}]`,
-                        value: `${roles}`.toString(),
-                    }
-                    )
+                .addField("Join Data", `${moment(Member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.joinedAt, "YYYYMMDD").fromNow()}`, true)
+                .addField("Creation Data", `${moment(Member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.user.createdAt, "YYYYMMDD").fromNow()}`, true)
+                .addField("Server Booster", `${Member.premiumSince ? moment(Member.premiumSince).format('MMMM Do YYYY, h:mm:ss a') : "Not a booster"}`, true)
+                .addField("Server Owner", `${isOwner}`, true)
+                .addField("Avatar URL", `[URL](${Member.user.displayAvatarURL()})`, true)
+                .addField("Presence", `${Member.presence ? Member.presence.status : "offline"}`, true)
+                .addField("Current Device", `${device.toString()}`, true)
+                .addField(`Roles [${Member.roles.cache.size - 1}]`, `${roles}`)
                 .setFooter({text: "User ID: "+Member.user.id})
                 .setTimestamp()
-                .setColor(Member.displayColor)
+                .setColor(Member.displayColor ? Member.displayColor : "WHITE")
 
             message.channel.send({embeds: [ Embed ]}).catch(err =>{
                 return console.log(err.stack)
