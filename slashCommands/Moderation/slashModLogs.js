@@ -41,7 +41,7 @@ module.exports = {
 
         function FindMember(Member){
             if(Member){
-                const member = interaction.guild.members.cache.get(Member.id)
+                const member = interaction.guild.members.resolve(Member.id)
                 if(member){
                     return fetchData(member)
                 }else {
@@ -57,9 +57,13 @@ module.exports = {
         }
 
         async function fetchData(Member){
+            let member;
+            if(Member.user) member = Member.user.id
+            else if(!member) member = Member.id || Member
+
             let Data = await LogsDatabase.findOne({
                 guildID: interaction.guild.id,
-                userID: Member.user ? Member.user.id : Member
+                userID: member
             })
 
             if(Data){

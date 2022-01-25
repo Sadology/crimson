@@ -26,15 +26,19 @@ class LogCreate{
     }
 
     async fetchData(){
+        let member;
+        if(this.member.user) member = this.member.user.id
+        else if(!member) member = this.member.id || this.member
+
         await LogsDatabase.findOne({
             guildID: this.guild.id,
-            userID: this.member?.user ? this.member.user?.id : this.member
+            userID: member
         })
         .then(res => {
             if(!res){
                 return this.message.channel.send({embeds: [
                     new Discord.MessageEmbed()
-                        .setDescription(`<:dnd:926939036281610300> ${this.member.user ? this.member.user.id : '<@'+this.member+'>'} has No logs`)
+                        .setDescription(`<:dnd:926939036281610300> ${this.member.user ? this.member.user : '<@'+this.member+'>'} has No logs`)
                         .setColor("RED")
                 ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
                 .catch(err => {return console.log(err.stack)})
@@ -56,7 +60,7 @@ class LogCreate{
         if(Data.Action.length == 0){
             return this.message.channel.send({embeds: [
                 new Discord.MessageEmbed()
-                    .setDescription(`${this.member.user ? this.member.user : "<@"+this.member+">"} has No logs`)
+                    .setDescription(`<:dnd:926939036281610300> ${this.member.user ? this.member.user : "<@"+this.member+">"} has no logs`)
                     .setColor("RED")
             ]}).then(m => setTimeout(() => m.delete(), 1000 * 20))
             .catch(err => {return console.log(err.stack)})

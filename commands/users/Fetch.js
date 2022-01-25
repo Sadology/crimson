@@ -9,7 +9,7 @@ module.exports = {
     aliases: ["fetch",],
     description: "Find a member and check their informations",
     permissions: ["MANAGE_MESSAGES"],
-    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
+    botPermission: ["BAN_MEMBERS", "SEND_MESSAGES", "EMBED_LINKS"],
     category: "Moderation",
     usage: "fetch [ user ]",
     cooldown: 3000,

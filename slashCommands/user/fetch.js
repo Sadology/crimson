@@ -12,7 +12,7 @@ module.exports = {
         .setDescription('Moderator Imformations')
         .addUserOption(option => option.setName('user').setDescription('Moderator informations of a user')),
     permissions: ["MANAGE_MESSAGES"],
-    botPermission: ["SEND_MESSAGES"],
+    botPermission: ["BAN_MEMBERS", "SEND_MESSAGES"],
     category: "Slash",
     run: async(client, interaction) =>{
 
