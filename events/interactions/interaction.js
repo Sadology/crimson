@@ -30,7 +30,7 @@ module.exports = {
         RunCommand()
         function RunCommand(){
             try {
-                slashCmd.run(client, interaction)
+                slashCmd.run(client, interaction).catch(err => {return console.log(err.stack)})
             }catch(err) {
                 interaction.channel.send({embeds: [
                     new Discord.MessageEmbed()

@@ -14,17 +14,23 @@ module.exports = {
         let Embed = new Discord.MessageEmbed()
             .setAuthor("Sadbot Recent Update")
             .setDescription(`
-            Sadbot update v1.4.2
-            New Year Update
-            What's New:
-            1 - Added command \`status\` you can now check enabled/disabled commands/modules status.
-            2 - Enable/disable support are now available in commands. \`enable\`/\`disable\`
-            3 - From now bot will now require \`Embed_Links\` permission to run any commands. 
-            4 - Non mod/admin type slash commands will require \`use application command\` permission to use.
-            5 - New Command added \`color\`. **Use HEX color code to search any color**
-            6 - New Command added \`edit-reason\`. Made a mistake while typing reason? Don't worry we gotchu back. You can now edit the reason.
-            7 - New Command added \`edit-log\`. You can now check new update logs whitout being in support server how cool is that lol.
-            8 - And the update you all have been waiting for. Yes \`custom-command\` has been re enabled. You can check your custom command list, individual command or dunno how to make command? We gotchu back, you can make custom command with brand new help manu \`/custom-command\` to find out more
+            **Sadbot update v1.4.3**
+            __New features:__
+            \` ﹃ \`Added command \`toggle\`. You can toggle between settings. Only one settings available right now which is \`loglimit\`. Let's talk about it in next row.
+            \` ﹃ \` You can add a log limit for your server. When ever a user reach their log limit, bot will notify you in the log channel which you can set by \`/set-log-channel\` \`log-limit-alert\`.
+            \` ﹃ \`As you all know discord added timeout. You can now timeout with bot how cool is that :p. Bot will auto detect any timeout even manual and log them in \`action log\` channel, yes where your mute/unmute gets logged.
+            Timeout available in both command and slash command.
+            \` ﹃ \`Fixed even more bugs.
+
+            **Sadbot update v1.4.4**
+            __New features:__
+            - Added command \`/command\`. You can manage each command.
+            - Added command \`/settings\`. Check your server settings.
+            - Changed \`/set-log-channel\` command name to \`/set-channel\` 
+            - Added command \`/set-role\` You can add moderation type role.
+            - Added command \`role-info\` & \`channel-info\`.
+            - Changes on few visual.
+            - More bug fixes.
             `)
             .setColor("WHITE")
 
