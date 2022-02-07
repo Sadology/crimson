@@ -7,5 +7,6 @@ module.exports = {
     errLog,
     LogManager: require('./LogManager'),
     Member: require('./MemberManager'),
-    GuildManager: require('./GuildManager')
+    GuildManager: require('./GuildManager'),
+    RankManager: require('./RankManager')
 };
