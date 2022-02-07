@@ -8,5 +8,5 @@ module.exports = {
     LogManager: require('./LogManager'),
     Member: require('./MemberManager'),
     GuildManager: require('./GuildManager'),
-    RankManager: require('./RankManager')
+    //RankManager: require('./RankManager')
 };
