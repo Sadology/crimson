@@ -4,7 +4,7 @@ const Discord = require('discord.js');
 const moment = require('moment');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js')
 const { errLog } = require('../../Functions/erroHandling');
-const { LogsDatabase, GuildRole} = require('../../models')
+const { LogsDatabase } = require('../../models')
 
 module.exports = {
     data: new SlashCommandBuilder()

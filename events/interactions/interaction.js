@@ -7,38 +7,42 @@ module.exports = {
     event: 'interactionCreate',
     once: false,
     run: async(interaction, client) =>{
-        if(!interaction.isCommand()) return;
-        let slashCmd = client.slash.get(interaction.commandName)
-        if(!slashCmd) return client.slash.delete(interaction.commandName)
+        try {
+            if(!interaction.isCommand()) return;
+            let slashCmd = client.slash.get(interaction.commandName)
+            if(!slashCmd) return client.slash.delete(interaction.commandName)
 
-        let settings = await Guild.findOne({
-            guildID: interaction.guild.id
-        })
+            let settings = await Guild.findOne({
+                guildID: interaction.guild.id
+            })
 
-        const { Modules, Commands, Roles} = settings;
-        cmdMap = Commands.get(slashCmd.data.name.toLowerCase());
+            const { Modules, Commands, Roles} = settings;
+            cmdMap = Commands.get(slashCmd.data.name.toLowerCase());
 
-        if(Roles){
-            rolemap = Roles
-        }
-
-        if( ModuleManager(slashCmd, Modules, Commands) == false ) return;
-        if( BotManager(slashCmd, interaction, client) == false ) return;
-        if( PermissionManager(slashCmd, interaction) == false ) return;
-        if( ChannelManager(interaction) == false) return;
-
-        RunCommand()
-        function RunCommand(){
-            try {
-                slashCmd.run(client, interaction).catch(err => {return console.log(err.stack)})
-            }catch(err) {
-                interaction.channel.send({embeds: [
-                    new Discord.MessageEmbed()
-                    .setDescription(err.message)
-                    .setColor("RED")
-                    ]}).catch(err => {return console.log(err.stack)})
-                return console.log(err.stack)
+            if(Roles){
+                rolemap = Roles
             }
+
+            if( ModuleManager(slashCmd, Modules, Commands) == false ) return;
+            if( BotManager(slashCmd, interaction, client) == false ) return;
+            if( PermissionManager(slashCmd, interaction) == false ) return;
+            if( ChannelManager(interaction) == false) return;
+
+            RunCommand()
+            function RunCommand(){
+                try {
+                    slashCmd.run(client, interaction).catch(err => {return console.log(err.stack)})
+                }catch(err) {
+                    interaction.channel.send({embeds: [
+                        new Discord.MessageEmbed()
+                        .setDescription(err.message)
+                        .setColor("RED")
+                        ]}).catch(err => {return console.log(err.stack)})
+                    return console.log(err.stack)
+                }
+            }
+        }catch(err){
+            return console.log(err.stack)
         }
     }
 }

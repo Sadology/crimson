@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const { GuildChannel } = require('../../models')
 const { LogManager } = require('../../Functions')
 const { Messages } = require('../../localDb')
 module.exports = {
@@ -60,15 +59,14 @@ module.exports = {
                         GreetMessage = Data[Math.floor(Math.random() * Data.length)];
                         sendData('db')
                     }else {
-                        getRandomMessage()
-                        sendData('local')
+
                     }
                 })
                 .catch(err => {
                     return console.log(err)
                 })
             }
-    
+            
             function sendData(opt) {
                 let Embed = new Discord.MessageEmbed()
                     .setAuthor({name: `${member.user.tag} - ${guild.memberCount.toLocaleString()}` , iconURL: `${member.user.displayAvatarURL({
@@ -93,7 +91,8 @@ module.exports = {
                     break;
                 }
             }
-            fetchData()
+            getRandomMessage();
+            sendData('local');
         }catch(err){
             return console.log(err.stack)
         }

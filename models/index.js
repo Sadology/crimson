@@ -5,5 +5,6 @@ module.exports = {
     ModStats: require('./ModStatictic'),
     GuildRole: require('./GuildRoles'),
     GuildChannel: require('./GuildChannels'),
-    CustomCommand: require("./customCmdsData")
+    CustomCommand: require("./customCmdsData"),
+    RankData: require('./RankData')
 };

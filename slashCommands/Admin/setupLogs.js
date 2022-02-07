@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, roleMention } = require('@discordjs/builders');
 const wait = require('util').promisify(setTimeout);
 const Discord = require('discord.js');
-const { GuildChannel, Guild } = require('../../models');
+const { Guild } = require('../../models');
 const { errLog } = require('../../Functions/erroHandling');
 
 module.exports = {
@@ -30,6 +30,7 @@ module.exports = {
         .addChannelOption(option =>
             option.setName("channels")
             .setDescription('The log channel')),
+        description: "Setup log channels on the server",
     permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",

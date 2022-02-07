@@ -1,6 +1,4 @@
 const { MessageEmbed } = require('discord.js');
-const { GuildChannel } = require('../../models');
-const { errLog } = require('../../Functions/erroHandling');
 const { LogManager } = require('../../Functions');
 module.exports = {
 	event: 'messageUpdate',

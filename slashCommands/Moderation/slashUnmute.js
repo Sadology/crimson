@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
-const { LogsDatabase, GuildChannel} = require('../../models');
+const { LogsDatabase } = require('../../models');
 const { LogManager } = require('../../Functions');
 
 module.exports = {

@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const wait = require('util').promisify(setTimeout);
 const Discord = require('discord.js');
-const { GuildChannel, Profiles, Guild } = require('../../models/');
+const { Profiles, Guild } = require('../../models/');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('my-story')

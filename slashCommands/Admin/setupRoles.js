@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, roleMention } = require('@discordjs/builders');
 const wait = require('util').promisify(setTimeout);
 const Discord = require('discord.js');
-const { GuildRole, Guild } = require('../../models');
+const { Guild } = require('../../models');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -24,6 +24,7 @@ module.exports = {
         .addStringOption(option =>
             option.setName("roles")
             .setDescription('Role(s) for the moderation roles')),
+        description: "Setup roles on the server",
     permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
     botPermission: ["SEND_MESSAGES"],
     category: "Slash",

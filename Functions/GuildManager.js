@@ -3,148 +3,87 @@ const Discord = require('discord.js');
 class GuildManager{
     constructor(Client, Guild){
         this.client = Client
-        this.guild = Guild
     }
 
-    async saveData(data, dataType){
-        await Guild.updateOne({
-            guildID: this.guild.id
+    async guildCreate(guild){
+        await Guild.findOne({
+            guildID: guild.id
+        }).then(async res => {
+            if(res){
+                return this.guildUpdate()
+            }else {
+                await Guild.updateOne({
+                    guildID: guild.id
+                }, {
+                    $set: {
+                        prefix: ">",
+                        ownerID: guild.ownerId,
+                        Settings: new Discord.Collection(),
+                        Modules: new Discord.Collection(),
+                        Commands: new Discord.Collection(),
+                        EarlySupporter: true,
+                    }
+                }, {
+                    upsert: true
+                }).catch(err => {return console.log(err.stack)}); 
+            }
+        }).catch(err => {return console.log(err.stack)}); 
+    }
+    async guildUpdate(){
+        // Fix Prefix
+        await Guild.updateMany({
+            prefix: {$exists : false}
         }, {
             $set: {
-                [`${dataType}`]: data
+                prefix: ">"
             }
-        }).catch(err => {return console.log(err.stack)})
-    }
+        }).catch(err => {return console.log(err.stack)});
 
-    async guildCreate(){
-        let schema = {
-           prefix: ">",
-           ownerID: this.guild.ownerId,
-           Settings: new Discord.Collection(),
-           Modules: new Discord.Collection(),
-           Commands: new Discord.Collection()
-        }
-
-        await Guild.findOne({
-            guildID: this.guild.id
-        })
-        .then(async res => {
-            if(!res){
-                await Guild.updateOne({
-                    guildID: this.guild.id,
-                }, {
-                    guildName: this.guild.name,
-                    Active: true,
-                    prefix: ">",
-                    ownerID: this.guild.ownerId,
-                    Balance: 100000,
-                    Modules: new Discord.Collection(),
-                    Commands: new Discord.Collection(),
-                }, {upsert: true})
-                .catch(err => {return console.log(err.stack)})
-            }else {
-                for (const [key, value] of Object.entries(schema)) {
-                    Guild.updateOne({
-                        guildID: this.guild.id,
-                        [`${key}`]: {$exists : false},
-                    }, {
-                        $set: {
-                            [`${key}`]: value,
-                        }
-                    }).catch(err => {return console.log(err.stack)})
-                }
+        // Fix Settings
+        await Guild.updateMany({
+            Settings: {$exists : false}
+        }, {
+            $set: {
+                Settings: new Discord.Collection()
             }
-        }).catch(err => {return console.log(err.stack)})
+        }).catch(err => {return console.log(err.stack)});
+
+        // Fix Modules
+        await Guild.updateMany({
+            Modules: {$exists : false}
+        }, {
+            $set: {
+                Modules: new Discord.Collection()
+            }
+        }).catch(err => {return console.log(err.stack)});
+
+        // Fix commands
+        await Guild.updateMany({
+            Commands: {$exists : false}
+        }, {
+            $set: {
+                Commands: new Discord.Collection()
+            }
+        }).catch(err => {return console.log(err.stack)});
+
+        // Early supporter (remove after verified)
+        await Guild.updateMany({
+            EarlySupporter: {$exists : false}
+        }, {
+            $set: {
+                EarlySupporter: true,
+            }
+        }).catch(err => {return console.log(err.stack)});
+
         return this
     }
 
     async setGuildChannels(){
-        await GuildChannel.findOne({
-            guildID: this.guild.id,
-            Data: {$exists: true}
-        })
-        .then(async res => {
-            if(!res) return
-
-            res.Data.forEach(data => {
-                if(data.name.toLowerCase() == 'banlog'){
-                    this.updateData('Logchannels', 'banlog', data.channel)
-                }
-                if(data.name.toLowerCase() == 'messagelog'){
-                    this.updateData('Logchannels', 'messagelog', data.channel)
-                }
-                if(data.name.toLowerCase() == 'userlog'){
-                    this.updateData('Logchannels', 'userlog', data.channel)
-                }
-                if(data.name.toLowerCase() == 'myStoryLog'){
-                    this.updateData('Logchannels', 'storylog', data.channel)
-                }
-                if(data.name.toLowerCase() == 'alertlog'){
-                    this.updateData('Logchannels', 'alertlog', data.channel)
-                }
-            })
-        }).catch(err => {return console.log(err.stack)})
-        return this
-    }
-
-    async updateData(option ,type, data){
-        await Guild.findOne({
-            guildID: this.guild.id,
-            [`${option}.${type}`]: {$exists: true}
-        })
-        .then(async res => {
-            if(!res) return
-
-            switch(type){
-                case 'manager':
-                case 'moderator':
-                    GuildRole.deleteMany({
-                        guildID: this.guild.id,
-                    })
-                break;
-                default:
-                    GuildChannel.deleteMany({
-                        guildID: this.guild.id,
-                    })
-            }
-        })
-        await Guild.findOne({
-            guildID: this.guild.id,
-            [`${option}.${type}`]: {$exists: false}
-        })
-        .then(async res => {
-            if(!res) return;
-
-            await Guild.updateOne({
-                guildID: this.guild.id,
-                [`${option}.${type}`]: {$exists: false}
-            }, {
-                $set: {
-                    [`${option}.${type}`]: data
-                }
-            })
-            .catch(err => {return console.log(err.stack)});
-        })
-        .catch(err => {return console.log(err.stack)});
-    }
+        await GuildChannel.deleteMany().catch(err => {return console.log(err.stack)})
+    };
 
     async setGuildRoles(){
-        await GuildRole.findOne({
-            guildID: this.guild.id,
-            Roles: {$exists: true}
-        })
-        .then(async res => {
-            if(!res) return
-
-            res.Roles.forEach(data => {
-                if(data.Name.toLowerCase() == 'manager'){
-                    this.updateData('Roles', 'manager', data.Roles)
-                }
-                if(data.Name.toLowerCase() == 'moderator'){
-                    this.updateData('Roles', 'moderator', data.Roles)
-                }
-            })
-        }).catch(err => {return console.log(err.stack)})
+        await GuildRole.deleteMany().catch(err => {return console.log(err.stack)});
         return this
     }
 

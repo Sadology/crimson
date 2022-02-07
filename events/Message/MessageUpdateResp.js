@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { Guild, GuildRole } = require('../../models');
+const { Guild } = require('../../models');
 let TimeOut = new Map();
 let cmdMap;
 let rolemap;

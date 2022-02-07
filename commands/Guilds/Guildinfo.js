@@ -1,15 +1,7 @@
 const Discord = require('discord.js');
 const moment = require('moment');
-const { GuildRole } = require("../../models");
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
-
-const verificationLevels = {
-    NONE: "None - unrestricted",
-    LOW: "Low - Require verified Email",
-    MEDIUM: "Medium - Must be a 5 minute old account",
-    HIGH: "High - Have to wait 10 minute",
-    VERY_HIGH: "Vey-High - Require verified phone number"
-  };
+const { MessageActionRow, MessageButton } = require('discord.js');
+const { Guild } = require('../../models');
 
 module.exports = {
     name: 'server',
@@ -17,13 +9,16 @@ module.exports = {
     description: "Get informations about your server.",
     permissions: ["SEND_MESSAGES"],
     botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
-    usage: "server-info",
+    usage: "server",
     category: "Utils",
     cooldown: 3000,
     
     run: async (client, message, args,prefix) =>{
-        const { author, content, guild } = message;
-
+        let earlysupp = await Guild.findOne({
+            guildID: message.guild.id,
+            EarlySupporter: true
+        }).catch(err => {return console.log(err.stack)});
+        
         const row = new MessageActionRow()
             .addComponents(
                 new MessageButton()
@@ -31,13 +26,6 @@ module.exports = {
                 .setLabel("Roles")
                 .setStyle("PRIMARY")
             )
-
-        const Channels = message.guild.channels.cache
-        const Roles = message.guild.roles.cache
-            .sort((a,b) => b.position - a.position)
-            .map(role => role.toString())
-            .slice(0, -1)
-            .join(', ') || "No roles in this server yet"
 
         let Data = {
             Name: message.guild.name,
@@ -64,12 +52,12 @@ module.exports = {
             .replace("TIER_3", "Level 3")
         }
 
-        serverInfo = new Discord.MessageEmbed()
+        let serverInfo = new Discord.MessageEmbed()
         .setAuthor({name: message.guild.name, iconURL: message.guild.iconURL({format: 'png', dynamic: true})})
         .setThumbnail(message.guild.iconURL({
             dynamic: true , format: 'png' , size:1024
         }))
-        .setDescription(Data.Description)
+        .setDescription(earlysupp ? "<:earlysupporter:940327468445888532> | "+`${Data.Description}` : `${Data.Description}`)
         .addField('Name', `${Data.Name}`, true)
         .addField('Owner', `${Data.Owner}`, true)
         .addField('Total-Members', `${Data.Member}`, true)
@@ -82,8 +70,11 @@ module.exports = {
         .addField("Boost Level", `${Data.Tier}`, true)
         .addField("Boost Amount", `${Data.Boost}`, true)
         .addField("Vanity URL",`${Data.Vanity}`, true)
-        .setFooter(`Created at: ${Data.Creation} | server ID: ${message.guild.id}`)
+        .setFooter({text: `Created at: ${Data.Creation} | server ID: ${message.guild.id}`})
         .setColor("#fffafa")
+        if(earlysupp){
+            serverInfo.addField("Early supporter", "Yes", true)
+        }
                 
         message.channel.send({embeds: [serverInfo], components: [row]}).then(msg =>{
             const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
@@ -102,6 +93,6 @@ module.exports = {
                 row.components[0].setDisabled(true)
                 msg.edit({components: [row]}).catch(err => {return console.log(err)})
             })
-        }).catch(err => {return console.log(err)})
+        }).catch(err => {return console.log(err)});
     }
 }

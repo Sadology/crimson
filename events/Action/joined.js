@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const { GuildChannel } = require('../../models')
 const { LogManager } = require('../../Functions')
 const { Messages } = require('../../localDb');
 
@@ -47,8 +46,7 @@ module.exports = {
                         GreetMessage = Data[Math.floor(Math.random() * Data.length)];
                         sendData('db')
                     }else {
-                        getRandomMessage()
-                        sendData('local')
+
                     }
                 })
                 .catch(err => {
@@ -80,7 +78,8 @@ module.exports = {
                     break;
                 }
             }
-            fetchData()
+            getRandomMessage()
+            sendData('local')
         }catch(err){
             return console.log(err.stack)
         }

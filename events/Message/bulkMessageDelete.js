@@ -33,9 +33,9 @@ module.exports = {
             );
 
             const Embed = new MessageEmbed()
-                .setAuthor(guild.name, guild.iconURL({
+                .setAuthor({name: guild.name, icon: guild.iconURL({
                     dynamic: true , format: 'png' , size:1024
-                }))
+                })})
                 .setDescription(`**Bulk message deleted in** ${channel} \n**Amount:** \`${length}\`\n**Messages:** ${bin.url}`)
                 .setTimestamp()
                 .setColor("#fa5757")

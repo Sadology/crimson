@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const ms = require('ms');
-const { LogsDatabase, GuildChannel, GuildRole } = require('../../models');
 const { commandUsed } = require('../../Functions/CommandUsage');
 const { errLog } = require('../../Functions/erroHandling');
 
@@ -10,7 +9,7 @@ module.exports = {
     description: "Sets a slowmode in the channel.",
     permissions: ["MANAGE_CHANNELS", ],
     botPermission: ["MANAGE_CHANNELS","EMBED_LINKS", "SEND_MESSAGES"],
-    usage: "sm [ limit ]",
+    usage: "sm [ interval ]",
     category: "Moderation",
     cooldown: 1000,
     run: async(client, message, args, prefix) =>{

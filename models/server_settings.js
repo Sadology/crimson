@@ -5,12 +5,12 @@ const serverSchema = mongoose.Schema({
     guildName: String,
     Active: Boolean,
     prefix: String,
-    ownerName: String,
     ownerID: String,
     botOwnerGuild: String,
     WelcomeMessage: String,
     Balance: Number,
     Settings: Map,
+    EarlySupporter: Boolean,
     RankSettings: {
         Channel: String,
         NoExpRole: String,

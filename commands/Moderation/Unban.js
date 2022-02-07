@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const { commandUsed } = require('../../Functions/CommandUsage');
-const { GuildRole } = require('../../models');
 const { Member } = require('../../Functions');
 module.exports = {
     name: 'unban',

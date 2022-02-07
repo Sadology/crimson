@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { Guild, GuildChannel, GuildRole } = require('../../models');
+const { Guild } = require('../../models');
 const { MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js');
 let session = new Map();
 let logSession = new Map();

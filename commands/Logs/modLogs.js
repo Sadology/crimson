@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { LogsDatabase, GuildRole} = require('../../models');
+const { LogsDatabase } = require('../../models');
 const moment = require('moment');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js')
 const { Member } = require('../../Functions');

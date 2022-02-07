@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const { GuildChannel } = require('../../models');
 const { errLog } = require('../../Functions/erroHandling');
 const { LogManager } = require('../../Functions');
 const ms = require('ms');
