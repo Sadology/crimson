@@ -4,12 +4,12 @@
 
 "@canvacord/assets@^2.0.5":
   version "2.1.0"
-  resolved "https://registry.npmjs.org/@canvacord/assets/-/assets-2.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/@canvacord/assets/-/assets-2.1.0.tgz#4d11644256dadcd47ac11cf59ae3d42d7ef30be2"
   integrity sha512-VwPVQrMz/nVLiAlkqUuWI+wuOBptpik2g+eIj2ADOsiK2yiLN/4ZSL+V0SQUidB3OLfAmuY949kCJ788CD5P9g==
 
 "@canvacord/emoji-parser@^1.0.1":
   version "1.0.1"
-  resolved "https://registry.npmjs.org/@canvacord/emoji-parser/-/emoji-parser-1.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/@canvacord/emoji-parser/-/emoji-parser-1.0.1.tgz#b33049320e01dc5290751df5b6279d99fe2f2437"
   integrity sha512-Lb3xatdd91MR9tU4sicgrxxKg+/rVD1zKTOh55bmVF2Ri5X8vHTV+jNHTvRzkomGpyepGM+7qA4xMvG8ZqtO8g==
   dependencies:
     twemoji-parser "^13.0.0"
@@ -100,7 +100,7 @@
 
 "@mapbox/node-pre-gyp@^1.0.0":
   version "1.0.8"
-  resolved "https://registry.npmjs.org/@mapbox/node-pre-gyp/-/node-pre-gyp-1.0.8.tgz"
+  resolved "https://registry.yarnpkg.com/@mapbox/node-pre-gyp/-/node-pre-gyp-1.0.8.tgz#32abc8a5c624bc4e46c43d84dfb8b26d33a96f58"
   integrity sha512-CMGKi28CF+qlbXh26hDe6NxCd7amqeAzEqnS6IHeO6LoaKyM/n+Xw3HT1COdq8cuioOdlKdqn/hCmqPUOMOywg==
   dependencies:
     detect-libc "^1.0.3"
@@ -522,7 +522,7 @@ camelcase@^6.2.0:
 
 canvacord@^5.2.3:
   version "5.2.3"
-  resolved "https://registry.npmjs.org/canvacord/-/canvacord-5.2.3.tgz"
+  resolved "https://registry.yarnpkg.com/canvacord/-/canvacord-5.2.3.tgz#efad0375022f05097b81bfee863bbbaa82ee0b5b"
   integrity sha512-aYxGA7tVQi3NCa7Qxg2b9u+wAeek2xE5q+nJjiReZofeUx0d1Xq731UerKf+iVIPBrCAcjbv/yflJL0qVwPuMQ==
   dependencies:
     "@canvacord/assets" "^2.0.5"
@@ -533,12 +533,12 @@ canvacord@^5.2.3:
     moment-duration-format "^2.3.2"
 
 canvas@^2.2.0, canvas@^2.8.0:
-  version "2.8.0"
-  resolved "https://registry.npmjs.org/canvas/-/canvas-2.8.0.tgz"
-  integrity sha512-gLTi17X8WY9Cf5GZ2Yns8T5lfBOcGgFehDFb+JQwDqdOoBOcECS9ZWMEAqMSVcMYwXD659J8NyzjRY/2aE+C2Q==
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/canvas/-/canvas-2.9.0.tgz#7df0400b141a7e42e597824f377935ba96880f2a"
+  integrity sha512-0l93g7uxp7rMyr7H+XRQ28A3ud0dKIUTIEkUe1Dxh4rjUYN7B93+SjC3r1PDKA18xcQN87OFGgUnyw7LSgNLSQ==
   dependencies:
     "@mapbox/node-pre-gyp" "^1.0.0"
-    nan "^2.14.0"
+    nan "^2.15.0"
     simple-get "^3.0.3"
 
 caseless@^0.12.0:
@@ -721,7 +721,7 @@ decompress-response@^3.3.0:
 
 decompress-response@^4.2.0:
   version "4.2.1"
-  resolved "https://registry.npmjs.org/decompress-response/-/decompress-response-4.2.1.tgz"
+  resolved "https://registry.yarnpkg.com/decompress-response/-/decompress-response-4.2.1.tgz#414023cc7a302da25ce2ec82d0d5238ccafd8986"
   integrity sha512-jOSne2qbyE+/r8G1VU+G/82LBs2Fs4LAsTiLSHOCOMZQl2OKZ6i8i4IyHemTe+/yIXOtTcRQMzPcgyhoFlqPkw==
   dependencies:
     mimic-response "^2.0.0"
@@ -1063,7 +1063,7 @@ get-stream@^5.1.0:
 
 gifencoder@^2.0.1:
   version "2.0.1"
-  resolved "https://registry.npmjs.org/gifencoder/-/gifencoder-2.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/gifencoder/-/gifencoder-2.0.1.tgz#fd363402e506529494757856aa66196697ee6bd4"
   integrity sha512-x19DcyWY10SkshBpokqFOo/HBht9GB75evRYvaLMbez9p+yB/o+kt0fK9AwW59nFiAMs2UUQsjv1lX/hvu9Ong==
   dependencies:
     canvas "^2.2.0"
@@ -1515,7 +1515,7 @@ mimic-response@^1.0.0, mimic-response@^1.0.1:
 
 mimic-response@^2.0.0:
   version "2.1.0"
-  resolved "https://registry.npmjs.org/mimic-response/-/mimic-response-2.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/mimic-response/-/mimic-response-2.1.0.tgz#d13763d35f613d09ec37ebb30bac0469c0ee8f43"
   integrity sha512-wXqjST+SLt7R009ySCglWBCFpjUygmCIfD790/kVbiGmUgfYGuB14PiTd5DwVxSV4NcYHjzMkoj5LjQZwTQLEA==
 
 mimic-response@^3.1.0:
@@ -1601,7 +1601,7 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
 
 moment-duration-format@^2.3.2:
   version "2.3.2"
-  resolved "https://registry.npmjs.org/moment-duration-format/-/moment-duration-format-2.3.2.tgz"
+  resolved "https://registry.yarnpkg.com/moment-duration-format/-/moment-duration-format-2.3.2.tgz#5fa2b19b941b8d277122ff3f87a12895ec0d6212"
   integrity sha512-cBMXjSW+fjOb4tyaVHuaVE/A5TqkukDWiOfxxAjY+PEqmmBQlLwn+8OzwPiG3brouXKY5Un4pBjAeB6UToXHaQ==
 
 moment@^2.29.1:
@@ -1678,9 +1678,9 @@ ms@2.1.3, ms@^2.0.0, ms@^2.1.1, ms@^2.1.3:
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-nan@^2.14.0:
+nan@^2.15.0:
   version "2.15.0"
-  resolved "https://registry.npmjs.org/nan/-/nan-2.15.0.tgz"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.15.0.tgz#3f34a473ff18e15c1b5626b62903b5ad6e665fee"
   integrity sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ==
 
 negotiator@0.6.2, negotiator@^0.6.2:
@@ -2163,12 +2163,12 @@ signal-exit@^3.0.0, signal-exit@^3.0.2:
 
 simple-concat@^1.0.0:
   version "1.0.1"
-  resolved "https://registry.npmjs.org/simple-concat/-/simple-concat-1.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/simple-concat/-/simple-concat-1.0.1.tgz#f46976082ba35c2263f1c8ab5edfe26c41c9552f"
   integrity sha512-cSFtAPtRhljv69IK0hTVZQ+OfE9nePi/rtJmw5UjHeVyVroEqJXP1sFztKUy1qU+xvz3u/sfYJLa947b7nAN2Q==
 
 simple-get@^3.0.3:
   version "3.1.1"
-  resolved "https://registry.npmjs.org/simple-get/-/simple-get-3.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/simple-get/-/simple-get-3.1.1.tgz#cc7ba77cfbe761036fbfce3d021af25fc5584d55"
   integrity sha512-CQ5LTKGfCpvE1K0n2us+kuMPbk/q0EKl82s4aheV9oXjFEz6W/Y7oQFVJuU6QG77hRT4Ghb5RURteF5vnWjupA==
   dependencies:
     decompress-response "^4.2.0"
@@ -2336,7 +2336,7 @@ tslib@^2.3.0, tslib@^2.3.1:
 
 twemoji-parser@^13.0.0:
   version "13.1.0"
-  resolved "https://registry.npmjs.org/twemoji-parser/-/twemoji-parser-13.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/twemoji-parser/-/twemoji-parser-13.1.0.tgz#65e7e449c59258791b22ac0b37077349127e3ea4"
   integrity sha512-AQOzLJpYlpWMy8n+0ATyKKZzWlZBJN+G0C+5lhX7Ftc2PeEVdUU/7ns2Pn2vVje26AIZ/OHwFoUbdv6YYD/wGg==
 
 type-fest@^0.20.2:

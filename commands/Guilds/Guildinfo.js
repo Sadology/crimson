@@ -26,6 +26,11 @@ module.exports = {
                 .setLabel("Roles")
                 .setStyle("PRIMARY")
             )
+        let roles = message.guild.roles.cache
+        .sort((a,b) => b.position - a.position)
+        .map(role => role.toString())
+        .slice(0, -1)
+        .join(', ') || "None"
 
         let Data = {
             Name: message.guild.name,
@@ -82,10 +87,10 @@ module.exports = {
                 if(b.user.id !== message.author.id) return
                 if(b.customId === 'serverRoles'){
                     let rolesEmbed = new Discord.MessageEmbed()
-                        .setDescription(`Server Roles \`[${message.guild.roles.cache.size}]\` \n${Roles}`)
+                        .setDescription(`Server Roles \`[${message.guild.roles.cache.size}]\` \n${roles}`)
                         .setColor("#fffafa")
                     collector.stop()
-                    b.update({embeds: [rolesEmbed], components: []}).catch(err => {return console.log(err)})
+                    b.update({embeds: [rolesEmbed], components: [row]}).catch(err => {return console.log(err)})
                 }
             })
 
