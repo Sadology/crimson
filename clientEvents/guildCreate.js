@@ -7,15 +7,15 @@ module.exports = async client =>{
         guildCreate.guildCreate(guild);
     });
 
-    // const GuildDataCheck = async () =>{
-    //     let data = new GuildManager(client)
-    //     data.guildUpdate();
-    //     data.setGuildChannels();
-    //     data.setGuildRoles();
-    //     data.deleteJunk()
+    const GuildDataCheck = async () =>{
+        let data = new GuildManager(client)
+        data.guildUpdate();
+        data.setGuildChannels();
+        data.setGuildRoles();
+        data.deleteJunk()
 
-    //     setTimeout(GuildDataCheck, 1000 * 60 * 60)
-    // }
-    // GuildDataCheck()
+        setTimeout(GuildDataCheck, 1000 * 60 * 60)
+    }
+    GuildDataCheck()
 }
 
