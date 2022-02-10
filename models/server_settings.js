@@ -25,7 +25,8 @@ const serverSchema = mongoose.Schema({
     Logchannels: Map,
     Roles: Map,
     Modules: Map,
-    Commands: Map
+    Commands: Map,
+    itemShop: Map
 })
 
 module.exports = mongoose.model('Server_Settings', serverSchema);

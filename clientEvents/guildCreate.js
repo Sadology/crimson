@@ -9,10 +9,10 @@ module.exports = async client =>{
 
     const GuildDataCheck = async () =>{
         let data = new GuildManager(client)
-        // data.guildUpdate();
-        // data.setGuildChannels();
-        // data.setGuildRoles();
-        // data.deleteJunk()
+        data.guildUpdate();
+        data.setGuildChannels();
+        data.setGuildRoles();
+        data.deleteJunk();
 
         setTimeout(GuildDataCheck, 1000 * 60 * 60)
     }
