@@ -12,7 +12,7 @@
   "author": "shadow~",
   "license": "ISC",
   "engines": {
-    "node": "16.x"
+    "node": "17.x"
   },
   "dependencies": {
     "@discordjs/opus": "^0.7.0",

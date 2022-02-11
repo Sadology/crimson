@@ -11,8 +11,8 @@ module.exports = {
     run: async(client, message, args)=> {
         await message.channel.send({content: "Pinging..."
         }).then(async (m) =>{
-            let Ping = m.createdTimestamp - message.createdTimestamp
-            await m.edit({content: `Pong \`${Ping} ms\``})
+            let Ping = Date.now() - m.createdTimestamp
+            await m.edit({content: `Pong \`${Ping}ms\``})
         })
     }
 }
