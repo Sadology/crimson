@@ -85,7 +85,7 @@ class LogCreate{
 
             for (let i = 0; i < current.length; i++){
                 Embed.addField(`**${start + i + 1}**• [ ${current[i].actionType} ]`,[
-                    `\`\`\`arm\n User     ∙ ${current[i].userName}`,
+                    `\`\`\`arm\n User    ∙ ${current[i].userName}`,
                     `Reason   ∙ ${current[i].actionReason}`,
                     `Mod      ∙ ${current[i].moderator}`,
                     `Duration ∙ ${current[i].actionLength ? current[i].actionLength : "∞"}`,
