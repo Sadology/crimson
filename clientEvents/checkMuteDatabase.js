@@ -81,25 +81,25 @@ module.exports = (client) =>{
             }
 
             const evadeData = {
-                color: "GREEN",
+                color: "#2f3136",
                 author: {
                     name: `Auto Mute - ${member.user.username}`,
                     icon_url: member.user.displayAvatarURL({dynamic: false, type: "png", size: 1024})
                 },
                 fields: [
                     {
-                        name: "User",
-                        value: `\`\`\`${member.user.tag}\`\`\``,
+                        name: "<:user_icon:953192887779221574> User",
+                        value: `${member.user.tag}`,
                         inline: true
                     },
                     {
-                        name: "Moderator",
-                        value: `\`\`\`${client.user.tag}\`\`\``,
+                        name: "<:staff:956457533957079080><:staff:956457534334566420> Moderator",
+                        value: `${client.user.tag}`,
                         inline: true
                     },
                     {
-                        name: "Reason",
-                        value: `\`\`\`Mute evade detection [ Auto muted ]\`\`\``,
+                        name: "<:reason:921094864073011221> Reason",
+                        value: `Mute evade detection [ Auto muted ]`,
                     },
                 ],
                 timestamp: new Date(),
@@ -126,26 +126,26 @@ async function updateNonExistedData(guildID, userID){
 
 function sendLogData(member, guild, client){
     const informations = {
-        color: "GREEN",
+        color: "#2f3136",
         author: {
-            name: `Unmute`,
+            name: `❖ Unmute`,
             icon_url: member.user ? member.user.displayAvatarURL({dynamic: false, format: "png", size: 1024}) : client.user.displayAvatarURL({format: 'png'})
         },
         fields: [
             {
-                name: "User",
-                value: `\`\`\`${member.user? member.user.tag : member}\`\`\``,
+                name: "<:user_icon:953192887779221574> User",
+                value: `${member.user? member.user.tag : member}`,
                 inline: true
             },
             {
-                name: "Moderator",
-                value: `\`\`\`${client.user.username}\`\`\``,
+                name: "<:staff:956457533957079080><:staff:956457534334566420> Moderator",
+                value: `${client.user.username}`,
                 inline: true
             },
         ],
         timestamp: new Date(),
         footer: {
-            text: `User ID: ${member.user? member.user.id : member}`
+            text: `User-ID: ${member.user? member.user.id : member}`
         }
     }
 

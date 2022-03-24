@@ -80,17 +80,17 @@ class LogCreate{
             const current = Data.slice(start, start + 5)
             const Embed = new Discord.MessageEmbed()
                 .setDescription(`${this.member.user ? this.member.user : "<@"+this.member+">"} Mod-Logs - \`[ ${Data.length} ]\``)
-                .setFooter({text: `Logs ${start + 1} - ${start + current.length}/${Data.length}`})
-                .setColor("#fffafa")
+                .setFooter({text: `User-ID: ${this.member.user ? this.member.user.id : this.member} ∙ Showing: ${start + 1} - ${start + current.length}`})
+                .setColor("#2f3136")
 
             for (let i = 0; i < current.length; i++){
                 Embed.addField(`**${start + i + 1}**• [ ${current[i].actionType} ]`,[
-                    `\`\`\`py\nUser     - ${current[i].userName}`,
-                    `Reason   - ${current[i].actionReason}`,
-                    `Mod      - ${current[i].moderator}`,
-                    `Duration - ${current[i].actionLength ? current[i].actionLength : "∞"}`,
-                    `Date     - ${moment(current[i].actionDate).format('llll')}`,
-                    `LogID    - ${current[i].caseID}\`\`\``
+                    `\`\`\`arm\n User     ∙ ${current[i].userName}`,
+                    `Reason   ∙ ${current[i].actionReason}`,
+                    `Mod      ∙ ${current[i].moderator}`,
+                    `Duration ∙ ${current[i].actionLength ? current[i].actionLength : "∞"}`,
+                    `Date     ∙ ${moment(current[i].actionDate).format('llll')}`,
+                    `LogID    ∙ ${current[i].caseID}\`\`\``
                 ].join(" \n").toString())
             }
             

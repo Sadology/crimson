@@ -65,7 +65,7 @@ module.exports = {
                     })}`)
                     .setFooter({text: member.user.id})
                     .setTimestamp()
-                    .setColor(guild.me.displayColor)
+                    .setColor("#2f3136")
     
                 switch(opt){
                     case 'db':
@@ -73,7 +73,7 @@ module.exports = {
                         new LogManager(guild).sendData({type: 'welcomelog', data: Embed, client})
                     break;
                     case 'local':
-                        Embed.setDescription(`\`\`\`${convertValue(GreetMessage)}\`\`\``)
+                        Embed.setDescription(`${convertValue(GreetMessage)}`)
                         new LogManager(guild).sendData({type: 'welcomelog', data: Embed, client})
                     break;
                 }

@@ -27,34 +27,34 @@ module.exports = {
             const { executor, target, reason } = BanLog
 
             const banEmbed = {
-                color: "#fc5947",
+                color: "#2f3136",
                 author: {
-                    name: `Ban Detection - ${target.tag}`,
+                    name: `Ban - ${target.tag}`,
                     icon_url: target.displayAvatarURL({
                         dynamic: true , 
-                        type: 'png'
+                        format: 'png'
                     })
                 },
                 fields: [
                     {
-                        name: `Member`,
-                        value: `\`\`\`${target.tag.toString()}\`\`\``,
+                        name: `<:user_icon:953192887779221574> User`,
+                        value: `${target.tag.toString()}`,
                         inline: true
                     },
                     {
-                        name: `Moderator`,
-                        value: `\`\`\`${executor.tag.toString()}\`\`\``,
+                        name: `<:staff:956457533957079080><:staff:956457534334566420> Moderator`,
+                        value: `${executor.tag.toString()}`,
                         inline: true
                     },
                     {
-                        name: `Reason for Ban`,
-                        value: `\`\`\`${reason ? reason : 'No reason provided'}\`\`\``.toString(),
+                        name: `<:reason:921094864073011221> Ban Reason`,
+                        value: `${reason ? reason : 'No reason was provided'}`.toString(),
                         inline: false
                     }
                 ],
                 timestamp: new Date(),
                 footer: {
-                    text: `${target.id}`
+                    text: `User-ID: ${target.id}`
                 }
             }
             const Data = {
@@ -63,7 +63,7 @@ module.exports = {
                 userID: target.id, 
                 userName: target.tag,
                 actionType: "Ban", 
-                actionReason: reason ? reason : 'No reason provided',
+                actionReason: reason ? reason : 'No reason was provided',
                 moderator: executor.tag,
                 moderatorID: executor.id,
             }
