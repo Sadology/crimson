@@ -51,16 +51,6 @@ module.exports = {
                 }
                 Embed.addField(`${keys}`,`\`\`\`${item}\`\`\``, true)
             })
-            let Time
-            if(timeData.OnlineTime){
-                if(timeData.OnlineTime.LastOnline == null) {
-                    Time = moment(timeData.OnlineTime.OnlineSince).format("lll") + ' - ' +moment(timeData.OnlineTime.OnlineSince, "YYYYMMDD").fromNow()
-                    Embed.addField("Online Since", `\`\`\`${Time}\`\`\``)
-                }else if(timeData.OnlineTime.OnlineSince == null) {
-                    Time = moment(timeData.OnlineTime.LastOnline).format("lll") + ' - ' +moment(timeData.OnlineTime.LastOnline, "YYYYMMDD").fromNow()
-                    Embed.addField("Last Online", `\`\`\`${Time}\`\`\``)
-                }
-            }
             return message.channel.send({
                 embeds: [Embed]
             }).catch(err => {return console.log(err.stack)})
