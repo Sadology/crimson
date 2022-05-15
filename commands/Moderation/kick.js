@@ -1,95 +1,124 @@
 const Discord = require('discord.js');
-const { ModStatus } = require('../../Functions/functions');
-const { Member } = require('../../Functions');
-module.exports = {
-    name: 'kick',
-    description: "Kick out a member from the server.",
-    permissions: ["KICK_MEMBERS"],
-    botPermission: ["KICK_MEMBERS", "SEND_MESSAGES", "EMBED_LINKS"],
-    usage: "kick [ member ]",
-    category: "Moderation",
-    delete: true,
-    cooldown: 1000,
-    run: async(client, message, args,prefix) =>{
-        const { guild, content, channel, author } = message;
+const { GuildMember, Permissions } = require('../../Functions');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-        if(!args.length){
-            return message.channel.send({embeds: [
-                new Discord.MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({type: 'png', dynamic: false}))
-                    .setDescription(`<:error:921057346891939840> Mention a member \n\nUsage: \`${prefix}kick [ member ] [ reason ]\``)
-                    .setColor("WHITE")
-            ]}).catch(err => {return console.log(err)})
+class KickManager{
+    constructor(client, guild, interaction){
+        this.client = client;
+        this.guild = guild;
+        this.interaction = interaction;
+    }
+
+    async MainFrame(user, reason){
+        let Member = this.guild.members.cache.get(user);
+        let Embed = new Discord.MessageEmbed();
+
+        if(!Member){
+
+            Embed.setDescription(`<:error:921057346891939840> Mentioned member is invalid`)
+            Embed.setColor("#2f3136")
+            return this.erroMessage(Embed);
+
         }
-        const kickReason = message.content.split(/s+/g).slice(2).join(' ') || "No reason provided"
-        const member = new Member(message, client).getMember({member: args[0]})
-        if(member == false ) return
-        MemberPermissionCheck(member)
+        
+        let ErrorEmbed = new Discord.MessageEmbed()
+            .setDescription("Can't Kick a Mod/Admin :(")
+            .setColor("RED")
 
-        function MemberPermissionCheck(Member){
-            try {
-                const authorHighestRole1 = message.member.roles.highest.position;
-                const mentionHighestRole1 = Member.roles.highest.position;
-                const clientHighestRole = message.guild.members.resolve( client.user ).roles.highest.position;
+        let RolePosition = this.RolePosition(Member);
+        if(!RolePosition) return;
 
-                const ErrorEmbed = new Discord.MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
-                    .setColor("RED")
+        if(Member.permissions.any(["BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_CHANNELS", "MANAGE_ROLES", "MANAGE_MESSAGES", "MANAGE_GUILD", "ADMINISTRATOR"])){
+            return this.erroMessage(ErrorEmbed);
+        };
+        
+        this.KickCreate(Member, reason)
+    }
 
-                if(Member.user.id === message.author.id){
-                    ErrorEmbed.setDescription(`Unfortunately you can't kick yourself.`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+    async KickCreate(User, reason){
+        if(!reason){
+            reason = "No reason was provided"
+        };
+        
+        await User.kick(`${reason} | ${User.user ? User.user.id : User} | ${this.interaction.member.user.tag}`)
+        .then((msg) => {
+            let Embed = new Discord.MessageEmbed()
+                .setDescription(`🦿 ${User.user ? User.user : "<@"+User+">"} was Kicked | ${reason}`)
+                .setColor("#2f3136")
 
-                }else if(Member.user.id === client.user.id){
-                    ErrorEmbed.setDescription(`Why you want to kick me ;-;`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+            return this.erroMessage(Embed)
+        })
+        .catch(err => {return console.log(err.stack)});
+    };
 
-                }else if (Member.kickable === false){  
-                    ErrorEmbed.setDescription(`Can't kick a Mod/Admin.`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+    RolePosition(User){
+        const authorHighest = this.interaction.member.roles.highest.position;
+        const UserHighest = User.roles.highest.position;
+        const clientHighest = this.guild.members.resolve( this.client.user ).roles.highest.position;
 
-                }else if (Member.permissions.any(["BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_CHANNELS", "MANAGE_ROLES", "MANAGE_MESSAGES", "MANAGE_GUILD", "ADMINISTRATOR"], { checkAdmin: true, checkOwner: true })){
-                    ErrorEmbed.setDescription(`Can't kick a Mod/Admin.`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+        if(User.user.id == this.client.user.id){
+            let Embed = new Discord.MessageEmbed()
+                .setDescription(`🦿 There you go i kicked my self ... you happy now? it hurts!! 😔`)
+                .setColor("#2f3136")
+            
+            this.client.eventEmitter.emit('CmdUsed', this.interaction.member, "Kick");
+            this.erroMessage(Embed)
+            return false;
+        };
 
-                }else if (mentionHighestRole1 >= authorHighestRole1) {
-                    ErrorEmbed.setDescription(`Can't kick member with higher or equal role as you ${message.author}.`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+        if(User.user.id == this.interaction.member.user.id){
+            let Embed = new Discord.MessageEmbed()
+                .setDescription(`Wish i could kick you 😔`)
+                .setColor("#2f3136")
 
-                }else if (mentionHighestRole1 >= clientHighestRole){
-                    ErrorEmbed.setDescription(`Can't kick a member higher or equal role as me.`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
+            this.erroMessage(Embed)
+            return false;
+        };
 
-                }else {
-                    kickMember(Member)
-                }
-            } catch(err){
-                message.channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(err.message)
-                    .setColor("RED")
-                ]})
-                return console.log(err.stack) 
-            }
-        }
+        if(UserHighest > clientHighest || UserHighest > authorHighest){
+            let Embed = new Discord.MessageEmbed()
+                .setDescription("Can't Ban a member with Higher or Equal role")
+                .setColor("RED")
 
-        async function kickMember(Member){
-            try {
-                await message.guild.members.kick(Member.id, `${kickReason} | ${Member.user.id} | ${message.author.tag}`).then(() => {
-                    message.channel.send({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`${Member} was kicked from the server | ${kickReason}`)
-                        .setColor( "#45f766" )
-                    ]
-                    }).then(m=>setTimeout(() => m.delete(), 1000 * 30))
-                    .catch(err => {return console.log(err)})
-                })
-                ModStatus({type: "Kick", guild: message.guild, member: message.author, content: content})
-            }catch(err){
-                message.channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(err.message)
-                    .setColor("RED")
-                ]})
-                return console.log(err)
-            }
-        }
+            this.erroMessage(Embed)
+            return false;
+        };
+
+        return true;
+    }
+
+    erroMessage(embed){
+        this.interaction.reply({embeds: [embed], ephemeral: true}).catch(err => {return console.log(err.stack)})
+    };
+
+}
+
+
+
+module.exports.run = {
+    run: async(client, interaction, args,prefix) =>{
+
+        const {options} = interaction;
+        let user = options.getUser('member');
+        let reason = options.getString('reason');
+
+        new KickManager(client, interaction.guild, interaction).MainFrame(user ? user.id : user, reason);
     }
 }
+
+module.exports.slash = {
+    data: new SlashCommandBuilder()
+        .setName('kick')
+        .setDescription("Kick a member from the server")
+        .addUserOption(option => 
+            option.setName('member')
+            .setDescription("The member you want to kick")
+            .setRequired(true))
+        .addStringOption(option =>
+            option
+            .setName('reason')
+            .setDescription("Reason for kicking the member")),
+    Permissions: ["KICK_MEMBERS"],
+    ClientPermissions: ["KICK_MEMBERS"],
+    category: "Moderation",
+};

@@ -1,10 +1,8 @@
 module.exports = {
-    Guild: require('./server_settings'),
+    Guild: require('./GuildSettings'),
     LogsDatabase: require('./ModLogs'),
-    Profiles: require('./profiles'),
-    ModStats: require('./ModStatictic'),
+    Stats: require('./Statictic'),
     GuildRole: require('./GuildRoles'),
     GuildChannel: require('./GuildChannels'),
     CustomCommand: require("./customCmdsData"),
-    //RankData: require('./RankData')
 };

@@ -1,53 +1,62 @@
 const Discord = require('discord.js');
-const { Client ,Intents } = require('discord.js');
-const client = new Discord.Client({
-  partials: ["CHANNEL"],
-  restTimeOffset: 0,
-  intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MEMBERS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_BANS,
-    Intents.FLAGS.DIRECT_MESSAGES,
-    Intents.FLAGS.GUILD_VOICE_STATES,
-    Intents.FLAGS.GUILD_PRESENCES,
-  ]
-});
-
-//const keepAlive = require("./server")
-require('dotenv').config();
+const { Client, Intents, Collection } = require('discord.js');
 const fs = require('fs');
-const { readdirSync } = require("fs");
-client.mongoose = require('./Functions/mongo');
-client.commands = new Discord.Collection();
-client.aliases = new Discord.Collection();
-client.slash = new Discord.Collection();
+require('dotenv').config();
+const cron = require('node-cron');
+const database = require('./Database/Builder');
+const event = require('events');
+const discordModals = require('discord-modals');
+
+// Client builder
+const client = new Client(
+    {
+        partials: ["CHANNEL"],
+        restTimeOffset: 0,
+        intents: [
+            Intents.FLAGS.GUILDS,
+            Intents.FLAGS.GUILD_MEMBERS,
+            Intents.FLAGS.GUILD_MESSAGES,
+            Intents.FLAGS.GUILD_BANS,
+            Intents.FLAGS.GUILD_PRESENCES
+        ]
+    }
+);
+
+// Collection maps
+client.Commands = new Collection();
+client.SlashCmd = new Collection();
+client.Aliases = new Collection();
+client.eventEmitter = new event.EventEmitter();
 client.GUILDS = new Map();
 
-fs.readdir("./handlers/", (err, files) => {
-  if (err) return console.error(err);
-  files.forEach(file => {
-    require(`./handlers/${file}`)(client)
-  });
+// Handlers management
+fs.readdir("./Handlers/", (err, files) => {
+    if (err) return console.error(err);
+
+    if (files) {
+        files.forEach(file => {
+            let handle = require(`./Handlers/${file}`);
+            handle.run(client);
+        });
+    } else {
+        console.log("A file is missing")
+    }
 });
 
-// CLIENT FUNCTION
-client.on('ready', async() => {
-  if(client.user.id == "874975916592332820"){
-    client.user.setPresence({ activities: [{ name: 'Im very SUS' }], status: 'online'});
-  }else if(client.user.id == "618434479601745950"){
-    client.user.setPresence({ activities: [{ name: '>help | Crying in shadows~ basement' }], status: 'online'});
-  }
-  console.log("ONLINE MY MASTER")
+// Check for Mute every 10 second
+cron.schedule('*/10 * * * * *', () => {
+    client.eventEmitter.emit('MuteCheck');
+});
 
-  fs.readdir("./clientEvents/", (err, files) => {
-    if (err) return console.error(err);
-    files.forEach(file => {
-      require(`./clientEvents/${file}`)(client)
-    });
-  });
-})
+cron.schedule('0 0 */1 * * *',() => {
+    client.guilds.cache.forEach(g => {
+        client.eventEmitter.emit('guildUpdate', g);
+    })
+});
 
-//keepAlive()
-client.mongoose.init();
+// Client & Database login
+discordModals(client);
+database.init();
 client.login(process.env.TOKEN)
+
+module.exports = client;

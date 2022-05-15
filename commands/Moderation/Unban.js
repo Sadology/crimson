@@ -1,68 +1,89 @@
 const Discord = require('discord.js');
-const { commandUsed } = require('../../Functions/CommandUsage');
-const { Member } = require('../../Functions');
-module.exports = {
-    name: 'unban',
-    description: "Unbans a banned member",
-    permissions: ["BAN_MEMBERS"],
-    botPermission: ["BAN_MEMBERS", "SEND_MESSAGES", "EMBED_LINKS"],
-    usage: "unban [ member ]",
-    category: "Moderation",
-    delete: true,
-    cooldown: 1000,
-    run: async(client, message, args,prefix) =>{
-        const { guild, content, channel, author } = message;
-        if(!args.length){
-            return message.channel.send({embeds: [
-                new Discord.MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({type: 'png', dynamic: false}))
-                    .setDescription(`<:error:921057346891939840> Mention a member \n\nUsage: \`${prefix}unban [ member ]\``)
-                    .setColor("WHITE")
-            ]}).catch(err => {return console.log(err)})
-        }
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-        function fetchmember(data){
-            let Member = data.replace(/<@!/g, '').replace(/>/g, '');
-            let guildMember = message.guild.members.resolve(Member)
-            if(guildMember){
-                return message.channel.send({embeds: [
-                    new Discord.MessageEmbed()
-                        .setDescription(`${guildMember} is not banned`)
-                        .setColor("RED")
-                ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
-                .catch(err => {return console.log(err.stack)})
-            }else {
-                return UnBan(Member)
-            }
-        }
-
-        async function UnBan(Member){
-            try {
-                let banData = await message.guild.bans.resolve(Member)
-                if(banData){
-                    return message.channel.send({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`${Member} is not Banned`)
-                        .setColor("RED")
-                    ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
-                    .catch(err => {return console.log(err.stack)})
-                }else {
-                    message.guild.bans.remove(Member, `Sadbot Unban`).then(res => {
-                        return message.channel.send({embeds: [new Discord.MessageEmbed()
-                            .setDescription(`${res} was Unbanned from the server`)
-                            .setColor( "#45f766" )
-                        ]
-                        }).then(m=>setTimeout(() => m.delete(), 1000 * 30))
-                        .catch(err => {return console.log(err.stack)})
-                    })
-                }
-            }catch(err){
-                message.channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(err.message)
-                    .setColor("RED")
-                ]})
-                return console.log(err.stack)
-            }
-        }
-        fetchmember(args[0])
+class BanManager{
+    constructor(client, guild, interaction){
+        this.client = client;
+        this.guild = guild;
+        this.interaction = interaction;
     }
+
+    async MainFrame(user, reason){
+        let Member = this.guild.members.cache.get(user);
+        let Embed = new Discord.MessageEmbed();
+
+        if(Member){
+            Embed.setDescription(`<:error:921057346891939840> <@${user}> is not banned`)
+            Embed.setColor("#2f3136")
+            return this.erroMessage(Embed);
+        }
+
+        let oldBan = await this.FetchBanAudit(user);
+        if(!oldBan) {
+
+            Embed.setDescription(`<:error:921057346891939840> <@${user}> is not banned`)
+            Embed.setColor("#2f3136")
+            return this.erroMessage(Embed);
+
+        }
+        
+        this.BanRemove(user, reason)
+    }
+
+    async BanRemove(User, reason){
+        await this.guild.bans.remove(User, `${this.client.user.username} unban`)
+        .then((msg) => {
+            let Embed = new Discord.MessageEmbed()
+                .setDescription(`<:check:959154334388584509> ${User.user ? User.user : "<@"+User+">"} was Unbanned`)
+                .setColor("#2f3136")
+
+            return this.erroMessage(Embed)
+        })
+        .catch(err => {return console.log(err.stack)});
+    };
+
+    async FetchBanAudit(User){
+        let userID = User.user ? User.user.id : User
+
+        await this.guild.bans.fetch();
+        let Data = this.guild.bans.resolve(userID);
+
+        if(Data){
+            return true;
+        };
+
+        return false;
+    };
+
+    erroMessage(embed){
+        this.interaction.reply({embeds: [embed], ephemeral: true}).catch(err => {return console.log(err.stack)})
+    };
+
+}
+
+module.exports.run = {
+    run: async(client, interaction, args,prefix) =>{
+
+        const {options} = interaction;
+        let user = options.getUser('user');
+        let reason = options.getString('reason');
+
+        // Calling the log resolver class for slash command
+        let data = new BanManager(client, interaction.guild, interaction).MainFrame(user ? user.id : user, reason);
+    }
+}
+
+// Slash command export
+module.exports.slash = {
+    data: new SlashCommandBuilder()
+        .setName("unban")
+        .setDescription("Unban a member from server")
+        .addUserOption(option =>
+            option
+            .setName("user")
+            .setDescription("The user you want to unban")
+            .setRequired(true)),
+    Permissions: ["BAN_MEMBERS"],
+    ClientPermissions: ["BAN_MEMBERS"],
+    category: "Moderation",
 }

@@ -1,130 +1,141 @@
 const Discord = require('discord.js');
-const { commandUsed } = require('../../Functions/CommandUsage');
-const { Member } = require('../../Functions');
-module.exports = {
-    name: 'ban',
-    description: "Bans a member from the server",
-    permissions: ["BAN_MEMBERS"],
-    botPermission: ["BAN_MEMBERS", "SEND_MESSAGES", "EMBED_LINKS"],
-    usage: "ban [ member ]",
-    category: "Moderation",
-    delete: true,
-    cooldown: 1000,
-    run: async(client, message, args,prefix) =>{
-        const { guild, content, channel, author } = message;
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-        if(!args.length){
-            return message.channel.send({embeds: [
-                new Discord.MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({type: 'png', dynamic: false}))
-                    .setDescription(`<:error:921057346891939840> Mention a member \n\nUsage: \`${prefix}ban [ member ] [ reason ]\``)
-                    .setColor("WHITE")
-            ]}).catch(err => {return console.log(err)})
+class BanManager{
+    constructor(client, guild, interaction){
+        this.client = client;
+        this.guild = guild;
+        this.interaction = interaction;
+    }
+
+    async MainFrame(user, reason){
+        let Member = this.guild.members.cache.get(user);
+        let Embed = new Discord.MessageEmbed();
+
+        if(!Member){
+            let oldBan = await this.FetchBanAudit(user);
+            if(oldBan) {
+
+                Embed.setDescription(`<:error:921057346891939840> <@${user}> is already banned`)
+                Embed.setColor("#2f3136")
+                return this.erroMessage(Embed);
+
+            }
+
+            return this.BanCreate(user, reason);
         }
         
-        function fetchmember(data){
-            let Member = data.replace(/<@!/g, '').replace(/>/g, '');
-            let guildMember = message.guild.members.resolve(Member)
-            if(guildMember){
-                return MemberPermissionCheck(guildMember)
-            }else {
-                return HackBan(Member)
-            }
-        }
+        let ErrorEmbed = new Discord.MessageEmbed()
+            .setDescription("Can't Ban a Mod/Admin :(")
+            .setColor("RED")
 
-        const banReason = message.content.split(/\s+/).slice(2).join(" ") || "No reason Provided"
+        let RolePosition = this.RolePosition(Member);
+        if(!RolePosition) return;
 
-        async function HackBan(Member){
-            let bannedMember = await message.guild.bans.resolve(Member)
-            if(bannedMember){
-                return message.channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(`<:error:921057346891939840> <@${Member}> is already banned`)
-                    .setColor("RED")
-                ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30)) 
-            }else {
-                try {
-                    await message.guild.bans.create(Member, {days: 0, reason: `${banReason} | ${Member} | ${message.author.tag}`}).then((res) => {
-                        message.channel.send({embeds: [new Discord.MessageEmbed()
-                            .setDescription(`${res} was Banned from the server | ${banReason}`)
-                            .setColor( "#45f766" )
-                        ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
-                        .catch(err => {return console.log(err.stack)})
-                    })
-                } catch(err){
-                    message.channel.send({embeds: [new Discord.MessageEmbed()
-                        .setDescription(err.message)
-                        .setColor("RED")
-                    ]})
-                    return console.log(err.stack)
-                }
-            }
-        }
-
-        function MemberPermissionCheck(Member){
-            try {
-                const authorHighestRole1 = message.member.roles.highest.position;
-                const mentionHighestRole1 = Member.roles.highest.position;
-                const clientHighestRole = message.guild.members.resolve( client.user ).roles.highest.position;
-
-                const ErrorEmbed = new Discord.MessageEmbed()
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL({dynamic: false, size: 1024, type: 'png'}))
-                    .setColor("RED")
-
-                if(Member.user.id === message.author.id){
-                    ErrorEmbed.setDescription(`Unfortunately you can't ban yourself.`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
-
-                }else if(Member.user.id === client.user.id){
-                    ErrorEmbed.setDescription(`Please don't ban me 😔🙏`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
-
-                }else if (Member.bannable === false){  
-                    ErrorEmbed.setDescription(`Can't ban a Mod/Admin.`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
-
-                }else if (Member.permissions.any(["BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_CHANNELS", "MANAGE_ROLES", "MANAGE_MESSAGES", "MANAGE_GUILD", "ADMINISTRATOR"], { checkAdmin: true, checkOwner: true })){
-                    ErrorEmbed.setDescription(`Can't ban a Mod/Admin.`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
-
-                }else if (mentionHighestRole1 >= authorHighestRole1) {
-                    ErrorEmbed.setDescription(`Can't ban member with higher or equal role as you.`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
-
-                }else if (mentionHighestRole1 >= clientHighestRole){
-                    ErrorEmbed.setDescription(`Can't ban a member higher or equal role as me.`)
-                    return message.channel.send( {embeds: [ErrorEmbed]} ).then(m=>setTimeout(() => m.delete(), 1000 * 20));
-
-                }else {
-                    BanMember(Member)
-                }
-            } catch(err){
-                message.channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(err.message)
-                    .setColor("RED")
-                ]})
-                return console.log(err) 
-            }
-        }
-
-        async function BanMember(Member){
-            try {
-                await message.guild.bans.create(Member.id, {days: 0, reason: `${banReason} | ${Member.id} | ${message.author.tag}`}).then((res) => {
-                    message.channel.send({embeds: [new Discord.MessageEmbed()
-                        .setDescription(`${res} was Banned from the server | ${banReason}`)
-                        .setColor( "#45f766" )
-                    ]}).then(m=>setTimeout(() => m.delete(), 1000 * 30))
-                    .catch(err => {return console.log(err.stack)})
-                })
-                
-            }catch(err){
-                message.channel.send({embeds: [new Discord.MessageEmbed()
-                    .setDescription(err.message)
-                    .setColor("RED")
-                ]})
-                return console.log(err)
-            }
-        }
-
-        fetchmember(args[0])
+        if(Member.permissions.any(["BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_CHANNELS", "MANAGE_ROLES", "MANAGE_MESSAGES", "MANAGE_GUILD", "ADMINISTRATOR"])){
+            return this.erroMessage(ErrorEmbed);
+        };
+        
+        this.BanCreate(Member, reason)
     }
+
+    async BanCreate(User, reason){
+        if(!reason){
+            reason = "No reason was provided"
+        };
+        
+        await this.guild.bans.create(User, {days: 0, reason: `${reason} | ${User.user ? User.user.id : User} | ${this.interaction.member.user.tag}`})
+        .then((msg) => {
+            let Embed = new Discord.MessageEmbed()
+                .setDescription(`<:banHammer:921094864073011221> ${User.user ? User.user : "<@"+User+">"} was Banned | ${reason}`)
+                .setColor("#2f3136")
+           
+            this.client.eventEmitter.emit('CmdUsed', this.interaction.member, "Ban");
+            return this.erroMessage(Embed)
+        })
+        .catch(err => {return console.log(err.stack)});
+    };
+
+    async FetchBanAudit(User){
+        let userID = User.user ? User.user.id : User
+
+        await this.guild.bans.fetch();
+        let Data = this.guild.bans.resolve(userID);
+
+        if(Data){
+            return true;
+        };
+
+        return false;
+    };
+
+    RolePosition(User){
+        const authorHighest = this.interaction.member.roles.highest.position;
+        const UserHighest = User.roles.highest.position;
+        const clientHighest = this.guild.members.resolve( this.client.user ).roles.highest.position;
+
+        if(User.user.id == this.client.user.id){
+            let Embed = new Discord.MessageEmbed()
+                .setDescription(`<:banHammer:921094864073011221> ${this.client.user} was bann ... wait im ${this.client.user.username} <:sweating:962363501081423923>`)
+                .setColor("#2f3136")
+
+            this.erroMessage(Embed)
+            return false;
+        };
+
+        if(User.user.id == this.interaction.member.user.id){
+            let Embed = new Discord.MessageEmbed()
+                .setDescription(`If you want to get banned then ask an higher authority to use this command on you :)`)
+                .setColor("#2f3136")
+
+            this.erroMessage(Embed)
+            return false;
+        };
+
+        if(UserHighest > clientHighest || UserHighest > authorHighest){
+            let Embed = new Discord.MessageEmbed()
+                .setDescription("Can't Ban a member with Higher or Equal role")
+                .setColor("RED")
+
+            this.erroMessage(Embed)
+            return false;
+        };
+
+        return true;
+    }
+
+    erroMessage(embed){
+        this.interaction.reply({embeds: [embed], ephemeral: true}).catch(err => {return console.log(err.stack)})
+    };
+
+}
+
+module.exports.run = {
+    run: async(client, interaction, args,prefix) =>{
+
+        const {options} = interaction;
+        let user = options.getUser('user');
+        let reason = options.getString('reason');
+
+        // Calling the log resolver class for slash command
+        let data = new BanManager(client, interaction.guild, interaction).MainFrame(user ? user.id : user, reason);
+    }
+}
+
+// Slash command export
+module.exports.slash = {
+    data: new SlashCommandBuilder()
+        .setName("ban")
+        .setDescription("Ban a member from server")
+        .addUserOption(option =>
+            option
+            .setName("user")
+            .setDescription("The user you want to ban")
+            .setRequired(true))
+        .addStringOption(option =>
+            option.setName("reason")
+            .setDescription("Reason for the ban")),
+    Permissions: ["BAN_MEMBERS"],
+    ClientPermissions: ["BAN_MEMBERS"],
+    category: "Moderation",
 }

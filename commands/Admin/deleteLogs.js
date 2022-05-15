@@ -1,116 +1,164 @@
-const Discord = require('discord.js');
-const { MessageButton, MessageActionRow, MessageEmbed } = require('discord.js')
-const { LogsDatabase }= require('../../models')
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { LogsDatabase } = require('../../models');
 const moment = require('moment');
-module.exports = {
-    name: 'delete-log',
-    aliases: ["deletelog"],
-    description: "Delete a moderation log",
-    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
-    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
-    usage: "delete-log [ log ID ]",
-    category: "Administrator",
-    cooldown: 3000,
-    run: async(client, message, args,prefix) =>{
-        const row = new MessageActionRow()
-        .addComponents(
-            new MessageButton()
-                .setStyle("DANGER")
-                .setLabel("Confirm")
-                .setCustomId("confirmDeleteLog")
-        )
-        .addComponents(
-            new MessageButton()
-                .setStyle("SUCCESS")
-                .setLabel("Cancel")
-                .setCustomId("cancelDeleteLog")
-        )
+const wait = require('util').promisify(setTimeout);
 
-        async function fetchData(caseid) {
-            let data = await LogsDatabase.findOne({
-                guildID: message.guild.id,
-                [`Action.caseID`]: caseid
-            })
-            if(data){
-                let items = data.Action.find(i => i.caseID == caseid)
-                confirmation(items, caseid) 
-            }else {
-                return message.channel.send({embeds: [
-                    new Discord.MessageEmbed()
-                        .setDescription(`No logs were found by this ID: **${caseid}**`)
-                        .setColor("RED")
-                ]}).catch(err => {return console.log(err.stack)})
-            }
-        }
-
-        function confirmation (data, id){
-            message.channel.send({ content: "Do you you wish to delete this log? (yes/no)",embeds: [
-                new Discord.MessageEmbed()
-                    .setAuthor({
-                        name: "Delete log",
-                        iconURL: client.user.displayAvatarURL({format: 'png'})
-                    })
-                    .setDescription(`
-                    **Log-ID: **${data.caseID}
-                    **Name: **${data.userName}
-                    **Reason: **${data.actionReason}
-                    **Type: **${data.actionType}
-                    **Duration: **${data.actionLength}
-                    **Moderator: **${data.moderator}
-                    `)
-                    .setColor("RED")
-            ], components: [row]}).then(async msg => {
-                const collector = msg.createMessageComponentCollector({ componentType: 'BUTTON', time: 1000 * 120 });
-                collector.on('collect', async b => {
-                    if(b.user.id !== message.author.id) return
-                    if(b.customId === 'confirmDeleteLog'){
-                        DeleteData(id).then(async () =>{
-                            row.components[0].setDisabled(true)
-                            row.components[1].setDisabled(true)
-                            await b.update({content: "Deleted the log", components: [row]})
-
-                        })
-                        .catch(err => {return console.log(err)})
-                        collector.stop();
-                    }
-                    if(b.customId === "cancelDeleteLog"){
-                        row.components[0].setDisabled(true)
-                        row.components[1].setDisabled(true)
-                        await b.update({content: "Canceled the command", components: [row]})
-
-                        collector.stop();
-                    }
-                });
-                collector.on("end", (b) =>{
-                    // When the collector ends
-                    row.components[0].setDisabled(true)
-                    row.components[1].setDisabled(true)
-                    msg.edit({content: "Canceled the command", components: [row]})
-
-                })
-            }).catch(err => {return console.log(err.stack)})
-        }
-
-        async function DeleteData(id) {
-            await LogsDatabase.updateOne({
-                guildID: message.guild.id,
-                [`Action.caseID`]: id
-            }, {
-                $pull: {
-                    Action: {
-                        caseID: id
-                    }
-                },
-            }).catch(err => {return console.log(err.stack)})
-        }
-
-        if(!args.length || !args[0]) return message.channel.send({
-            embeds: [
-                new Discord.MessageEmbed()
-                    .setDescription(`Please provide the Log-ID you'd like to delete \n\n**Usage:** \`${prefix}delete-log [ Log-ID ]\``)
-                    .setColor("WHITE")
-            ]}).catch(err => {return console.log(err.stack)})
-
-        fetchData(args[0])
+let row = new MessageActionRow()
+    .addComponents(
+        new MessageButton()
+            .setCustomId('confirm')
+            .setLabel("Confirm")
+            .setStyle("DANGER")
+    )
+    .addComponents(
+        new MessageButton()
+            .setCustomId('cancel')
+            .setLabel("Cancel")
+            .setStyle("SUCCESS")
+    )
+class UserLogs{
+    constructor(client, guild, interaction){
+        this.client = client;
+        this.guild = guild;
+        this.interaction = interaction;
     }
+
+    async fetchData(ID, user){
+        let data = await LogsDatabase.findOne({
+            guildID: this.guild.id,
+            [`Action.caseID`]: ID
+        })
+
+        if(!data){
+            data = await LogsDatabase.findOne({
+                guildID: this.guild.id,
+                [`Action.LogID`]: ID
+            })
+        }
+
+        if(data) {
+            return data;
+        }
+
+        else return false;
+    };
+
+    async DeleteLog(id){
+        let data = await this.fetchData(id)
+
+        if(!data){
+            return this.interaction.reply({embeds: [
+                new MessageEmbed()
+                    .setDescription(`<:error:921057346891939840> The log-id is invalid`)
+                    .setColor("RED")
+            ]})
+        }
+
+        let userData = data.Action.find(i => i.LogID == id)
+        if(!userData) userData = data.Action.find(i => i.caseID == id)
+
+        let Embed = new MessageEmbed()
+        .addField(`Log-Id ∙ ${userData.caseID ? userData.caseID : userData.LogID}`,[
+            `\`\`\`arm\nUser     ∙ ${userData.userName}`,
+            `Reason   ∙ ${userData.actionReason}`,
+            `Mod      ∙ ${userData.moderator}`,
+            `Duration ∙ ${userData.actionLength ? userData.actionLength : "∞"}`,
+            `Date     ∙ ${moment(userData.actionDate).format('llll')}\`\`\``
+        ].join(" \n").toString(), true)
+        .setColor("#2f3136")
+
+        this.interaction.deferReply();
+        await wait(1000);
+
+        row.components[0].setDisabled(false)
+        row.components[1].setDisabled(false)
+        this.interaction.editReply({embeds: [Embed], components: [row]}).then( m => {
+            this.CollectorHandle(m, id)
+        })
+    };
+
+    CollectorHandle(msg, id){
+        const filter = (button) => button.member.user.id == this.interaction.member.id;
+        const collector = msg.createMessageComponentCollector({ filter, componentType: 'BUTTON', time: 1000 * 60 * 5 });
+
+        collector.on('collect', (b) => {
+            if(b.customId === 'confirm'){
+                this.saveData(b, id);
+                collector.stop();
+            }
+            if(b.customId === 'cancel'){
+                b.reply({
+                    embeds: [new MessageEmbed()
+                        .setDescription(`<:check:959154334388584509> canceled`)
+                        .setColor("#2f3136")
+                    ], ephemeral: true
+                });
+
+                collector.stop();
+            }
+        })
+
+        collector.on('end', () => {
+            row.components[0].setDisabled(true)
+            row.components[1].setDisabled(true)
+
+            msg.edit({components: [row]}).catch(err => {return console.log(err.stack)});
+        })
+    }
+
+    async saveData(msg, id){
+        await LogsDatabase.updateOne({
+            guildID: this.guild.id,
+            [`Action.caseID`]: id
+        }, {
+            $pull: {
+                Action: {
+                    caseID: id
+                }
+            }
+        }).catch(err => {return console.log(err.stack)});
+
+        await LogsDatabase.updateOne({
+            guildID: this.guild.id,
+            [`Action.LogID`]: id
+        }, {
+            $pull: {
+                Action: {
+                    LogID: id
+                }
+            }
+        }).catch(err => {return console.log(err.stack)});
+
+        msg.reply({
+            embeds: [new MessageEmbed()
+                .setDescription(`<:check:959154334388584509> Log **${id}** was deleted`)
+                .setColor("#2f3136")
+            ]
+        });
+    };
+
+}
+
+module.exports.run = {
+    run: async(client, interaction, args,prefix) =>{
+
+        const {options} = interaction;
+        let caseID = options.getString('log-id')
+
+        let data = new UserLogs(client, interaction.guild, interaction).DeleteLog(caseID)
+    }
+}
+
+
+module.exports.slash = {
+    data: new SlashCommandBuilder()
+        .setName("delete-log")
+        .setDescription("Delete a moderation log")
+        .addStringOption(option => 
+            option.setName('log-id')
+            .setDescription("Log-ID that you want to delete")
+            .setRequired(true)),
+    category: "Administration",
+    Permissions: ["MANAGE_GUILD"],
 }

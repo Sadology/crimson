@@ -1,12 +1,27 @@
 
-const { LogChannel } = require('./LogManager');
+const { LogManagers, LogManager } = require('./LogManager');
 const { errLog } = require('./erroHandling');
+const {DatabaseManager} = require('./DatabaseManager')
+const {Member, GuildMember, ClientMember, FindMember} = require('./MemberManager');
+const {RoleManager, UserRoleManager} = require('./RolesManager');
+const {Permissions} = require('./PermissionManager')
+const { WebhookManager } = require('./WebHookManager')
+const {GuildManager} = require('./GuildManager');
+const {CacheManager} = require('./CacheManager')
 module.exports = {
-    commandCreate: require('./CommandObject'),
-    LogChannel,
     errLog,
-    LogManager: require('./LogManager'),
-    Member: require('./MemberManager'),
-    GuildManager: require('./GuildManager'),
+    GuildManager,
+    Member,
+    GuildMember,
+    ClientMember,
+    FindMember,
+    RoleManager,
+    UserRoleManager,
+    LogManagers,
+    DatabaseManager,
+    Permissions,
+    WebhookManager
+
     //RankManager: require('./RankManager')
+
 };

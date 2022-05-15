@@ -1,47 +1,40 @@
-const { MessageEmbed } = require('discord.js')
-const moment = require('moment')
-const ms = require('ms')
-module.exports = {
-    name: 'bot-info',
-    aliases: ['botinfo'],
-    description: "checks bot informations",
-    permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
-    usage: "bot-info",
-    category: "Utils",
-    cooldown: 3000,
-    run: async(client, message, args,prefix) =>{
+const moment = require('moment');
+const ms = require('ms');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+
+module.exports.run = {
+    run: async(client, interaction, args,prefix) =>{
         const guilds = client.guilds.cache.size
         let totalmember = 0;
-
         client.guilds.cache.forEach(g => {
             totalmember += parseInt(g.memberCount);
         })
-
         let uptime = ms(client.uptime, {long: true})
+
         const Embeds = {
             author: {
-                name: "Sadbot",
-                icon_url: client.user.avatarURL({dynamic: false, size: 1024, type: 'png'})
+                name: `${client.user.username}`,
+                icon_url: client.user.avatarURL({dynamic: false, size: 1024, format: 'png'})
             },
+            description: "The beginning after the end",
             fields: [
                 {
                     name: "Version",
-                    value: 'Beta v1.4.4',
+                    value: '1',
                     inline: true
                 },
                 {
-                    name: "Discord Version",
-                    value: 'v13',
+                    name: "Library Used",
+                    value: 'Djs v13',
                     inline: true
                 },
                 {
                     name: "Node Version",
-                    value: 'v17',
+                    value: 'v16',
                     inline: true
                 },
                 {
-                    name: "Total Guild",
+                    name: "Total Guilds",
                     value: `${guilds}`.toString(),
                     inline: true
                 },
@@ -66,12 +59,19 @@ module.exports = {
                     inline: true
                 },
             ],
-            color: "WHITE",
+            color: "#2f3136",
             footer: {
-                text: "Special thanks to Hyper bot dev Fluxpuck for the design idea"
+                text: "Made with 🖤"
             }
         }
 
-        return message.channel.send({embeds: [Embeds]}).catch(err => {return console.log(err.stack)})
+        return interaction.reply({embeds: [Embeds]}).catch(err => {return console.log(err.stack)})
     }
+}
+
+module.exports.slash = {
+    data: new SlashCommandBuilder()
+        .setName('about-me')
+        .setDescription("Learn more about me"),
+    category: "Utility",
 }

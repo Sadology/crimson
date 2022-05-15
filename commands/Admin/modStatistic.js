@@ -1,59 +1,73 @@
-const Discord = require('discord.js');
-const { Profiles } = require('../../models');
-const { Member } = require('../../Functions');
-const moment = require('moment');
-module.exports = {
-    name: 'mod-stats',
-    aliases: ["modstats"],
-    description: "Moderators statistic. Moderation data of all time.",
-    permissions: ["ADMINISTRATOR", "MANAGE_GUILD"],
-    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
-    usage: "mod-stats [ user ]",
-    category: "Administrator",
-    cooldown: 3000,
-    run: async(client, message, args,prefix) =>{
-        const member = new Member(message, client).getMember({member: args[0], clientMember: true})
-        if(member == false ) return
-        fetchData(member)
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const {MessageEmbed} = require('discord.js');
+const {Stats} = require('../../models');
 
-        async function fetchData(Member) {
-            await Profiles.findOne({
-                guildID: message.guild.id,
-                userID: Member.user ? Member.user.id : Member.id
-            })
-            .then(res => {
-                if(!res || Object.keys(res.ModerationStats).length === 0){
-                    return message.channel.send({
-                        embeds: [new Discord.MessageEmbed()
-                            .setDescription("User doesn't have any moderation history")
-                            .setColor("RED")
-                        ]}).catch(err => {return console.log(err)})
-                }else {
-                    return values(res.ModerationStats ,Member, res)
-                }
-            })
-            .catch(err => {
-                return console.log(err.stack)
-            })
-        }
-
-        function values(Data, Member, timeData) {
-            let Embed = new Discord.MessageEmbed()
-                .setAuthor(`${Member.user ? Member.user.tag : Member.tag}'s - Moderation Statistics`)
-                .setDescription(`${Data.Recent ? Data.Recent : "None"}`)
-                .setColor("WHITE")
-            let values = Object.keys(Data)
-            values.shift()
-            values.forEach((keys) => {
-                let item = Data[keys]
-                if(item == undefined){
-                    item = "0"
-                }
-                Embed.addField(`${keys}`,`\`\`\`${item}\`\`\``, true)
-            })
-            return message.channel.send({
-                embeds: [Embed]
-            }).catch(err => {return console.log(err.stack)})
-        }
+class StatisticsManager{
+    constructor(client, guild, interaction){
+        this.client = client;
+        this.guild = guild;
+        this.interaction = interaction;
     }
+
+    async FetchData(user){
+        let data = await Stats.findOne({
+            guildID: this.guild.id,
+            userID: user.user ? user.user.id : user.id ? user.id : user
+        }).catch(err => {return console.log(err.stack)})
+
+        if(!data){
+            return false;
+        }
+
+        else return data;
+    }
+
+    async Mainframe(user){
+        let data = await this.FetchData(user)
+
+        if(!data){
+            let embed = new MessageEmbed()
+                .setDescription(`The user doesn't have any stats`)
+                .setColor("RED")
+            return this.erroMessage(embed)
+        }
+
+        let member = this.guild.members.cache.get(user);
+
+        if(!member){
+            member = user
+        }
+
+        let embed = new MessageEmbed()
+            .setDescription(`${member.user ? member.user : "<@"+member+">"} • Moderation statistics`)
+            .addField("**Stats**", `Mute • ${data.Stats.Mute}\nWarn • ${data.Stats.Warn}\nTimeout • ${data.Stats.Timeout}\nBan • ${data.Stats.Ban}\nKick • ${data.Stats.Kick}\nTotal • ${data.Stats.Kick + data.Stats.Ban + data.Stats.Timeout + data.Stats.Mute + data.Stats.Warn}`)
+            .setColor("#2f3136")
+
+        this.interaction.reply({embeds: [embed]}).catch(err => {return console.log(err.stack)})
+            
+    }
+
+    erroMessage(embed){
+        this.interaction.reply({embeds: [embed], ephemeral: true}).catch(err => {return console.log(err.stack)})
+    };
+}
+module.exports.run = {
+    run: (client, interaction) => {
+        const {options} = interaction;
+        let user = options.getUser('user');
+        let data = new StatisticsManager(client, interaction.guild, interaction).Mainframe(user ? user.id : user)
+    }
+}
+
+module.exports.slash = {
+    data: new SlashCommandBuilder()
+        .setName('stats')
+        .setDescription('Statistic of every command usage')
+        .addUserOption(option => 
+            option
+            .setName('user')
+            .setDescription("Check stats of another user")
+            .setRequired(true)),
+    category: "Administration",
+    Permissions: ["MANAGE_GUILD"],
 }

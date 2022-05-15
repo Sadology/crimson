@@ -1,147 +1,90 @@
-const { MessageEmbed, MessageActionRow, MessageSelectMenu } = require('discord.js')
+const { MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js')
+const wait = require('util').promisify(setTimeout);
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const ms = require('ms');
 
-module.exports = {
-    name: 'help',
-    permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
-    category: 'Utils',
-    cooldown: 3000,
-    run: async(client, message, args,prefix) =>{
-        const Menu = new MessageEmbed()
-            .setAuthor({name: `${client.user.username} - Help Menu`,iconURL: client.user.avatarURL({dynamic: true, size: 1024, format: 'png'})})
-            .setDescription(
-                "Select a category from the select menu you would like to visit \n\n<:administration:915457421823078460> - Administration\n<:moderation:915457421831462922> - Moderation\n🎮 - Fun\n<:utility:915457793618739331> - Utility\n<:slashCmds:915458597801062461> - slash commands \n\n[Invite Me](https://discordbotlist.com/bots/sadbot) • [Support Server](https://discord.gg/DfmQmqWJmA) • [Website](https://d2x3xhvgiqkx42.cloudfront.net/12345678-1234-1234-1234-1234567890ab/9432a2ad-f01d-4a3d-ae53-370c37e15e62/2018/01/16/4b638361-3888-4e77-b1ea-af956fa98d7f.png)",
-            )
-            .setColor("WHITE")
-            .setFooter("/help command-name: [ cmd name ] to check individual commands")
-        
-        const row = new MessageActionRow()
-            .addComponents(
-                new MessageSelectMenu()
-                .setCustomId('selectHelpData')
-                .setPlaceholder('Select a category')
-                .addOptions([
-                    {
-                        label: 'Administration',
-                        description: 'Administrative type commands',
-                        value: 'adminOption',
-                        emoji: '<:administration:915457421823078460>'
-                    },
-                    {
-                        label: 'Moderation',
-                        description: 'Moderation type commands',
-                        value: 'modOption',
-                        emoji: '<:moderation:915457421831462922>'
-                    },
-                    {
-                        label: 'Fun',
-                        description: 'Fun type commands',
-                        value: 'funOption',
-                        emoji: '🎮'
-                    },
-                    {
-                        label: 'Utils',
-                        description: 'Utility type commands',
-                        value: 'utilOption',
-                        emoji: '<:utility:915457793618739331>'
-                    },
-                    {
-                        label: 'Slash',
-                        description: 'Slash commands',
-                        value: 'slashOption',
-                        emoji: '<:slashCmds:915458597801062461>'
-                    },
+class HelpManuManager{
+    constructor(client, guild, interaction){
+        this.client = client;
+        this.guild = guild;
+        this.interaction = interaction;
+    }
 
-                ]),
-            )
+    Mainpage(){
+        const MainMenu = new MessageEmbed()
+        .setAuthor({name: `${this.client.user.username} • Help Menu`, iconURL: this.client.user.avatarURL({dynamic: true, size: 1024, format: 'png'})})
+        .setDescription(`<:help:959185007778336809> • Categories you can check \n\n<:admin:966996093894283315> • **Admininstration** _Manage server more efficiently with admin cmds_ \n<:moderation:921093310368596008> • **Moderation** _Fast & efficient cmds to help the moderators_\n<:config:915457421823078460> • **Configuration** _Configure ${this.client.user.username} in your server_\n<a:funny:966983540187213867> • **Fun** _Funny commands to make your day better\n<:utility:915457793618739331>_ • **Utils** _Useful commands for daily basis_ \n\n[support server](https://discord.gg/DfmQmqWJmA) • Invite me x-x`)
+        .setColor("#2f3136")
 
-        message.channel.send({embeds: [Menu], components: [row]}).then((m) => {
-            const collector = m.createMessageComponentCollector({ componentType: 'SELECT_MENU', time: 1000 * 60 * 10  });
-            collector.on('collect',async b => {
-                if(b.user.id !== message.author.id) return
-                if(b.customId === "selectHelpData"){
-                    getData(b.values.join(" "), b)
-                }
-            });
-            collector.on("end", (b) =>{
-                row.components[0].setDisabled(true)
-                m.edit({components: [row]})
-            })
+        this.interaction.reply({embeds: [MainMenu]})
+    }
+
+    async Mainframe(type, name){
+        if(type){
+            return this.CategoryHandle(type)
+        }
+        else {
+            return this.Mainpage()
+        }
+    } 
+    
+    // Administration category format
+    CategoryHandle(type){
+        let CommandData = [];
+        this.client.SlashCmd.forEach(data => {
+            console.log(data)
+            if(data.category && data.category == type){
+                CommandData.push(`\` ${data.data.name} \``)
+            }
         })
 
-        function getData(type, data) {
-            let Data = []
-            let HelpMenu = new MessageEmbed()
-                .setColor('#fffafa')
-                .setFooter({text: "/help command-name: [ cmd name ] to check individual commands"})
-                .setAuthor({name: client.user.username+ " - Help Menu", iconURL: client.user.avatarURL({dynamic: true, size: 1024, type: 'png'})})
-            switch(type){
-                case 'modOption':
-                    client.commands.forEach(cmds =>{
-                        if(cmds.category && cmds.category == "Moderation"){
-                            if(cmds.name){
-                               Data.push("\` "+cmds.name+" \`") 
-                            }
-                        }
-                    })
-                    HelpMenu.setDescription(`<:moderation:915457421831462922> Moderator \`[ ${Data.length} ]\`\n\n`+Data.toString())
-                    sendMessage(HelpMenu, data)
-                break;
-                case 'adminOption':
-                    client.commands.forEach(cmds =>{
-                        if(cmds.category && cmds.category == "Administrator"){
-                            if(cmds.name){
-                                Data.push("\` "+cmds.name+" \`") 
-                            }
-                        }
-                    })
-                    HelpMenu.setDescription(`<:administration:915457421823078460> Admin \`[ ${Data.length} ]\`\n\n`+Data.toString())
-                    sendMessage(HelpMenu, data)
-                break;
-                case 'funOption':
-                    client.commands.forEach(cmds =>{
-                        if(cmds.category && cmds.category == "Fun"){
-                            if(cmds.name){
-                                Data.push("\` "+cmds.name+" \`") 
-                            }
-                        }
-                    })
-                    HelpMenu.setDescription(`🎮 Fun \`[ ${Data.length} ]\`\n\n`+Data.toString())
-                    sendMessage(HelpMenu, data)
-                break;
-                case 'utilOption':
-                    client.commands.forEach(cmds =>{
-                        if(cmds.category && cmds.category == "Utils"){
-                            if(cmds.name){
-                                Data.push("\` "+cmds.name+" \`") 
-                            }
-                        }
-                    })
-                    HelpMenu.setDescription(`<:utility:915457793618739331> Utility \`[ ${Data.length} ]\`\n\n`+Data.toString())
-                    sendMessage(HelpMenu, data)
-                break;
-                case 'slashOption':
-                    client.slash.forEach(s =>{
-                        if(s.data.name){
-                            Data.push("\` "+s.data.name+" \`") 
-                        }
-                    })
-                    HelpMenu.setDescription(`<:slashCmds:915458597801062461> Slash \`[ ${Data.length} ]\`\n\n`+Data.toString())
-                    sendMessage(HelpMenu, data)
-                break;
-            }
-        }
+        let Embed = new MessageEmbed()
+            .setAuthor({name: `${this.client.user.username} • ${type}`, iconURL: this.client.user.displayAvatarURL({dynamic: true, format: 'png'})})
+            .setColor("#2f3136")
+            .setDescription(`**Commands** [${CommandData.length}] \n${CommandData.length == 0 ? "None" : CommandData.join(' • ')}`)
 
-        async function sendMessage(data, select) {
-            select.reply({embeds: [data], ephemeral: true})
-            .catch(err => {
-                message.channel.send({embeds: [
-                    new MessageEmbed()
-                        .setDescription("Something unexpected happened")
-                        .setColor("RED")
-                ]})
-                return console.log(err)
-            })
-        }
+        this.interaction.reply({embeds: [Embed]})
     }
+}
+
+module.exports.run = {
+    run: async(client, interaction, args, prefix) =>{
+        const {options} = interaction;
+        let cat = options.getString('category');
+
+        let Data = new HelpManuManager(client, interaction.guild, interaction).Mainframe(cat);
+    }
+}
+
+module.exports.slash = {
+    data: new SlashCommandBuilder()
+        .setName('help')
+        .setDescription("Don't know how bot works? we got your back")
+    .addStringOption(option =>
+        option.setName('category')
+        .setDescription("Select a category to start exploring")
+        .addChoices(
+            {
+                name: 'Administration',
+                value: 'Administration'
+            },
+            {
+                name: 'Moderation',
+                value: 'Moderation'
+            },
+            {
+                name: 'Configuration',
+                value: 'Configuration'
+            },
+            {
+                name: 'Fun',
+                value: 'Fun'
+            },
+            {
+                name: 'Utility',
+                value: 'Utility'
+            },
+        )
+        ),
+    category: "Utility",
 }
