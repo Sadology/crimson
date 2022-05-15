@@ -12,7 +12,7 @@ const row = new MessageActionRow()
     .setStyle("PRIMARY")
     .setCustomId("info")
     .setLabel("Expand")
-    .setEmoji("<a:expand:956935681698070579>")
+    .setEmoji("<:down:975461613471682560>")
 )
 .addComponents(
     new MessageButton()
@@ -76,24 +76,24 @@ class MemberResolver {
             format: 'png',
             size: 1024
         }))
-        .addField("User", `${member.user.tag}`, true)
-        .addField("User ID", `${member.user.id}`, true)
-        .addField("Log Amount", `${this.logamt}`, true)
-        .addField("Created At", `${moment(member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.user.createdAt, "YYYYMMDD").fromNow()}`, true)
+        .addField("<:user_icon:958016031127904307> User", `${member.user.tag}`, true)
+        .addField("<:ID:975459612386025592> User ID", `${member.user.id}`, true)
+        .addField("<:search:959185395424321576> Log Amount", `${this.logamt}`, true)
+        .addField("<a:create:962717227705069629> Created At", `${moment(member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.user.createdAt, "YYYYMMDD").fromNow()}`, true)
         .setColor("#2f3136")
-        .setFooter({text: `User-ID: ${member.user.id}`})
+        .setFooter({text: `<:ID:975459612386025592> User-ID: ${member.user.id}`})
         .setTimestamp()
         if(isBanned){
             row.components[0].setDisabled(true);
             row.components[1].setDisabled(false);
 
-            UserEmbed.addField("Joined At", `Not Available`, true)
+            UserEmbed.addField("<a:join:962717227705069629> Joined At", `Not Available`, true)
             UserEmbed.addField("Ban Reason", `${member.reason}`)
         }else {
             row.components[0].setDisabled(false);
             row.components[1].setDisabled(false);
 
-            UserEmbed.addField("Joined At", `${moment(member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.joinedAt, "YYYYMMDD").fromNow()}`, true)
+            UserEmbed.addField("<a:join:962717227705069629> Joined At", `${moment(member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.joinedAt, "YYYYMMDD").fromNow()}`, true)
         }
         
         if(this.interaction.type == "APPLICATION_COMMAND"){
