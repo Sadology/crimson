@@ -3,6 +3,8 @@ const { LogManagers, DatabaseManager, WebhookManager } = require('../../Function
 const wait = require('util').promisify(setTimeout);
 
 client.on("guildMemberRemove", async(member) => {
+    if(client.user.id == member.user.id) return;
+    
     const clientPerm = member.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
     if (!clientPerm || clientPerm == false) return;
 

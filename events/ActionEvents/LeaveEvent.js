@@ -105,6 +105,7 @@ const { WebhookManager } = require('../../Functions');
 const ms = require('ms');
 
 client.on("guildMemberRemove", async(member) => {
+    if(client.user.id == member.user.id) return;
     const roles = member.roles.cache
         .sort((a, b) => b.position - a.position)
         .map(role => role.toString())

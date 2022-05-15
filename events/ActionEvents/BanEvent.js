@@ -3,6 +3,8 @@ const wait = require('util').promisify(setTimeout);
 const client = require('../../index');
 
 client.on('guildBanAdd', async(User) => {
+    if(client.user.id == User.user.id) return;
+
     const clientPerm = User.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
     if (!clientPerm || clientPerm == false) return;
 
