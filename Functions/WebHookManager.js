@@ -47,12 +47,12 @@ class WebhookManager{
 
         // Fetch guild webhooks
         const hooks = await channel.fetchWebhooks();
-        const webHook = hooks.find(i => i.owner.id == this.client.user.id && i.name == 'sadbot');
+        const webHook = hooks.find(i => i.owner.id == this.client.user.id && i.name == 'Aqua~');
 
         // Create a webhook and send the embed
         if(!webHook){
-            channel.createWebhook("sadbot", {
-                avatar: "https://i.ibb.co/86GB8LZ/images.jpg"
+            channel.createWebhook("Aqua~", {
+                avatar: "https://i.imgur.com/u2O4Qba.png"
             }).then((i) => {
                 return i.send({embeds: [Embed]}).catch(err => {return console.log(err.stack)});
             });
