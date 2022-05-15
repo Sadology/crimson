@@ -81,7 +81,7 @@ class MemberResolver {
         .addField("<:search:959185395424321576> Log Amount", `${this.logamt}`, true)
         .addField("<a:create:962717227705069629> Created At", `${moment(member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.user.createdAt, "YYYYMMDD").fromNow()}`, true)
         .setColor("#2f3136")
-        .setFooter({text: `<:ID:975459612386025592> User-ID: ${member.user.id}`})
+        .setFooter({text: `User-ID: ${member.user.id}`})
         .setTimestamp()
         if(isBanned){
             row.components[0].setDisabled(true);
