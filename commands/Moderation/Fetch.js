@@ -38,10 +38,11 @@ class MemberResolver {
     async FetchMember(user){
         let Member = this.guild.members.cache.get(user)
         if(!Member){
+            this.logamt = await this.FetchDatabase(Member);
             return this.FetchBanAudit(user);
         }
 
-        //this.FetchDatabase(member);
+        this.logamt = await this.FetchDatabase(Member);
         this.EmbedResolve(Member);
     };
 
@@ -51,11 +52,14 @@ class MemberResolver {
             userID: User.user.id
         });
 
+        let counter;
         if(FetchData){
-            this.count = FetchData.Action.length
+            counter = FetchData.Action.length
         }else {
-            this.count = 0
+            counter = 0
         }
+
+        return counter;
     };
 
     async EmbedResolve(member, isBanned){
@@ -74,7 +78,7 @@ class MemberResolver {
         }))
         .addField("User", `${member.user.tag}`, true)
         .addField("User ID", `${member.user.id}`, true)
-        .addField("Log Amount", `${this.count}`, true)
+        .addField("Log Amount", `${this.logamt}`, true)
         .addField("Created At", `${moment(member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.user.createdAt, "YYYYMMDD").fromNow()}`, true)
         .setColor("#2f3136")
         .setFooter({text: `User-ID: ${member.user.id}`})
@@ -89,7 +93,7 @@ class MemberResolver {
             row.components[0].setDisabled(false);
             row.components[1].setDisabled(false);
 
-            UserEmbed.addField("Joined At", `${moment(member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.user.createdAt, "YYYYMMDD").fromNow()}`, true)
+            UserEmbed.addField("Joined At", `${moment(member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.joinedAt, "YYYYMMDD").fromNow()}`, true)
         }
         
         if(this.interaction.type == "APPLICATION_COMMAND"){
