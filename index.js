@@ -30,12 +30,12 @@ client.eventEmitter = new event.EventEmitter();
 client.GUILDS = new Map();
 
 // Handlers management
-fs.readdir("./Handlers/", (err, files) => {
+fs.readdir("./handlers/", (err, files) => {
     if (err) return console.error(err);
 
     if (files) {
         files.forEach(file => {
-            let handle = require(`./Handlers/${file}`);
+            let handle = require(`./handlers/${file}`);
             handle.run(client);
         });
     } else {
