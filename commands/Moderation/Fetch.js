@@ -148,8 +148,8 @@ class MemberResolver {
                 const permArr = perms.join(", ")
                 const permData = permArr.split("_").join(" ") || "None"
         
-                Embed.addField("Roles", `${roles}`)
-                Embed.addField("Permissions", `${permData.toLowerCase()}`)
+                Embed.addField("<:roles:921093178046693377> Roles", `${roles}`)
+                Embed.addField("<:administration:915457421823078460> Permissions", `${permData.toLowerCase()}`)
 
                 row.components[0].setDisabled(true);
                 await b.update({embeds: [Embed], components: [row]}).catch(err => {return console.log(err.stack)})
