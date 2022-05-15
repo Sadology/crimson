@@ -1,6 +1,6 @@
 const client = require('../../index');
 
 client.on('ready', () => {
-    client.user.setPresence({ status: 'dnd', activities: [{ type: 'COMPETING', name: "Among us" }] });
-    console.log("I'm the imposter");
+    client.user.setPresence({ status: 'online', activities: [{ type: 'WATCHING', name: "Underwater" }] });
+    console.log("FOR YOUR SERVICE MASTER");
 });
