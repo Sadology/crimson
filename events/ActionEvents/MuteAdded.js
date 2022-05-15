@@ -3,7 +3,7 @@ const client = require('../..');
 const {DatabaseManager, WebhookManager} = require('../../Functions')
 
 client.eventEmitter.on('MuteAdded', async(data, Member) => {
-    const { moderator, actionLength, actionReason, Duration } = data
+    const { moderator, actionLength, actionReason, Duration, guildID } = data
 
     // Update database
     new DatabaseManager(client).SaveLogData(data, true)
@@ -19,6 +19,6 @@ client.eventEmitter.on('MuteAdded', async(data, Member) => {
         .setFooter({text: "ID • "+Member.user.id})
         .setTimestamp()
     
-    client.eventEmitter.emit('CmdUsed', moderator, "Mute");
+    client.eventEmitter.emit('CmdUsed', moderator, "Mute", guildID);
     new WebhookManager(client, Member.guild).WebHook(Embed, 'actionlog')
 });

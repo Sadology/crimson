@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const client = require('../..');
 const {Stats} = require('../../models')
 
-client.eventEmitter.on('CmdUsed', async(Member, cmd) => {
+client.eventEmitter.on('CmdUsed', async(Member, cmd, guild) => {
     if(Member.user){
         if(Member.user.bot == true) return
     }
@@ -12,14 +12,14 @@ client.eventEmitter.on('CmdUsed', async(Member, cmd) => {
     let memId = Member.user ? Member.user.id : Member.id ? Member.id : Member
 
     let data = await Stats.findOne({
-        guildID: Member.guild.id,
+        guildID: guild.id ? guild.id : guild,
         userID: memId,
         Stats: {$exists: true}
-    })
+    }).catch(err => {return console.log(err.stack)})
 
     if(!data){
         await Stats.updateOne({
-            guildID: Member.guild.id,
+            guildID: guild.id ? guild.id : guild,
             userID: memId,
         }, {
             "Stats": {
@@ -29,16 +29,16 @@ client.eventEmitter.on('CmdUsed', async(Member, cmd) => {
                 "Timeout": 0,
                 "Kick": 0
             }
-        }, {upsert: true})
+        }, {upsert: true}).catch(err => {return console.log(err.stack)})
         return;
     }
 
     await Stats.updateOne({
-        guildID: Member.guild.id,
+        guildID: guild.id ? guild.id : guild,
         userID: memId
     }, {
         $inc: {
             [`Stats.${cmd}`]: 1
         }
-    }, {upsert: true})
+    }, {upsert: true}).catch(err => {return console.log(err.stack)})
 });

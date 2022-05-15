@@ -1,6 +1,6 @@
-const { LogManagers, DatabaseManager, WebhookManager, Member } = require('../../Functions');
+const { LogManagers, DatabaseManager, WebhookManager } = require('../../Functions');
 const wait = require('util').promisify(setTimeout);
-const client = require('../../index');
+const client = require('../..');
 
 client.on('guildBanAdd', async(User) => {
     if(client.user.id == User.user.id) return;
@@ -63,6 +63,8 @@ client.on('guildBanAdd', async(User) => {
             text: `User-ID • ${target.id}`
         }
     }
-    client.eventEmitter.emit('CmdUsed', executor, "Ban");
-    new WebhookManager(client, User.guild).WebHook(Embed, 'banlog')
+
+    new WebhookManager(client, User.guild).WebHook(Embed, 'banlog');
+    client.eventEmitter.emit('CmdUsed', executor, "Ban", User.guild);
+    
 });

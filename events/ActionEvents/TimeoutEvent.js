@@ -43,6 +43,6 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
         .setFooter({text: "ID • "+newMember.user.id})
         .setTimestamp()
 
-    client.eventEmitter.emit('CmdUsed', logs.executor, "Timeout");
+    client.eventEmitter.emit('CmdUsed', logs.executor, "Timeout", newMember.guild);
     new WebhookManager(client, newMember.guild).WebHook(Embed, 'actionlog')
 })

@@ -1,5 +1,5 @@
 const client = require('../..');
-const { LogManagers, DatabaseManager, WebhookManager } = require('../../Functions');
+const { LogManagers, DatabaseManager, WebhookManager} = require('../../Functions');
 const wait = require('util').promisify(setTimeout);
 
 client.on("guildMemberRemove", async(member) => {
@@ -63,6 +63,6 @@ client.on("guildMemberRemove", async(member) => {
         }
     }
 
-    client.eventEmitter.emit('CmdUsed', executor, "Kick");
+    client.eventEmitter.emit('CmdUsed', executor, "Kick", member.guild);
     new WebhookManager(client, member.guild).WebHook(Embed, 'kicklog');
 })

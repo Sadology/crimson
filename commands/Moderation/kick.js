@@ -61,7 +61,7 @@ class KickManager{
                 .setDescription(`🦿 There you go i kicked my self ... you happy now? it hurts!! 😔`)
                 .setColor("#2f3136")
             
-            this.client.eventEmitter.emit('CmdUsed', this.interaction.member, "Kick");
+            this.client.eventEmitter.emit('CmdUsed', this.interaction.member, "Kick", this.guild);
             this.erroMessage(Embed)
             return false;
         };

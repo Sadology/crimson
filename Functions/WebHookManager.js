@@ -47,12 +47,12 @@ class WebhookManager{
 
         // Fetch guild webhooks
         const hooks = await channel.fetchWebhooks();
-        const webHook = hooks.find(i => i.owner.id == this.client.user.id && i.name == 'Aqua~');
+        const webHook = hooks.find(i => i.owner.id == this.client.user.id && i.name == this.client.username);
 
         // Create a webhook and send the embed
         if(!webHook){
-            channel.createWebhook("Aqua~", {
-                avatar: "https://i.imgur.com/u2O4Qba.png"
+            channel.createWebhook(this.client.user.username, {
+                avatar: "https://media.discordapp.net/attachments/880768542482509874/975443166490689626/Aqua.png?width=642&height=428"
             }).then((i) => {
                 return i.send({embeds: [Embed]}).catch(err => {return console.log(err.stack)});
             });

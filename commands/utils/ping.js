@@ -5,34 +5,16 @@ const ms = require('ms');
 
 module.exports.run = {
     run: async(client, interaction, args)=> {
-        switch (interaction.type){
-            case 'APPLICATION_COMMAND':
-                interactionFunc();
-            break;
 
-            case 'DEFAULT':
-                messageFunc();
-            break;
-        };
+        interaction.deferReply();
+        await wait(1000)
 
-        async function interactionFunc(){
-            interaction.deferReply();
-            await wait(1000)
-
-            await interaction.editReply({content: "Pinging..."
-            }).then(async (m) =>{
-                let Ping = m.createdTimestamp - interaction.createdTimestamp
-                interaction.editReply({content: `Pong \`${ms(Ping, {long: true})}\``})
-            })
-        };
-
-        async function messageFunc(){
-            await interaction.reply({content: "Pinging..."
-            , allowedMentions: [{repliedUser: false}]}).then(async (m) =>{
-                let Ping = m.createdTimestamp - interaction.createdTimestamp;
-                await m.edit({content: `Pong \`${ms(Ping, {long: true})}\``, allowedMentions: [{repliedUser: false}]})
-            })
-        };
+        await interaction.editReply({content: "Pinging..."
+        }).then(async (m) =>{
+            let Ping = m.createdTimestamp - interaction.createdTimestamp
+            interaction.editReply({content: `Pong \`${ms(Ping, {long: true})}\``})
+        })
+        
     }
 }
 

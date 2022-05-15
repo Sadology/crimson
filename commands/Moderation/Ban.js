@@ -50,7 +50,7 @@ class BanManager{
                 .setDescription(`<:banHammer:921094864073011221> ${User.user ? User.user : "<@"+User+">"} was Banned | ${reason}`)
                 .setColor("#2f3136")
            
-            this.client.eventEmitter.emit('CmdUsed', this.interaction.member, "Ban");
+            this.client.eventEmitter.emit('CmdUsed', this.interaction.member, "Ban", this.guild);
             return this.erroMessage(Embed)
         })
         .catch(err => {return console.log(err.stack)});

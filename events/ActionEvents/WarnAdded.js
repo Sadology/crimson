@@ -22,6 +22,6 @@ client.eventEmitter.on('WarnAdded', async(Member, reason, executor) => {
         .setFooter({text: "ID • "+Member.user.id})
         .setTimestamp()
     
-    client.eventEmitter.emit('CmdUsed', executor, "Warn");
+    client.eventEmitter.emit('CmdUsed', executor, "Warn", executor.guild);
     new WebhookManager(client, Member.guild).WebHook(Embed, 'actionlog')
 });
