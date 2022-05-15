@@ -34,6 +34,10 @@ module.exports = {
             });
         });
 
+        client.on("guildCreate", async (guild) => {
+            guild.commands.set(cmds, guild.id).catch(console.error);
+        })
+
 
 
         //let clientID = "874975916592332820";
