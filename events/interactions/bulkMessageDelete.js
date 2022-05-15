@@ -1,9 +1,9 @@
 const Discord = require('discord.js');
 const sourcebin = require('sourcebin')
 const { MessageEmbed } = require('discord.js');
-const { LogManager } = require('../../Functions');
 const client = require('../..');
 const wait = require('util').promisify(setTimeout);
+const { WebhookManager } = require('../../Functions');
 
 client.on('messageDeleteBulk', async(deletedMessage) => {
     wait(1000);
@@ -38,5 +38,6 @@ client.on('messageDeleteBulk', async(deletedMessage) => {
         .setDescription(`**Bulk message deleted in** ${channel} \n**Amount:** \`${length}\`\n**Messages:** ${bin.url}`)
         .setTimestamp()
         .setColor("#fa5757")
-    new LogManager(guild).sendData({type: 'messagelog', data: Embed, client})
+    
+    new WebhookManager(client, deletedMessage.guild).WebHook(Embed, 'messagelog')
 });
