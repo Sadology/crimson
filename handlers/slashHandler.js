@@ -7,14 +7,14 @@ let cmds = []
 // Slash handle function
 module.exports = {
     run: async(client) => {
-        readdirSync("./Commands/").forEach(dir => {
-            const commands = readdirSync(`./Commands/${dir}/`)
+        readdirSync("./commands/").forEach(dir => {
+            const commands = readdirSync(`./commands/${dir}/`)
             .filter(file =>
                 file.endsWith(".js")
             );
 
             for (let file of commands) {
-                let data = require(`../Commands/${dir}/${file}`);
+                let data = require(`../commands/${dir}/${file}`);
                 if (data.slash) {
                     let value = {
                         ...data.run,

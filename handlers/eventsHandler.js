@@ -6,7 +6,7 @@ const globPromise = promisify(glob);
 module.exports = {
     run: async(client) => {
 
-        const eventFiles = await globPromise(`${process.cwd()}/Events/**/*.js`);
+        const eventFiles = await globPromise(`${process.cwd()}/events/**/*.js`);
         eventFiles.map((value) => require(value));
 
     }

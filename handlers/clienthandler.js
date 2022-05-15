@@ -3,12 +3,12 @@ const { readdirSync } = require("fs");
 // Client handle function
 module.exports = {
     run: (client) => {
-        readdirSync("./Events/").forEach(dir => {
-            const events = readdirSync(`./Events/${dir}/`).filter(file =>
+        readdirSync("./events/").forEach(dir => {
+            const events = readdirSync(`./events/${dir}/`).filter(file =>
                 file.endsWith(".js")
             );
             for (let file of events) {
-                let data = require(`../Events/${dir}/${file}`);
+                let data = require(`../events/${dir}/${file}`);
                 const event = data.event;
         
                 try{

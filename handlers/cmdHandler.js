@@ -3,13 +3,13 @@ const { readdirSync } = require("fs");
 // Command handle function
 module.exports = {
     run: (client) => {
-        readdirSync("./Commands/").forEach(dir => {
-            const commands = readdirSync(`./Commands/${dir}/`).filter(file =>
+        readdirSync("./commands/").forEach(dir => {
+            const commands = readdirSync(`./commands/${dir}/`).filter(file =>
                 file.endsWith(".js")
             );
             
             for (let file of commands) {
-                let data = require(`../Commands/${dir}/${file}`);
+                let data = require(`../commands/${dir}/${file}`);
                 if (data.cmd) {
                     let value = {
                         ...data.run,
