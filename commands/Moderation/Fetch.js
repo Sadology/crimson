@@ -49,7 +49,7 @@ class MemberResolver {
     async FetchDatabase(User){
         const FetchData = await LogsDatabase.findOne({
             guildID: this.guild.id,
-            userID: User.user.id
+            userID: User.user ? User.user.id : User.id ? User.id : User
         });
 
         let counter;
