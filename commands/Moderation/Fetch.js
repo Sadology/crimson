@@ -38,7 +38,7 @@ class MemberResolver {
     async FetchMember(user){
         let Member = this.guild.members.cache.get(user)
         if(!Member){
-            this.logamt = await this.FetchDatabase(Member);
+            this.logamt = await this.FetchDatabase(user);
             return this.FetchBanAudit(user);
         }
 
@@ -180,8 +180,9 @@ class MemberResolver {
 
 
     async FetchBanAudit(user){
+        user = user.user ? user.user.id : user.id ? user.id : user
         await this.guild.bans.fetch().then(data => {
-            let bannedUser = data.find(User => User.user.id == user.user ? user.user.id : user);
+            let bannedUser = data.find(User => User.user.id == user);
 
             if(!bannedUser){
                 let embed = new MessageEmbed()
