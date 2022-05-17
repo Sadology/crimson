@@ -47,7 +47,7 @@ class WebhookManager{
 
         // Fetch guild webhooks
         const hooks = await channel.fetchWebhooks();
-        const webHook = hooks.find(i => i.owner.id == this.client.user.id && i.name == this.client.username);
+        const webHook = hooks.find(i => i.owner.id == this.client.user.id);
 
         // Create a webhook and send the embed
         if(!webHook){

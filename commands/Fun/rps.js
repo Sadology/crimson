@@ -250,3 +250,204 @@
 //         }
 //     }
 // }
+
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const {MessageEmbed, MessageActionRow, MessageButton} = require('discord.js');
+const wait = require('util').promisify(setTimeout);
+
+const row = new MessageActionRow()
+    .addComponents(
+        new MessageButton()
+        .setCustomId('Rock')
+        .setLabel("Rock")
+        .setStyle("PRIMARY")
+    )
+    .addComponents(
+        new MessageButton()
+        .setCustomId('Paper')
+        .setLabel("Paper")
+        .setStyle("PRIMARY")
+    )
+    .addComponents(
+        new MessageButton()
+        .setCustomId('Scissor')
+        .setLabel("Scissor")
+        .setStyle("PRIMARY")
+    )
+
+class RockPaperScissor{
+    constructor(client, guild, interaction){
+        this.client = client;
+        this.guild = guild;
+        this.interaction = interaction;
+
+        this.p1 = {
+            id: Number,
+            choice: String,
+            collected: false
+        }
+
+        this.p2 = {
+            id: Number,
+            choice: String,
+            collected: false
+        }
+    }
+
+    PlayerFind(user){
+        let member = this.guild.members.cache.get(user);
+
+        let embed = new MessageEmbed()
+            .setDescription("<:error:921057346891939840> Mentioned member is invalid")
+            .setColor("RED")
+
+        if(!member) {
+            return this.errorHandle(embed);
+        }
+
+        this.p1.id = this.interaction.member.user.id;
+        this.p2.id = member.user.id;
+
+        this.MainFrame(member)
+    }
+
+    async MainFrame(member){
+        const filer = u => u.user.id == this.p1.id || u.user.id == this.p2.id;
+
+        let Embed = new MessageEmbed()
+            .setDescription("Make a choice")
+            
+        this.interaction.deferReply()
+        await wait(1000)
+
+        this.interaction.editReply({embeds: [Embed], components: [row]}).then(m => {
+            let collector = m.createMessageComponentCollector({filer, componentType: "BUTTON", time: 1000 * 30});
+
+            collector.on('collect', (b) => {
+                if(b.user.id == this.interaction.member.user.id){
+                    if(this.p1.collected){
+                        return b.reply({embeds: [
+                            new MessageEmbed()
+                                .setDescription("You're already locked in")
+                                .setColor("RED")
+                        ], ephemeral: true})
+                    }
+
+                    this.p1.choice = b.customId;
+                    this.p1.collected = true;
+
+                    b.reply({embeds: [
+                        new MessageEmbed()
+                            .setDescription("Locked in")
+                            .setColor("GREEN")
+                    ], ephemeral: true})
+
+                }
+
+                if(b.user.id == member.user.id){
+                    if(this.p2.collected){
+                        return b.reply({embeds: [
+                            new MessageEmbed()
+                                .setDescription("You're already locked in")
+                                .setColor("RED")
+                        ], ephemeral: true})
+                    }
+
+                    this.p2.choice = b.customId;
+                    this.p2.collected = true;
+
+                    b.reply({embeds: [
+                        new MessageEmbed()
+                            .setDescription("Locked in")
+                            .setColor("GREEN")
+                    ], ephemeral: true})
+                }
+
+                if(this.p1.collected && this.p2.collected){
+                    this.result(member)
+
+                    collector.stop()
+                }
+            })
+        })
+    }
+
+    result (member){
+        let winner;
+        let pick1 = this.p1.choice.toLowerCase();
+        let pick2 = this.p2.choice.toLowerCase();
+        let embed = new MessageEmbed()
+
+        if(this.p1.choice == this.p2.choice){
+            embed.setDescription("The game was a draw")
+            embed.setColor("YELLOW")
+
+            return this.interaction.channel.send({embeds: [embed]});
+        }
+
+        switch(pick1){
+            case 'rock':
+                if(pick2 == 'paper'){
+                    winner = 'paper'
+                }
+                else {
+                    winner = 'rock'
+                }
+            break;
+            case 'paper':
+                if(pick2 == 'rock'){
+                    winner = 'paper'
+                }
+                else {
+                    winner = 'scissor'
+                }
+            break;
+            case 'scissor':
+                if(pick2 == 'rock'){
+                    winner = 'rock'
+                }
+                else {
+                    winner = 'scissor'
+                }
+            break;
+        }
+
+        if(this.p1.choice.toLowerCase() == winner){
+            embed.setDescription("The winner is "+this.interaction.member)
+            embed.setColor("GREEN")
+
+            return this.interaction.channel.send({embeds: [embed]});
+        }
+        else if(this.p2.choice.toLowerCase() == winner){
+            embed.setDescription("The winner is "+member.user)
+            embed.setColor("GREEN")
+
+            return this.interaction.channel.send({embeds: [embed]});
+        }
+
+    }
+
+    errorHandle(embed){
+        this.interaction.reply({embeds: [embed], ephemeral: true })
+        .catch(err => {return console.log(err.stack)});
+    }
+}
+
+module.exports.run = {
+    run: async(client, interaction ) =>{
+        const {options} = interaction;
+        
+        let user = options.getUser('member')
+        let data = new RockPaperScissor(client, interaction.guild, interaction).PlayerFind(user ? user.id : user)
+    }
+}
+
+module.exports.slash = {
+    data: new SlashCommandBuilder()
+        .setName('rps')
+        .setDescription("The classic rock! paper! scissor! game")
+        .addUserOption(option => 
+            option
+            .setName('member')
+            .setDescription('Play with another member'))
+}
