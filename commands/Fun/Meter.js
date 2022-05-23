@@ -57,11 +57,18 @@ class MeterManager{
                 .setColor("#2f3136")
             break;
 
-            case 'nerd':
-                embed.setDescription(`**${user.username}** is **${percentage}%** nerd <:nerd:852918397909729310>`)
-                .setAuthor({name: "Nerd Meter"})
+            case 'dumb':
+                embed.setDescription(`**${user.username}** is **${percentage}%** dumb <:nerd:852918397909729310>`)
+                .setAuthor({name: "Dumb Meter"})
                 .setColor("#2f3136")
             break;
+
+            case 'homie':
+                embed.setDescription(`**${this.interaction.member.user.username}** & **${user.username}** is **${percentage}%** Homie 🤜🤛`)
+                .setAuthor({name: "Homie Meter"})
+                .setColor("#2f3136")
+            break;
+
         }
 
         this.HandleInt(embed, false)
@@ -139,11 +146,11 @@ module.exports.slash = {
         )
         .addSubcommand(option =>
             option
-            .setName('nerd')
-            .setDescription("How nerd are you")
+            .setName('dumb')
+            .setDescription("How dumb are you")
             .addUserOption(option => 
                 option.setName('member')
-                .setDescription("The nerd person 🤓")
+                .setDescription("The dumbest person 🤓")
                 .setRequired(true)
             )
         )
@@ -154,6 +161,16 @@ module.exports.slash = {
             .addUserOption(option => 
                 option.setName('member')
                 .setDescription("The sexiest person 😍")
+                .setRequired(true)
+            )
+        )
+        .addSubcommand(option =>
+            option
+            .setName('homie')
+            .setDescription("You and your homies meter")
+            .addUserOption(option => 
+                option.setName('member')
+                .setDescription("Your homie")
                 .setRequired(true)
             )
         )
