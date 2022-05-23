@@ -294,5 +294,6 @@ module.exports.slash = {
             option
             .setName('member')
             .setDescription('Play with another member')
-        )
+        ),
+    category: "Fun",
 }
