@@ -52,12 +52,19 @@ class WebhookManager{
         // Create a webhook and send the embed
         if(!webHook){
             channel.createWebhook(this.client.user.username, {
-                avatar: "https://media.discordapp.net/attachments/880768542482509874/975443166490689626/Aqua.png?width=642&height=428"
+                avatar: "https://media.discordapp.net/attachments/880768542482509874/979000216051146762/realm.jpg.png?width=404&height=438"
             }).then((i) => {
                 return i.send({embeds: [Embed]}).catch(err => {return console.log(err.stack)});
             });
         }else {
-            webHook.send({embeds: [Embed]}).catch(err => {return console.log(err.stack)});
+            if(webHook.avatar !== this.client.user.avatar){
+                webHook.edit({avatar: "https://media.discordapp.net/attachments/880768542482509874/979000216051146762/realm.jpg.png?width=404&height=438"})
+            };
+            if(webHook.name !== this.client.user.username){
+                webHook.edit({name: this.client.user.username})
+            };
+
+            await webHook.send({embeds: [Embed]}).catch(err => {return console.log(err.stack)});
         };
     }
 }
