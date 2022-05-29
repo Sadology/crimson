@@ -58,10 +58,7 @@ class WebhookManager{
             });
         }else {
             if(webHook.avatar !== this.client.user.avatar){
-                webHook.edit({avatar: "https://media.discordapp.net/attachments/880768542482509874/979000216051146762/realm.jpg.png?width=404&height=438"})
-            };
-            if(webHook.name !== this.client.user.username){
-                webHook.edit({name: this.client.user.username})
+                webHook.edit({name: this.client.user.username, avatar: "https://media.discordapp.net/attachments/959188995898740756/980536793634066442/crimson.png?width=427&height=427"})
             };
 
             await webHook.send({embeds: [Embed]}).catch(err => {return console.log(err.stack)});
