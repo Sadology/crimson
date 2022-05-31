@@ -39,6 +39,6 @@ client.on('messageCreate', async(message) => {
             })
         }
 
-        message.delete()
+        message.delete().catch(err => {return console.log(err.stack)})
     })
 });
