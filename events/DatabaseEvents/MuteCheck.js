@@ -23,11 +23,17 @@ client.eventEmitter.on('MuteCheck', async() => {
 
             await guild.members.fetch();
             const User = guild.members.resolve(userID)
-    
-            let pendingMute = await new UserRoleManager(client, guild).RemoveRole(User, {name: 'muted'});
-            if(!pendingMute) return;
 
-            client.eventEmitter.emit('MuteRemoved', User, client);
+            if(User){
+                let pendingMute = await new UserRoleManager(client, guild).RemoveRole(User, {name: 'muted'});
+                if(!pendingMute) return;
+    
+                client.eventEmitter.emit('MuteRemoved', User, client);
+            }
+            else {
+                client.eventEmitter.emit('MuteRemoved', userID, client);
+            }
+
         }
     }
 
