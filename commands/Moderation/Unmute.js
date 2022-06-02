@@ -69,7 +69,7 @@ class UnmuteManager{
         })
         .catch(err => {return console.log(err)});
 
-        this.client.eventEmitter.emit('MuteRemoved', Member, executor);
+        this.client.eventEmitter.emit('MuteRemoved', Member, executor, Member.guild);
     }
 
     errorHandle(embed){

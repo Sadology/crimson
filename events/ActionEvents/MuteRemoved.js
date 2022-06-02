@@ -2,9 +2,9 @@ const Discord = require('discord.js');
 const client = require('../..');
 const { LogManagers, DatabaseManager, WebhookManager } = require('../../Functions');
 
-client.eventEmitter.on('MuteRemoved', async(Member, executor) => {
+client.eventEmitter.on('MuteRemoved', async(Member, executor, guild) => {
 
-    let logData = new LogManagers(client, Member.guild)
+    let logData = new LogManagers(client, guild)
         .setUser(Member)
         .setActions("Unmute", `Unmuted by ${executor.user.tag}`)
         .setExecutor(executor)
