@@ -125,7 +125,7 @@ class TicTacToe{
 
         let mainEmbed = new MessageEmbed()
             .setTitle("TicTacToe")
-            .setDescription(`<@${this.game.p1}> Vs <@${this.game.p2}> \n\n**${this.interaction.member.user.username} • ** ❌\n**${user.username} • ** ⭕`)
+            .setDescription(`<@${this.game.p1}> Vs <@${this.game.p2}> \n\n**${this.interaction.member.user.username} • ** ⭕\n**${user.username} • ** ❌`)
             .setColor("#2f3136")
 
         const filter = u => u.user.id == this.game.turn;
@@ -150,7 +150,7 @@ class TicTacToe{
                 
                 if(this.game.ended == true){
                     mainEmbed.addField("Result", `<@${this.game.turn}> Won 🎉`)
-                    .setColor("RED")
+                    .setColor("GREEN")
 
                     collector.stop();
 
