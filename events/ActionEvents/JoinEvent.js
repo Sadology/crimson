@@ -50,7 +50,7 @@ client.on("guildMemberAdd", async(member) => {
         })}`)
         .setFooter({text: "ID • "+member.user.id})
         .setTimestamp()
-        .setColor("#2f3136")
+        .setColor('GREEN')
 
     Embed.setDescription(`${convertValue(GreetMessage)}`)
     new WebhookManager(client, member.guild).WebHook(Embed, 'welcome');
