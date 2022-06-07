@@ -159,13 +159,16 @@ class TicTacToe{
 
                 if(this.game.turn == this.game.p1 && button.user.id == this.game.turn){
                     this.game.turn = this.game.p2
+
+                    await button.update({content: `<@${this.game.turn}>'s Turn`, embeds: [mainEmbed], components: [row1, row2, row3]})
                 }
 
                 else if(this.game.turn == this.game.p2 && button.user.id == this.game.turn){
                     this.game.turn = this.game.p1
+
+                    await button.update({content: `<@${this.game.turn}>'s Turn`, embeds: [mainEmbed], components: [row1, row2, row3]})
                 };
 
-                await button.update({content: `<@${this.game.turn}>'s Turn`, embeds: [mainEmbed], components: [row1, row2, row3]})
             })
 
             collector.on('end', () => {
