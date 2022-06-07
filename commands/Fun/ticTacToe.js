@@ -286,7 +286,7 @@ module.exports.run = {
 
 module.exports.slash = {
     data: new SlashCommandBuilder()
-        .setName('ttt')
+        .setName('tictactoe')
         .setDescription("The classic tic tac toe game")
         .addUserOption(option => 
             option
