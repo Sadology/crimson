@@ -70,6 +70,23 @@ class TicTacToe{
     }
 
     async Mainframe(user){
+        if(!user.id || user.id == this.interaction.user.id || user.bot){
+            return this.interaction.reply({embeds: [
+                new MessageEmbed()
+                    .setDescription(`Can't play with this user`)
+                    .setColor("RED")
+            ]})
+        }
+
+        let guildmember = this.guild.members.cache.get(user.id)
+        if(!guildmember){
+            return this.interaction.reply({embeds: [
+                new MessageEmbed()
+                    .setDescription(`Please mention a valid member`)
+                    .setColor("RED")
+            ]})
+        }
+
         this.frame = {
             c0: "",
             c1: "",
