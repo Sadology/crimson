@@ -10,7 +10,7 @@ client.on("guildMemberAdd", async(member) => {
         .setThumbnail(member.user.displayAvatarURL({dynamic: true, format: 'png'}))
         .setDescription(`<:user_icon:958016031127904307> ${member.user} • ${member.user.tag}`)
         .addField("<:time:958254873906933820> Account age", `${moment(member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.user.createdAt, "YYYYMMDD").fromNow()}`, true)
-        .setColor("#2f3136")
+        .setColor("GREEN")
         .setFooter({text: `ID • ${member.user.id}`})
         .setTimestamp()
 
