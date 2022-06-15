@@ -6,7 +6,7 @@ client.on('ready', () => {
     }
 
     else if(client.user.id == "811921753344311296"){
-        client.user.setPresence({ status: 'online', activities: [{ type: 'LISTENING', name: "The sound of abyss" }] });
+        client.user.setPresence({ status: 'online', activities: [{ type: 'LISTENING', name: "The beginning after the end" }] });
     }
     function calcTime(city, offset) {
         // create Date object for current location

@@ -155,7 +155,7 @@ module.exports.slash = {
         .addSubcommand(cmd =>
             cmd
             .setName('channel')
-            .setDescription('purge messages of another member')
+            .setDescription('Purge messages in the channel')
             .addIntegerOption(option => 
                 option.setName('amount')
                 .setDescription("Amount of message to delete")
@@ -166,7 +166,7 @@ module.exports.slash = {
         .addSubcommand(cmd =>
             cmd
             .setName('user')
-            .setDescription('purge messages of another member')
+            .setDescription('purge messages of another user')
             .addIntegerOption(option => 
                 option.setName('amount')
                 .setDescription("Amount of message to delete")
@@ -182,7 +182,7 @@ module.exports.slash = {
         .addSubcommand(cmd =>
             cmd
             .setName('filter')
-            .setDescription('purge messages of another member')
+            .setDescription('Purge a specific message')
             .addIntegerOption(option => 
                 option.setName('amount')
                 .setDescription("Amount of message to delete")
@@ -192,7 +192,7 @@ module.exports.slash = {
             )
             .addStringOption(option => 
                 option.setName('filter')
-                .setDescription("Different filters in purge")
+                .setDescription("Filters")
                 .setRequired(true)
                 .addChoices({name: "bot",value: "bot"},
                 {name: "humans",value: "human"},
