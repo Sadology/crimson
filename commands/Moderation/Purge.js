@@ -152,29 +152,63 @@ module.exports.slash = {
     data: new SlashCommandBuilder()
         .setName('purge')
         .setDescription("Purge bulk amount of messages")
-        .addIntegerOption(option => 
-            option.setName('amount')
-            .setDescription("Amount of message to delete")
-            .setMinValue(1)
-            .setMaxValue(100)
-            .setRequired(true))
-        .addUserOption(option => 
-            option.setName('user')
-            .setDescription("Purge messages of a user"))
-        .addStringOption(option => 
-            option.setName('filter')
-            .setDescription("Different filters in purge")
-            .addChoices({name: "bot",value: "bot"},
-            {name: "humans",value: "human"},
-            {name: "starts-with",value: "start"},
-            {name: "ends-with",value: "end"},
-            {name: "match",value: "match"},
-            {name: "mismatch",value: "not"},
-            {name: "mentions",value: "mention"},
-            {name: "links",value: "link"}))
-        .addStringOption(option => 
-            option.setName('filter-msg')
-            .setDescription("The msg you want to filter (select a filter first)")),
+        .addSubcommand(cmd =>
+            cmd
+            .setName('channel')
+            .setDescription('purge messages of another member')
+            .addIntegerOption(option => 
+                option.setName('amount')
+                .setDescription("Amount of message to delete")
+                .setMinValue(1)
+                .setMaxValue(100)
+                .setRequired(true))
+        )
+        .addSubcommand(cmd =>
+            cmd
+            .setName('user')
+            .setDescription('purge messages of another member')
+            .addIntegerOption(option => 
+                option.setName('amount')
+                .setDescription("Amount of message to delete")
+                .setMinValue(1)
+                .setMaxValue(100)
+                .setRequired(true))
+            .addUserOption(option => 
+                option.setName('user')
+                .setDescription("Purge messages of a user")
+                .setRequired(true)
+                )
+        )
+        .addSubcommand(cmd =>
+            cmd
+            .setName('filter')
+            .setDescription('purge messages of another member')
+            .addIntegerOption(option => 
+                option.setName('amount')
+                .setDescription("Amount of message to delete")
+                .setMinValue(1)
+                .setMaxValue(100)
+                .setRequired(true)
+            )
+            .addStringOption(option => 
+                option.setName('filter')
+                .setDescription("Different filters in purge")
+                .setRequired(true)
+                .addChoices({name: "bot",value: "bot"},
+                {name: "humans",value: "human"},
+                {name: "starts-with",value: "start"},
+                {name: "ends-with",value: "end"},
+                {name: "match",value: "match"},
+                {name: "mismatch",value: "not"},
+                {name: "mentions",value: "mention"},
+                {name: "links",value: "link"}
+            ))
+            .addStringOption(option => 
+                option.setName('filter-msg')
+                .setDescription("The message you want to filter")
+                .setRequired(true)
+            )
+        ),
     Permissions: ["MANAGE_MESSAGES"],
     ClientPermissions: ["MANAGE_MESSAGES"],
     Permissions: ["KICK_MEMBERS"],

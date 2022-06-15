@@ -8,7 +8,7 @@ class WebhookManager{
 
     async FetchDatabase(){
         let Data = await Guild.findOne({
-            guildID: this.guild.id
+            guildID: this.guild.id ? this.guild.id : this.guild
         })
         .catch(err => {
             return console.log(err.stack);

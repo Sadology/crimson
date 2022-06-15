@@ -38,6 +38,6 @@ client.on('messageDeleteBulk', async(deletedMessage) => {
         .setDescription(`**Bulk message deleted in** ${channel} \n**Amount:** \`${length}\`\n**Messages:** ${bin.url}`)
         .setTimestamp()
         .setColor("#fa5757")
-    
-    new WebhookManager(client, deletedMessage.guild).WebHook(Embed, 'messagelog')
+
+    new WebhookManager(client, guild).WebHook(Embed, 'messagelog')
 });
