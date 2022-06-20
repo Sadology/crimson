@@ -211,6 +211,5 @@ module.exports.slash = {
         ),
     Permissions: ["MANAGE_MESSAGES"],
     ClientPermissions: ["MANAGE_MESSAGES"],
-    Permissions: ["KICK_MEMBERS"],
 
 }
