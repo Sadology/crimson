@@ -17,6 +17,7 @@ class LogManagers{
         this.actionLength = data.actionLength;
         this.moderator = data.moderator;
         this.moderatorID = data.moderatorID;
+        this.actionDate = data.actionDate;
     }
 
     setUser(User){
@@ -36,7 +37,6 @@ class LogManagers{
     setLengths(expire = null, duration = null){
         this.Expire = expire;
         this.actionLength = duration;
-
         return this;
     }
 
@@ -59,6 +59,7 @@ class LogManagers{
             actionLength: this.actionLength,
             moderator: this.moderator,
             moderatorID: this.moderatorID,
+            actionDate: this.actionDate,
         }
     }
 }

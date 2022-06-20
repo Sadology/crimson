@@ -16,6 +16,7 @@ class DatabaseManager{
 
         // Generate a 16 digit id for logs
         data["LogID"] = randomID(16);
+        data["actionDate"] = new Date()
 
         // Save the data to database
         await LogsDatabase.updateOne({
