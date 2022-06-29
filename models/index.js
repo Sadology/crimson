@@ -5,4 +5,5 @@ module.exports = {
     GuildRole: require('./GuildRoles'),
     GuildChannel: require('./GuildChannels'),
     CustomCommand: require("./customCmdsData"),
+    CrimsonSettings: require('./CrimsonSettings')
 };

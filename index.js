@@ -17,7 +17,8 @@ const client = new Client(
             Intents.FLAGS.GUILD_MEMBERS,
             Intents.FLAGS.GUILD_MESSAGES,
             Intents.FLAGS.GUILD_BANS,
-            Intents.FLAGS.GUILD_PRESENCES
+            Intents.FLAGS.GUILD_PRESENCES,
+            Intents.FLAGS.GUILD_VOICE_STATES
         ]
     }
 );
@@ -48,10 +49,16 @@ cron.schedule('*/10 * * * * *', () => {
     client.eventEmitter.emit('MuteCheck');
 });
 
+// Check for Servers every Hour
 cron.schedule('0 0 */1 * * *',() => {
     client.guilds.cache.forEach(g => {
         client.eventEmitter.emit('guildUpdate', g);
     })
+});
+
+// Check for Scheduled every 10 second
+cron.schedule('0 0 */1 * * *', () => {
+    client.eventEmitter.emit('scheduleCheck');
 });
 
 // Client & Database login

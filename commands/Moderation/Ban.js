@@ -85,7 +85,7 @@ class BanManager{
 
         if(User.user.id == this.interaction.member.user.id){
             let Embed = new Discord.MessageEmbed()
-                .setDescription(`If you want to get banned then ask an higher authority to use this command on you :)`)
+                .setDescription(`If you want to get banned then ask a higher authority to use this command on you :)`)
                 .setColor("#2f3136")
 
             this.erroMessage(Embed)
