@@ -76,6 +76,7 @@ class MemberResolver {
             format: 'png',
             size: 1024
         }))
+        .setDescription(`${member.user}`)
         .addField("<:user_icon:958016031127904307> User", `${member.user.tag}`, true)
         .addField("<:ID:975459612386025592> User ID", `${member.user.id}`, true)
         .addField("<:search:959185395424321576> Log Amount", `${this.logamt}`, true)

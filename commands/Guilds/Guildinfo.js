@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const moment = require('moment');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports.run = {
     run: async (client, message, args,prefix) =>{
@@ -51,13 +52,8 @@ module.exports.run = {
     }
 }
 
-module.exports.cmd = {
-    name: 'server',
-    aliases: ['guild', 'serverinfo', 'guildinfo', 'server-info', 'guild-info'],
-    description: "Get informations about your server.",
-    permissions: ["SEND_MESSAGES"],
-    botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
-    usage: "server",
-    category: "Utils",
-    cooldown: 3000,
+module.exports.slash = {
+    data: new SlashCommandBuilder()
+        .setName('server-info')
+        .setDescription('Get infromation about the server')
 }

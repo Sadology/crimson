@@ -1,4 +1,6 @@
-const {MessageEmbed} = require('discord.js')
+const {MessageEmbed} = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+
 class ActivityScanner{
     constructor(client, guild, interaction){
         this.client = client;
@@ -6,9 +8,7 @@ class ActivityScanner{
         this.interaction = interaction;
     }
 
-    async MainFrame(){
-        let type;
-        type = this.interaction.content.split(/ +/g).slice(1).join(' ')
+    async MainFrame(type){
         type = type.toLowerCase();
         
         let MemberList = [];
@@ -40,9 +40,9 @@ class ActivityScanner{
 
             })
 
-        this.interaction.channel.send({embeds: [
+        this.interaction.reply({embeds: [
             new MessageEmbed()
-            .setAuthor({name: "Activity Type • "+type})
+            .setAuthor({name: "Filter • "+type})
             .setColor("#2f3136")
             .setDescription(MemberList.length == 0 ? "None" : MemberList.join('\n'))
         ]})
@@ -51,44 +51,21 @@ class ActivityScanner{
 
 module.exports.run = {
     run: async(client, interaction, args,prefix) =>{
-        // Switch the interaction type
-        switch (interaction.type){
-            // Slash command
-            case 'APPLICATION_COMMAND':
-                interactionFunc();
-            break;
+        let type = interaction.options.getString('type');
 
-            // Default command
-            case 'DEFAULT':
-                messageFunc();
-            break;
-        };
+        let data = new ActivityScanner(client, interaction.guild, interaction).MainFrame(type)
 
-        // Calling the log resolver class for slash command
-        function interactionFunc(){
-            let data = new ActionChannelManager(client, interaction.guild).BaseFrame(interaction)
-        };
-
-        // Calling the log resolver class for default command
-        function messageFunc(){
-            let data = new ActivityScanner(client, interaction.guild, interaction).MainFrame()
-        };
     }
 }
 
-// module.exports.cmd = {
-//     name: 'scan-status',
-//     aliases: ['status-scan', 'scanstatus'],
-//     description: "Action log of every moderation action taken by moderators",
-//     permissions: ["MANAGE_MESSAGES"],
-//     botPermission: ["SEND_MESSAGES", "EMBED_LINKS"],
-//     usage: "logs [ member ]",
-//     category: "Administration",
-//     cooldown: 1000,
-// }
-
-// module.exports.slash = {
-//     data: new SlashCommandBuilder()
-//         .setName('action-log')
-//         .setDescription('Setup action log channels for guild')
-// }
+module.exports.slash = {
+    data: new SlashCommandBuilder()
+        .setName('scan-activity')
+        .setDescription('Scan members activity of the server')
+        .addStringOption(option =>
+            option
+            .setName('type')
+            .setDescription("Type of presence")),
+    category: "Administration",
+    Permissions: ["ADMINISTRATOR"],
+}
