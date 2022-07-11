@@ -18,7 +18,7 @@ class ActivityScanner{
 
                 let status = m.presence.activities[0]; 
                 if(!status || status == null) return;
-                
+
                 if(!type){
                     if(status.state){
                         return MemberList.push(`**${m.user.username}** •  ${status.details ? status.details + ' - ' : ''} ${status.state}`)
@@ -28,14 +28,23 @@ class ActivityScanner{
 
                 let statusName;
                 statusName = status.name.toLowerCase();
+                
                 let regex = new RegExp(type, "g");
 
                 if(status.type.toLowerCase() == type){
-                    MemberList.push(`**${m.user.username}** • ${status.details == null ? status.name : status.details }`)
+                    MemberList.push(`**${m.user.username}** • ${status.details !== null ? status.details : status.name == 'Custom Status' ? status.state : status.name }`)
                 }
 
                 else if(statusName.match(regex)){
-                    MemberList.push(`**${m.user.username}** • ${status.details == null ? status.name : status.details}`)
+                    MemberList.push(`**${m.user.username}** • ${status.details !== null ? status.details : status.name == 'Custom Status' ? status.state : status.name }`)
+                }
+
+                else if(status.state){
+                    let statusState = status.state.toLowerCase();
+
+                    if(statusState.match(regex)){
+                        MemberList.push(`**${m.user.username}** • ${status.state}`)
+                    }
                 }
 
             })
