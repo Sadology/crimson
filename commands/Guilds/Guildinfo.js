@@ -3,24 +3,24 @@ const moment = require('moment');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports.run = {
-    run: async (client, message, args,prefix) =>{
-        let roles = message.guild.roles.cache
+    run: async (client, interaction, args,prefix) =>{
+        let roles = interaction.guild.roles.cache
             .sort((a,b) => b.position - a.position)
             .map(role => role.toString())
             .slice(0, -1)
             .join(', ') || "None"
 
         let Data = {
-            Owner: message.guild.members.resolve(message.guild.ownerId),
-            Member: message.guild.memberCount,
-            Text: message.guild.channels.cache.filter(c => c.type === 'GUILD_TEXT').size,
-            Voice: message.guild.channels.cache.filter(c => c.type === 'GUILD_VOICE').size,
-            Category: message.guild.channels.cache.filter(c => c.type === 'GUILD_CATEGORY').size,
-            Partner: message.guild.partnered == true ? "Yes" : "No",
-            Verified: message.guild.verified == true ? "Yes" : "No",
-            Boost: message.guild.premiumSubscriptionCount,
-            Tier: replaceTier(message.guild.premiumTier),
-            Creation: moment(message.guild.createdTimestamp).format("LL")
+            Owner: interaction.guild.members.resolve(interaction.guild.ownerId),
+            Member: interaction.guild.memberCount,
+            Text: interaction.guild.channels.cache.filter(c => c.type === 'GUILD_TEXT').size,
+            Voice: interaction.guild.channels.cache.filter(c => c.type === 'GUILD_VOICE').size,
+            Category: interaction.guild.channels.cache.filter(c => c.type === 'GUILD_CATEGORY').size,
+            Partner: interaction.guild.partnered == true ? "Yes" : "No",
+            Verified: interaction.guild.verified == true ? "Yes" : "No",
+            Boost: interaction.guild.premiumSubscriptionCount,
+            Tier: replaceTier(interaction.guild.premiumTier),
+            Creation: moment(interaction.guild.createdTimestamp).format("LL")
         }
 
         function replaceTier(data){
@@ -32,8 +32,8 @@ module.exports.run = {
         }
 
         let serverInfo = new Discord.MessageEmbed()
-        .setAuthor({name: message.guild.name, iconURL: message.guild.iconURL({format: 'png', dynamic: true})})
-        .setThumbnail(message.guild.iconURL({
+        .setAuthor({name: interaction.guild.name, iconURL: interaction.guild.iconURL({format: 'png', dynamic: true})})
+        .setThumbnail(interaction.guild.iconURL({
             dynamic: true , format: 'png' , size:1024
         }))
         .addField('Owner', `${Data.Owner.user.username}`, true)
@@ -45,10 +45,10 @@ module.exports.run = {
         .addField("Verified", `${Data.Verified}`, true)
         .addField("Boost Level", `${Data.Tier}`, true)
         .addField("Boost Amount", `${Data.Boost}`, true)
-        .setFooter({text: `Creation date • ${Data.Creation} | server-id • ${message.guild.id}`})
+        .setFooter({text: `Creation date • ${Data.Creation} | server-id • ${interaction.guild.id}`})
         .setColor("#2f3136")
                 
-        message.channel.send({embeds: [serverInfo]}).catch(err => {return console.log(err.stack)})
+        interaction.reply({embeds: [serverInfo]}).catch(err => {return console.log(err.stack)})
     }
 }
 
