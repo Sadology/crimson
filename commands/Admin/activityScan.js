@@ -65,7 +65,8 @@ module.exports.slash = {
         .addStringOption(option =>
             option
             .setName('type')
-            .setDescription("Type of presence")),
+            .setDescription("Type of presence")
+            .setRequired(true)),
     category: "Administration",
     Permissions: ["ADMINISTRATOR"],
 }
