@@ -69,6 +69,12 @@ class MeterManager{
                 .setColor("#2f3136")
             break;
 
+            case 'sus':
+                embed.setDescription(`**${user.username}** is **${percentage}%** sus <:amogus:996454172310392992>`)
+                .setAuthor({name: "Sus Meter"})
+                .setColor("#ff3d40")
+            break;
+
         }
 
         this.HandleInt(embed, false)
@@ -171,6 +177,16 @@ module.exports.slash = {
             .addUserOption(option => 
                 option.setName('member')
                 .setDescription("Your homie")
+                .setRequired(true)
+            )
+        )
+        .addSubcommand(option =>
+            option
+            .setName('sus')
+            .setDescription("How sus are you?")
+            .addUserOption(option => 
+                option.setName('member')
+                .setDescription("The sussy person")
                 .setRequired(true)
             )
         )
