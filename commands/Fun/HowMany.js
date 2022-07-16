@@ -72,6 +72,34 @@ class MeterManager{
                     embed.setDescription(`**${percentage}** fbi-agent watching **${user.username}** <:uhm:854293548219236353>`) 
                 }
             break;
+
+            // case 'subscriber':
+            //     percentage = this.PercentageGen(100000000);
+                
+            //     if(percentage == 0){
+            //         embed.setDescription(`**${user.username}** has **${percentage}** subscribers. Unluckiest guy alive 😔`)
+            //     }
+            //     else if(percentage == 100000000){
+            //         embed.setDescription(`**${user.username}** has **${percentage}** subscribers. Luckiest person alive 🎉`)
+            //     }
+            //     else {
+            //         embed.setDescription(`**${user.username}** has **${percentage}** subscribers`) 
+            //     }
+            // break;
+
+            case 'homework':
+                percentage = this.PercentageGen(100);
+                
+                if(percentage == 0){
+                    embed.setDescription(`**${user.username}** has **${percentage}** homework folder. Bro you're going to haven.`)
+                }
+                else if(percentage == 100000000){
+                    embed.setDescription(`**${user.username}** has **${percentage}** homework folder <:pepo_troll:926708965805539338>`)
+                }
+                else {
+                    embed.setDescription(`**${user.username}** has **${percentage}** homework folder <:tanvirHorniEmoji:967210983049289759>`) 
+                }
+            break;
         }
 
         this.HandleInt(embed, false)
@@ -103,7 +131,7 @@ module.exports.slash = {
             .setDescription("How many love you have")
             .addUserOption(option => 
                 option.setName('member')
-                .setDescription("How many love another person have")
+                .setDescription("How many love another person has")
             )
         )
         .addSubcommand(option =>
@@ -112,7 +140,7 @@ module.exports.slash = {
             .setDescription("How many crush you have")
             .addUserOption(option => 
                 option.setName('member')
-                .setDescription("How many crush another person have")
+                .setDescription("How many crush another person has")
             )
         )
         .addSubcommand(option =>
@@ -133,6 +161,16 @@ module.exports.slash = {
                 .setDescription("How many fbi agent watching another person")
             )
         )
-            ,
+
+        .addSubcommand(option =>
+            option
+            .setName('homework')
+            .setDescription("How many homework folder you have")
+            .addUserOption(option => 
+                option.setName('member')
+                .setDescription("How many homework folder another person has")
+            )
+        )    
+        ,
     category: "Fun",
 }
