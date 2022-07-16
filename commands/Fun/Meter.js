@@ -18,6 +18,7 @@ class MeterManager{
     Mainframe(type, user){
         let embed = new MessageEmbed();
         let percentage = this.PercentageGen();
+        user = user ? user : this.interaction.user
 
         switch(type){
             case 'love':
@@ -117,7 +118,6 @@ module.exports.slash = {
             .addUserOption(option => 
                 option.setName('member')
                 .setDescription("The hot person")
-                .setRequired(true)
             )
         )
         .addSubcommand(option =>
@@ -127,7 +127,6 @@ module.exports.slash = {
             .addUserOption(option => 
                 option.setName('member')
                 .setDescription("The funny person")
-                .setRequired(true)
             )
         )
         .addSubcommand(option =>
@@ -137,7 +136,6 @@ module.exports.slash = {
             .addUserOption(option => 
                 option.setName('member')
                 .setDescription("The cringy person")
-                .setRequired(true)
             )
         )
         .addSubcommand(option =>
@@ -147,7 +145,6 @@ module.exports.slash = {
             .addUserOption(option => 
                 option.setName('member')
                 .setDescription("The smart person")
-                .setRequired(true)
             )
         )
         .addSubcommand(option =>
@@ -157,7 +154,6 @@ module.exports.slash = {
             .addUserOption(option => 
                 option.setName('member')
                 .setDescription("The dumbest person 🤓")
-                .setRequired(true)
             )
         )
         .addSubcommand(option =>
@@ -167,7 +163,6 @@ module.exports.slash = {
             .addUserOption(option => 
                 option.setName('member')
                 .setDescription("The sexiest person 😍")
-                .setRequired(true)
             )
         )
         .addSubcommand(option =>
@@ -187,7 +182,6 @@ module.exports.slash = {
             .addUserOption(option => 
                 option.setName('member')
                 .setDescription("The sussy person")
-                .setRequired(true)
             )
         )
             ,
