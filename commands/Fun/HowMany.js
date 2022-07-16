@@ -63,13 +63,13 @@ class MeterManager{
                 percentage = this.PercentageGen(10);
                 
                 if(percentage == 0){
-                    embed.setDescription(`**${user.username}** has **${percentage}** fbi-agent watching them. Wonder how 🤔`)
+                    embed.setDescription(`**${percentage}** fbi-agent watching **${user.username}**. Wonder how 🤔`)
                 }
                 else if(percentage == 10){
-                    embed.setDescription(`**${user.username}** has **${percentage}** fbi-agent watching them. Damn bro, what you've been upto? 😬`)
+                    embed.setDescription(`**${percentage}** fbi-agent watching **${user.username}**. Damn bro, what you've been upto? 😬`)
                 }
                 else {
-                    embed.setDescription(`**${user.username}** has **${percentage}** fbi-agent watching them <:uhm:854293548219236353>`) 
+                    embed.setDescription(`**${percentage}** fbi-agent watching **${user.username}** <:uhm:854293548219236353>`) 
                 }
             break;
         }
