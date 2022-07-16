@@ -27,11 +27,11 @@ class MeterManager{
                 percentage = this.PercentageGen(10);
                 
                 if(percentage == 0){
-                    embed.setDescription(`${user.username} literally has ${percentage} love 💀`)
+                    embed.setDescription(`**${user.username}** literally has **${percentage}** love 💀`)
                 }
                 
                 else {
-                    embed.setDescription(`${user.username} has ${percentage} love 💏`)
+                    embed.setDescription(`**${user.username}** has **${percentage}** love 💏`)
                 }
             break;
 
@@ -39,11 +39,11 @@ class MeterManager{
                 percentage = this.PercentageGen(10);
                 
                 if(percentage == 0){
-                    embed.setDescription(`${user.username} has ${percentage} crush on them <:dielaughing:962091762057379910>`)
+                    embed.setDescription(`**${user.username}** has **${percentage}** crush on them <:dielaughing:962091762057379910>`)
                 }
                 
                 else {
-                    embed.setDescription(`${user.username} has ${percentage} crush on them 😳`)
+                    embed.setDescription(`**${user.username}** has **${percentage}** crush on them 😳`)
                 }
             break;
 
@@ -51,11 +51,11 @@ class MeterManager{
                 percentage = this.PercentageGen(10);
                 
                 if(percentage == 0){
-                    embed.setDescription(`${user.username} gonna have ${percentage} babies 💀`)
+                    embed.setDescription(`**${user.username}** gonna have **${percentage}** babies 💀`)
                 }
                 
                 else {
-                    embed.setDescription(`${user.username} gonna have ${percentage} babies 👶`)
+                    embed.setDescription(`**${user.username}** gonna have **${percentage}** babies 👶`)
                 }
             break;
 
@@ -63,13 +63,13 @@ class MeterManager{
                 percentage = this.PercentageGen(10);
                 
                 if(percentage == 0){
-                    embed.setDescription(`${user.username} have ${percentage} fbi-agent watching them. Wonder how 🤔`)
+                    embed.setDescription(`**${user.username}** has **${percentage}** fbi-agent watching them. Wonder how 🤔`)
                 }
                 else if(percentage == 10){
-                    embed.setDescription(`${user.username} have ${percentage} fbi-agent watching them. Damn bro, what you've been upto? 😬`)
+                    embed.setDescription(`**${user.username}** has **${percentage}** fbi-agent watching them. Damn bro, what you've been upto? 😬`)
                 }
                 else {
-                    embed.setDescription(`${user.username} have ${percentage} fbi-agent watching them <:uhm:854293548219236353>`) 
+                    embed.setDescription(`**${user.username}** has **${percentage}** fbi-agent watching them <:uhm:854293548219236353>`) 
                 }
             break;
         }
