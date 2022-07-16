@@ -9,8 +9,8 @@ class MeterManager{
         this.interaction = interaction;
     }
 
-    PercentageGen(max){
-        let Number = Math.floor(Math.random() * max)
+    PercentageGen(max, min = 0){
+        let Number = Math.floor(Math.random() * (max - min + 1)) + min
 
         return Number;
     }
@@ -94,10 +94,21 @@ class MeterManager{
                     embed.setDescription(`**${user.username}** has **${percentage}** homework folder. Bro you're going to haven.`)
                 }
                 else if(percentage == 100000000){
-                    embed.setDescription(`**${user.username}** has **${percentage}** homework folder <:pepo_troll:926708965805539338>`)
+                    embed.setDescription(`**${user.username}** has **${percentage}** homework folders <:pepenani:853173076833599498>`)
                 }
                 else {
-                    embed.setDescription(`**${user.username}** has **${percentage}** homework folder <:tanvirHorniEmoji:967210983049289759>`) 
+                    embed.setDescription(`**${user.username}** has **${percentage}** homework folders <:pepo_troll:926708965805539338>`) 
+                }
+            break;
+
+            case 'weight':
+                percentage = this.PercentageGen(1000, 30);
+                
+                if(percentage > 300){
+                    embed.setDescription(`**${user.username}'s** weight is **${percentage}** kg. Certified discord mod moment.`)
+                }
+                else {
+                    embed.setDescription(`**${user.username}'s** weight is **${percentage}** kg`) 
                 }
             break;
         }
@@ -170,7 +181,17 @@ module.exports.slash = {
                 option.setName('member')
                 .setDescription("How many homework folder another person has")
             )
-        )    
+        )   
+        
+        .addSubcommand(option =>
+            option
+            .setName('weight')
+            .setDescription("How much weight you have")
+            .addUserOption(option => 
+                option.setName('member')
+                .setDescription("How much weight another person has")
+            )
+        )   
         ,
     category: "Fun",
 }
