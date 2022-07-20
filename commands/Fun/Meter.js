@@ -76,6 +76,11 @@ class MeterManager{
                 .setColor("#ff3d40")
             break;
 
+            case 'depression':
+                embed.setDescription(`**${user.username}** is **${percentage}%** depressed 😔`)
+                .setAuthor({name: "Depression Meter"})
+                .setColor("#2f3136")
+            break;
         }
 
         this.HandleInt(embed, false)
@@ -184,6 +189,15 @@ module.exports.slash = {
                 .setDescription("The sussy person")
             )
         )
-            ,
+        .addSubcommand(option =>
+            option
+            .setName('depression')
+            .setDescription("How depressed are you?")
+            .addUserOption(option => 
+                option.setName('member')
+                .setDescription("Another depressed person")
+            )
+        )
+        ,
     category: "Fun",
 }
