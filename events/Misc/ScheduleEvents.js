@@ -1,14 +1,15 @@
 const Discord = require('discord.js');
 const client = require('../..');
-const {Schedule} = require('../../localDb')
-const fs = require("fs");
-const path = require('path');
-const { CrimsonSettings } = require('../../models')
+const { Schedule } = require('../../localDb');
+const { CrimsonSettings } = require('../../models');
+
 client.eventEmitter.on('scheduleCheck', async(data) => {
     var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    var yyyy = today.getFullYear();
+    var utc = today.getTime() + (today.getTimezoneOffset() * 60000);
+    var nd = new Date(utc + (3600000*'+6'));
+    var dd = String(nd.getDate()).padStart(2, '0');
+    var mm = String(nd.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = nd.getFullYear();
 
     let db = await CrimsonSettings.findOne({
         sentID: {$exists: true},
@@ -42,33 +43,4 @@ client.eventEmitter.on('scheduleCheck', async(data) => {
             }, {upsert: true}).catch(err => {return console.log(err.stack)});
         }
     });
-
-    // function calcTime(city, offset) {
-    //     // create Date object for current location
-    //     var d = new Date();
-    
-    //     // convert to msec
-    //     // subtract local time zone offset
-    //     // get UTC time in msec
-    //     var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
-    
-    //     // create new Date object for different city
-    //     // using supplied offset
-    //     var nd = new Date(utc + (3600000*offset));
-    
-    //     // return time as a string
-    //     return "The local time for city"+ city +" is "+ nd.toLocaleString();
-    // }
-
-
-
-    // let guild = client.guilds.cache.get('874975341347762206')
-    // let channel = guild.channels.cache.get('874975341347762209')
-
-    // console.log(dd + '/' + mm + '/' + yyyy)
-    // if(dd == 29 && mm == 6 && yyyy == 2022){
-    //     console.log("HMMM")
-    //     channel.send("HELLO").catch(err => console.log(err.stack))
-    // }
-    // console.log(calcTime('Dhaka', '+6'));
 });
