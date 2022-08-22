@@ -19,13 +19,13 @@ class MuteManager {
 
         let Member = this.guild.members.cache.get(user);
         if(!Member){
-            Embed.setDescription("<:error:921057346891939840> Mentioned user is invalid")
+            Embed.setDescription("<:error:1011174128503500800> Mentioned user is invalid")
             return this.errHandler(Embed)
         }
 
         let oldMute = await this.FetchDatabase(Member);
         if(oldMute){
-            Embed.setDescription(`<:error:921057346891939840> ${Member} is currently muted`);
+            Embed.setDescription(`<:error:1011174128503500800> ${Member} is currently muted`);
 
             return this.errHandler(Embed);
         }
@@ -33,7 +33,7 @@ class MuteManager {
         let pendingMute = await new UserRoleManager(this.client, this.guild, this.interaction).AddRole(Member, {name: 'muted', newCreate: true})
         if(!pendingMute) return;
 
-        Embed.setDescription(`<:check:959154334388584509> ${Member.toString()} was muted`);
+        Embed.setDescription(`<:check:1011170584996106300> ${Member.toString()} was muted`);
         Embed.setColor("#2f3136");
         this.errHandler(Embed)
 

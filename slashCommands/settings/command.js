@@ -54,7 +54,7 @@ module.exports = {
         if(!cmd){
             return interaction.editReply({embeds: [
                     new Discord.MessageEmbed()
-                    .setDescription("<:error:921057346891939840> Couldn't find any command | Please make sure the command exist")
+                    .setDescription("<:error:1011174128503500800> Couldn't find any command | Please make sure the command exist")
                     .setColor("RED")
                 ], ephemeral: true
             }).catch(err => {return console.log(err.stack)});
@@ -362,7 +362,7 @@ module.exports = {
                                 iconURL: client.user.displayAvatarURL({format: 'png'})
                             })
                             .setDescription(`
-                            <:reply:897083777703084035> \` ${cmd} \`\n
+                            <:reply:1011174493252755537> \` ${cmd} \`\n
                             **Enabled** \` ⥋ \` True
                             **Allowed-Roles** \` ⥋ \` None
                             **Ignored-Roles** \` ⥋ \` None
@@ -420,7 +420,7 @@ module.exports = {
                             iconURL: client.user.displayAvatarURL({format: 'png'})
                         })
                         .setDescription(`
-                        <:reply:897083777703084035> \` ${cmd} \`\n
+                        <:reply:1011174493252755537> \` ${cmd} \`\n
                         **Enabled** \` ⥋ \` ${data.Enabled ? data.Enabled : "true"}
                         **Allowed-Roles** \` ⥋ \` ${allowedroles}
                         **Ignored-Roles** \` ⥋ \` ${ignoredroles}

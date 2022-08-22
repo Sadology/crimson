@@ -2,7 +2,8 @@ const { readdirSync } = require("fs");
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
 const wait = require('util').promisify(setTimeout);
-let cmds = []
+let cmds = [];
+let privetCmds = [];
 
 // Slash handle function
 module.exports = {
@@ -16,10 +17,12 @@ module.exports = {
             for (let file of commands) {
                 let data = require(`../commands/${dir}/${file}`);
                 if (data.slash) {
+
                     let value = {
                         ...data.run,
                         ...data.slash,
                     }
+
                     client.SlashCmd.set(data.slash.data.name, value);
                     cmds.push(data.slash.data.toJSON())
                 }else {
@@ -30,11 +33,13 @@ module.exports = {
 
         client.on("ready", async () => {
             client.guilds.cache.forEach(guild => {
+
                 guild.commands.set(cmds, guild.id).catch(console.error);
             });
         });
 
         client.on("guildCreate", async (guild) => {
+
             guild.commands.set(cmds, guild.id).catch(console.error);
         })
 

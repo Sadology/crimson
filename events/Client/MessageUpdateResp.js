@@ -231,7 +231,7 @@
 //             message.channel.send({
 //                 embeds: [
 //                     new Discord.MessageEmbed()
-//                     .setDescription(`<:error:921057346891939840> Missing Permissions\n\n> ${missings.join(", ").toLowerCase()}`)
+//                     .setDescription(`<:error:1011174128503500800> Missing Permissions\n\n> ${missings.join(", ").toLowerCase()}`)
 //                     .setColor("RED")
 //                 ]
 //             }).catch(err => {

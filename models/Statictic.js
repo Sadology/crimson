@@ -8,12 +8,16 @@ const moderatorSchema = mongoose.Schema({
     Global: Boolean,
     guildID: String,
     userID: String,
+    AuditLog: Boolean,
+    Audits: Array,
     Stats: {
         Mute: Number,
         Warn: Number,
         Ban: Number,
         Timeout: Number,
-        Kick: Number
+        Kick: Number,
+        Unmute: Number,
+        Unban: Number
     }
 })
 

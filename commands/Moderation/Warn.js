@@ -14,7 +14,7 @@ class WarnManager{
         if(!Member){
             return this.interaction.reply({
                 embeds: [new MessageEmbed()
-                    .setDescription(`<:error:921057346891939840> Mentioned member is invalid`)
+                    .setDescription(`<:error:1011174128503500800> Mentioned member is invalid`)
                     .setColor("RED")
                 ], ephemeral: true
             })

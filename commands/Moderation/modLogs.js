@@ -11,13 +11,13 @@ const row = new MessageActionRow()
     new MessageButton()
         .setStyle("PRIMARY")
         .setCustomId("NextPageModLog")
-        .setEmoji("<:next:956793238105235466")
+        .setEmoji("<:next:1011181156336672829>")
 )
 .addComponents(
     new MessageButton()
         .setStyle("PRIMARY")
         .setCustomId("PreviousPageModLog")
-        .setEmoji("<:previous:956793238268821557>")
+        .setEmoji("<:previous:1011181158807113760>")
 )
 
 class LogResolver{
@@ -38,7 +38,7 @@ class LogResolver{
         let Member = await new GuildMember(this.client, this.interaction.guild, this.interaction).MemberNonHandled(ID)
 
         if(!Member){
-            ErrorEmbed.setDescription("<:error:921057346891939840> Mentioned user is invalid")
+            ErrorEmbed.setDescription("<:error:1011174128503500800> Mentioned user is invalid")
             return this.sendErrorData(ErrorEmbed)
         }
         if(Member.ID){
@@ -61,7 +61,7 @@ class LogResolver{
         })
         .then(res => {
             if(!res){
-                errEmbed.setDescription("<:error:921057346891939840> User doesn't have any logs")
+                errEmbed.setDescription("<:error:1011174128503500800> User doesn't have any logs")
                 return this.sendErrorData(errEmbed);
             };
 
@@ -78,7 +78,7 @@ class LogResolver{
         .setColor("RED")
 
         if(Data.Action.length == 0){
-            errEmbed.setDescription("<:error:921057346891939840> User doesn't have any logs")
+            errEmbed.setDescription("<:error:1011174128503500800> User doesn't have any logs")
             return 
         };
 

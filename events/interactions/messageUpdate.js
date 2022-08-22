@@ -15,7 +15,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 
 	const Embed = new MessageEmbed()
 		.setAuthor({name: `${newMessage.author.tag} - Message Edited`, iconURL: newMessage.author.displayAvatarURL({dynamic: false, type: "png", size: 1024})})
-		.setDescription(`User ${newMessage.author} \`${newMessage.author.tag}\` in ${oldMessage.channel} \`${oldMessage.channel.name}\`\n<:reply:897083777703084035> [Jump](https://discord.com/channels/${oldMessage.guild.id}/${oldMessage.channel.id}/${oldMessage.id})`)
+		.setDescription(`User ${newMessage.author} \`${newMessage.author.tag}\` in ${oldMessage.channel} \`${oldMessage.channel.name}\`\n<:reply:1011174493252755537> [Jump](https://discord.com/channels/${oldMessage.guild.id}/${oldMessage.channel.id}/${oldMessage.id})`)
 		.addField("Before", `${oldMessage}`.toString())
 		.addField("After", `${newMessage}`.toString())
 		.setTimestamp()

@@ -40,17 +40,17 @@ class UserInfoManager{
             .setAuthor({name: `${Member.user.username}`, iconURL: Member.user.displayAvatarURL({dynamic: true, format: 'png'})})
             .addFields([
                 {
-                    name: `<a:join:962717227705069629> Join Date`,
+                    name: `<:hi:1011182837866700840> Join Date`,
                     value: `${moment(Member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.joinedAt, "YYYYMMDD").fromNow()}`,
                     inline: true
                 },
                 {
-                    name: `<:time:958254873906933820> Creation Date`,
+                    name: `<:verified:1011183456744636486> Creation Date`,
                     value: `${moment(Member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(Member.user.createdAt, "YYYYMMDD").fromNow()}`,
                     inline: true
                 },
                 {
-                    name: `<:roles:921093178046693377> Roles [${Member.roles.cache.size - 1}]`,
+                    name: `<:roles:1011184351737819226> Roles [${Member.roles.cache.size - 1}]`,
                     value: `${roles}`,
                 },
             ])

@@ -86,7 +86,7 @@ module.exports = {
             .then(() => {
                 return interaction.reply({embeds: [
                     new Discord.MessageEmbed()
-                        .setDescription(`<:online:926939036562628658> **${filteranme(logOption.toLowerCase())}** has been __Enabled__\n<:reply:897083777703084035> \`Channel:\` ${channels}`)
+                        .setDescription(`<:online:926939036562628658> **${filteranme(logOption.toLowerCase())}** has been __Enabled__\n<:reply:1011174493252755537> \`Channel:\` ${channels}`)
                         .setColor("GREEN")
                 ]})
             })

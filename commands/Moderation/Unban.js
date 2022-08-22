@@ -13,7 +13,7 @@ class BanManager{
         let Embed = new Discord.MessageEmbed();
 
         if(Member){
-            Embed.setDescription(`<:error:921057346891939840> <@${user}> is not banned`)
+            Embed.setDescription(`<:error:1011174128503500800> <@${user}> is not banned`)
             Embed.setColor("#2f3136")
             return this.erroMessage(Embed);
         }
@@ -21,7 +21,7 @@ class BanManager{
         let oldBan = await this.FetchBanAudit(user);
         if(!oldBan) {
 
-            Embed.setDescription(`<:error:921057346891939840> <@${user}> is not banned`)
+            Embed.setDescription(`<:error:1011174128503500800> <@${user}> is not banned`)
             Embed.setColor("#2f3136")
             return this.erroMessage(Embed);
 
@@ -34,7 +34,7 @@ class BanManager{
         await this.guild.bans.remove(User, `${this.client.user.username} unban`)
         .then((msg) => {
             let Embed = new Discord.MessageEmbed()
-                .setDescription(`<:check:959154334388584509> ${User.user ? User.user : "<@"+User+">"} was Unbanned`)
+                .setDescription(`<:check:1011170584996106300> ${User.user ? User.user : "<@"+User+">"} was Unbanned`)
                 .setColor("#2f3136")
 
             return this.erroMessage(Embed)

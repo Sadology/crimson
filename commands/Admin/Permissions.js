@@ -18,14 +18,14 @@
 
 //         if(!cmdName) {
 //             return this.interaction.reply({embeds: [new MessageEmbed()
-//                 .setDescription("<:error:921057346891939840> This command doesn't exist")
+//                 .setDescription("<:error:1011174128503500800> This command doesn't exist")
 //                 .setColor("RED")
 //             ]})
 //         }
 
 //         if(channeltype && channeltype.type !== 'GUILD_TEXT'){
 //             return this.interaction.reply({embeds: [new MessageEmbed()
-//                 .setDescription("<:error:921057346891939840> channel must be a text channel")
+//                 .setDescription("<:error:1011174128503500800> channel must be a text channel")
 //                 .setColor("RED")
 //             ]})
 //         }
@@ -49,7 +49,7 @@
             
 //             this.interaction.reply({
 //                 embeds: [new MessageEmbed()
-//                 .setDescription("<:error:921057346891939840> Command name is invalid")
+//                 .setDescription("<:error:1011174128503500800> Command name is invalid")
 //                 .setColor("RED")]
 //             })
 //             return false
@@ -101,7 +101,7 @@
 //                 .then(() => {
 //                     this.interaction.reply({
 //                         embeds: [new MessageEmbed()
-//                             .setDescription(`<:check:959154334388584509> ${data.toString()} ${type == 'allow' ? "__allowed__" : "__denied__"} for command **${name}**`)
+//                             .setDescription(`<:check:1011170584996106300> ${data.toString()} ${type == 'allow' ? "__allowed__" : "__denied__"} for command **${name}**`)
 //                             .setColor("#2f3136")
 //                         ]
 //                     });
@@ -124,7 +124,7 @@
 //                 .then(() => {
 //                     this.interaction.reply({
 //                         embeds: [new MessageEmbed()
-//                             .setDescription(`<:check:959154334388584509> ${data.toString()} ${type == 'allow' ? "__allowed__" : "__denied__"} for command **${name}**`)
+//                             .setDescription(`<:check:1011170584996106300> ${data.toString()} ${type == 'allow' ? "__allowed__" : "__denied__"} for command **${name}**`)
 //                             .setColor("#2f3136")
 //                         ]
 //                     });

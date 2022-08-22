@@ -26,7 +26,7 @@ class UnmuteManager{
         if(!Member){
             return this.interaction.reply({
                 embeds: [new Discord.MessageEmbed()
-                    .setDescription("<:error:921057346891939840> Mentioned user is invalid")
+                    .setDescription("<:error:1011174128503500800> Mentioned user is invalid")
                     .setColor("RED")
                 ]
             })
@@ -41,7 +41,7 @@ class UnmuteManager{
 
         let muteRole = await this.guild.roles.cache.find(r => r.name.toLowerCase() === 'muted')
         if(!muteRole){
-            Embed.setDescription("<:error:921057346891939840> Couldn't find the muted role")
+            Embed.setDescription("<:error:1011174128503500800> Couldn't find the muted role")
             Embed.setColor("RED")
             return this.errorHandle(Embed);
         }
@@ -55,7 +55,7 @@ class UnmuteManager{
         }
 
         if(!Member.roles.cache.has(muteRole.id)){
-            Embed.setDescription(`<:error:921057346891939840> ${Member.user} is currently not muted`)
+            Embed.setDescription(`<:error:1011174128503500800> ${Member.user} is currently not muted`)
             Embed.setColor("RED")
             return this.errorHandle(Embed);
         }
@@ -63,7 +63,7 @@ class UnmuteManager{
         await Member.roles.remove(muteRole.id)
         .then(() => {
             this.interaction.reply({embeds: [new Discord.MessageEmbed()
-                .setDescription(`<:check:959154334388584509> ${Member.user} was unmuted`)
+                .setDescription(`<:check:1011170584996106300> ${Member.user} was unmuted`)
                 .setColor("#2f3136")
             ], allowedMentions: [{repliedUser: false}]})
         })

@@ -13,7 +13,7 @@ class HelpManuManager{
     Mainpage(){
         const MainMenu = new MessageEmbed()
         .setAuthor({name: `${this.client.user.username} • Help Menu`, iconURL: this.client.user.avatarURL({dynamic: true, size: 1024, format: 'png'})})
-        .setDescription(`<:help:959185007778336809> • Categories you can check \n\n<:admin:966996093894283315> • **Admininstration** _Manage server more efficiently with admin cmds_ \n<:moderation:921093310368596008> • **Moderation** _Fast & efficient cmds to help the moderators_\n<:config:915457421823078460> • **Configuration** _Configure ${this.client.user.username} in your server_\n<a:funny:966983540187213867> • **Fun** _Funny commands to make your day better\n<:utility:915457793618739331>_ • **Utils** _Useful commands for daily basis_ \n\n[support server](https://discord.gg/DfmQmqWJmA) • Invite me x-x`)
+        .setDescription(`<:help:1011170600754085930> • Categories you can check \n\n<:admin:1011184540498284544> • **Admininstration** _Manage server more efficiently with admin cmds_ \n<:staff:1011186336058843266><:staff:1011186338533494814> • **Moderation** _Fast & efficient cmds to help the moderators_\n<:settings:1011184939657605162> • **Configuration** _Configure ${this.client.user.username} in your server_\n<a:funny:966983540187213867> • **Fun** _Funny commands to make your day better\n<:utility:915457793618739331>_ • **Utils** _Useful commands for daily basis_ \n\n[support server](https://discord.gg/vA8cVu8cR2) • Invite me`)
         .setColor("#2f3136")
 
         this.interaction.reply({embeds: [MainMenu]})

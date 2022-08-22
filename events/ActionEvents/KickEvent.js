@@ -43,17 +43,17 @@ client.on("guildMemberRemove", async(member) => {
         },
         fields: [
             {
-                name: `<:user_icon:958016031127904307> User`,
+                name: `<:user_icon:1011170605636259921> User`,
                 value: `${target.tag}`,
                 inline: true
             },
             {
-                name: `<:staff:956457533957079080><:staff:956457534334566420> Moderator`,
+                name: `<:staff:1011186336058843266><:staff:1011186338533494814> Moderator`,
                 value: `${executor.tag}`,
                 inline: true
             },
             {
-                name: "<:scroll:958253321410445363> Reason",
+                name: "<:reason:1011187388371968051> Reason",
                 value: `${reason ? reason : "No reason was provided"}`
             }
         ],
@@ -63,6 +63,13 @@ client.on("guildMemberRemove", async(member) => {
         }
     }
 
-    client.eventEmitter.emit('CmdUsed', executor, "Kick", member.guild);
     new WebhookManager(client, member.guild).WebHook(Embed, 'kicklog');
+    client.eventEmitter.emit('AuditAdd', {
+        User: executor,
+        Guild: member.guild,
+        Reason: `Kicked ${target.tag} with reason: ${reason}`,
+        Date: new Date(),
+        Command: "Kick",
+        Moderation: true
+    });
 })

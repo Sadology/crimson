@@ -34,7 +34,7 @@ module.exports.run = {
 
         await interaction.reply({embeds: [new Discord.MessageEmbed()
             .setAuthor({name: interaction.member.user.username, iconURL: interaction.member.user.displayAvatarURL({dynamic: true, size: 1024, format: 'png'})})
-            .setDescription(`🎱 • **${ques}**\n<:reply:897083777703084035> ${chooseQuote}`)
+            .setDescription(`🎱 • **${ques}**\n<:reply:1011174493252755537> ${chooseQuote}`)
             .setColor("#2f3136")
         ], allowedMentions: [{repliedUser: false}]
         })

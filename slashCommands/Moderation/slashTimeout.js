@@ -46,7 +46,7 @@ module.exports = {
                         name: message.user.tag,
                         iconURL: message.user.displayAvatarURL({format: 'png', dynamic: false})
                     })
-                    .setDescription( `<:error:921057346891939840> Please mention a valid member` )
+                    .setDescription( `<:error:1011174128503500800> Please mention a valid member` )
                     .setColor( "#fffafa" )
                 ], ephemeral: true})
                 .catch(err => {return console.log(err.stack)})
@@ -62,7 +62,7 @@ module.exports = {
                             name: interaction.user.tag,
                             iconURL: interaction.user.displayAvatarURL({format: 'png', dynamic: false})
                         })
-                        .setDescription( `<:error:921057346891939840> Please mention a valid member` )
+                        .setDescription( `<:error:1011174128503500800> Please mention a valid member` )
                         .setColor( "#fffafa" )
                     ], ephemeral: true})
                     .catch(err => {return console.log(err)})

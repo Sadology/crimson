@@ -42,12 +42,12 @@ client.on('guildBanRemove', async(User) => {
         },
         fields: [
             {
-                name: `<:user_icon:958016031127904307> User`,
+                name: `<:user_icon:1011170605636259921> User`,
                 value: `${target.tag}`,
                 inline: true
             },
             {
-                name: `<:staff:956457533957079080><:staff:956457534334566420> Moderator`,
+                name: `<:staff:1011186336058843266><:staff:1011186338533494814> Moderator`,
                 value: `${executor.tag}`,
                 inline: true
             },
@@ -57,6 +57,13 @@ client.on('guildBanRemove', async(User) => {
             text: `User-ID • ${target.id}`
         }
     }
-
+    client.eventEmitter.emit('AuditAdd', {
+        User: executor,
+        Guild: User.guild,
+        Reason: `Unbanned ${target.tag}`,
+        Date: new Date(),
+        Command: "Unban",
+        Moderation: true
+    });
     new WebhookManager(client, User.guild).WebHook(Embed, 'banlog')
 });

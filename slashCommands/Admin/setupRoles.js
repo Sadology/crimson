@@ -158,7 +158,7 @@ module.exports = {
             .then(() => {
                 return interaction.reply({
                     embeds: [new Discord.MessageEmbed()
-                        .setDescription(`<:online:926939036562628658> __${filterName(logOption)}__ has been updated\n<:reply:897083777703084035>\`${type}\`: ${RolesName}`)
+                        .setDescription(`<:online:926939036562628658> __${filterName(logOption)}__ has been updated\n<:reply:1011174493252755537>\`${type}\`: ${RolesName}`)
                         .setColor("GREEN")    
                     ]
                 })

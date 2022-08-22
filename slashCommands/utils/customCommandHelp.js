@@ -54,21 +54,21 @@ module.exports = {
                     }
 
                     let Data = {
-                        Name: items.Name ? items.Name : "<:error:921057346891939840>",
-                        Content: items.Content ? items.Content : "<:error:921057346891939840>",
+                        Name: items.Name ? items.Name : "<:error:1011174128503500800>",
+                        Content: items.Content ? items.Content : "<:error:1011174128503500800>",
                         Embed: items.Embed ? items.Embed : "False",
                         DeleteCmd: items.DeleteCmd ? items.DeleteCmd : "False",
                         Mention: items.Mention ? items.Mention : "False",
-                        Description: items.Description ? items.Description : "<:error:921057346891939840>",
-                        Author: items.Author ? items.Author : "<:error:921057346891939840>",
-                        Title: items.Title ? items.Title : "<:error:921057346891939840>",
-                        Image: items.Image ? items.Image : "<:error:921057346891939840>",
+                        Description: items.Description ? items.Description : "<:error:1011174128503500800>",
+                        Author: items.Author ? items.Author : "<:error:1011174128503500800>",
+                        Title: items.Title ? items.Title : "<:error:1011174128503500800>",
+                        Image: items.Image ? items.Image : "<:error:1011174128503500800>",
                         Color: items.Color ? items.Color : "Sadbot Role Color",
-                        Footer: items.Footer ? items.Footer : "<:error:921057346891939840>",
+                        Footer: items.Footer ? items.Footer : "<:error:1011174128503500800>",
                         Permission: items.Permission ? items.Permission : null,
                     }
 
-                    let roleArr = ["<:error:921057346891939840>"]
+                    let roleArr = ["<:error:1011174128503500800>"]
                     if(Data.Permission){
                         roleArr.pop()
                         Data.Permission.forEach(perms => {
@@ -115,11 +115,11 @@ module.exports = {
 
                     let cmds = []
                     res.Data.forEach(data => {
-                        cmds.push(`\` - \` **Cmd Name:** ${data.Name ? data.Name : "<:error:921057346891939840>"}`)
+                        cmds.push(`\` - \` **Cmd Name:** ${data.Name ? data.Name : "<:error:1011174128503500800>"}`)
                     })
 
                     let listEmbed = new Discord.MessageEmbed()
-                        .setDescription(`<:reply:897083777703084035>__Custom Commands__\n${cmds.join(" \n")}`)
+                        .setDescription(`<:reply:1011174493252755537>__Custom Commands__\n${cmds.join(" \n")}`)
                         .setColor("WHITE")
 
                     interaction.editReply({embeds: [listEmbed]}).catch(err => {return console.log(err.stack)})

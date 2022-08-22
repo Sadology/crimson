@@ -42,14 +42,14 @@ class UserLogs{
         if(!data){
             return this.interaction.reply({embeds: [
                 new MessageEmbed()
-                    .setDescription(`<:error:921057346891939840> The user doesn't have any logs`)
+                    .setDescription(`<:error:1011174128503500800> The user doesn't have any logs`)
                     .setColor("RED")
             ]})
         }
 
         let Embed = new MessageEmbed()
         .setDescription(`• ⚠ **WARNING**
-        <:reply:897083777703084035> This action will wipe out all moderation log of <@${user}>. Do you still want to continue?`)
+        <:reply:1011174493252755537> This action will wipe out all moderation log of <@${user}>. Do you still want to continue?`)
         .setColor("RED")
 
         this.interaction.deferReply();
@@ -75,7 +75,7 @@ class UserLogs{
             if(b.customId === 'cancel'){
                 b.reply({
                     embeds: [new MessageEmbed()
-                        .setDescription(`<:check:959154334388584509> canceled`)
+                        .setDescription(`<:check:1011170584996106300> canceled`)
                         .setColor("#2f3136")
                     ], ephemeral: true
                 });
@@ -100,7 +100,7 @@ class UserLogs{
 
         msg.reply({
             embeds: [new MessageEmbed()
-                .setDescription(`<:check:959154334388584509> <@${id}>'s data was wiped out.`)
+                .setDescription(`<:check:1011170584996106300> <@${id}>'s data was wiped out.`)
                 .setColor("#2f3136")
             ]
         });

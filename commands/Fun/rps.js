@@ -114,13 +114,13 @@ class RockPaperScissor{
         let embed = new MessageEmbed()
 
         if(!member) {
-            embed.setDescription("<:error:921057346891939840> Mentioned member is invalid")
+            embed.setDescription("<:error:1011174128503500800> Mentioned member is invalid")
             embed.setColor("RED")
             return this.errorHandle(embed);
         }
 
         if(member.user.id == this.client.user.id || member.user.id == this.interaction.member.user.id){
-            embed.setDescription("<:error:921057346891939840> You can't play with this member")
+            embed.setDescription("<:error:1011174128503500800> You can't play with this member")
             embed.setColor("RED")
 
             return this.errorHandle(embed);

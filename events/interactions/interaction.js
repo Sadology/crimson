@@ -55,7 +55,7 @@ function ClientPerms(cmd, interaction){
         interaction.reply({
             embeds: [new Discord.MessageEmbed()
                 .setAuthor({name: `Missing permissions`, iconURL: interaction.guild.me.displayAvatarURL({dynamic: true, format: 'png'})})
-                .setDescription(`**Bot require**\n<:reply:897083777703084035>${missing.toLowerCase()}`)
+                .setDescription(`**Bot require**\n<:reply:1011174493252755537>${missing.toLowerCase()}`)
                 .setColor("#2f3136")
             ],
             ephemeral: true
@@ -86,7 +86,7 @@ function UserPerms(cmd, interaction){
         interaction.reply({
             embeds: [new Discord.MessageEmbed()
                 .setAuthor({name: `Missing permissions`, iconURL: interaction.member.user.displayAvatarURL({dynamic: true, format: 'png'})})
-                .setDescription(`**Require any of the following permissions**\n<:reply:897083777703084035>${missing.toLowerCase()}`)
+                .setDescription(`**Require any of the following permissions**\n<:reply:1011174493252755537>${missing.toLowerCase()}`)
                 .setColor("#2f3136")
             ],
             ephemeral: true

@@ -21,7 +21,7 @@ class PurgeManager{
             if(!word){
                 return interaction.reply({
                     embeds: [new Discord.MessageEmbed()
-                        .setDescription("<:error:921057346891939840> You have to supply \"filter-message\" for this action")
+                        .setDescription("<:error:1011174128503500800> You have to supply \"filter-message\" for this action")
                         .setColor("RED")]
                 })
             }

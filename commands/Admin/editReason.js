@@ -35,7 +35,7 @@ class EditReason{
         if(!data){
             return this.interaction.reply({embeds: [
                 new MessageEmbed()
-                    .setDescription(`<:error:921057346891939840> LogId is invalid`)
+                    .setDescription(`<:error:1011174128503500800> LogId is invalid`)
                     .setColor("RED")
             ], ephemeral: true})
         }
@@ -86,7 +86,7 @@ class EditReason{
         .then(() =>{
             this.interaction.reply({embeds: [
                 new MessageEmbed()
-                    .setDescription(`<:check:959154334388584509> Reason has been updated for LogId - **__${ID}__**`)
+                    .setDescription(`<:check:1011170584996106300> Reason has been updated for LogId - **__${ID}__**`)
                     .setColor("#2f3136")
             ]})
         })

@@ -172,11 +172,11 @@ class UserRoleManager extends RoleManager{
         const clientTopRole = this.guild.members.resolve( this.client.user ).roles.highest.position;
 
         if(user.permissions.any(["MANAGE_MESSAGES", "MANAGE_ROLES", "MANAGE_GUILD", "ADMINISTRATOR", "KICK_MEMBERS", "BAN_MEMBERS", "MANAGE_CHANNELS", "MODERATE_MEMBERS"], { checkAdmin: true, checkOwner: true })){
-            Embed.setDescription("<:error:921057346891939840> Can't mute a Mod/Admin")
+            Embed.setDescription("<:error:1011174128503500800> Can't mute a Mod/Admin")
             return super.ErroData(Embed)
 
         }else if(role.position >= clientTopRole){
-            Embed.setDescription("<:error:921057346891939840> "+role.toString()+" role position is Higher or equal as my highest role")
+            Embed.setDescription("<:error:1011174128503500800> "+role.toString()+" role position is Higher or equal as my highest role")
             return super.ErroData(Embed)
         }
 

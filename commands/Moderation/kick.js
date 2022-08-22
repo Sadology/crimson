@@ -15,7 +15,7 @@ class KickManager{
 
         if(!Member){
 
-            Embed.setDescription(`<:error:921057346891939840> Mentioned member is invalid`)
+            Embed.setDescription(`<:error:1011174128503500800> Mentioned member is invalid`)
             Embed.setColor("#2f3136")
             return this.erroMessage(Embed);
 
@@ -61,7 +61,6 @@ class KickManager{
                 .setDescription(`🦿 There you go i kicked my self ... you happy now? it hurts!! 😔`)
                 .setColor("#2f3136")
             
-            this.client.eventEmitter.emit('CmdUsed', this.interaction.member, "Kick", this.guild);
             this.erroMessage(Embed)
             return false;
         };

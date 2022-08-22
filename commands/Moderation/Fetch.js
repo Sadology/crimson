@@ -12,14 +12,14 @@ const row = new MessageActionRow()
     .setStyle("PRIMARY")
     .setCustomId("info")
     .setLabel("Expand")
-    .setEmoji("<:down:975461613471682560>")
+    .setEmoji("<:down:1011170598505947228>")
 )
 .addComponents(
     new MessageButton()
     .setStyle("PRIMARY")
     .setLabel("Logs")
     .setCustomId("seekLogs")
-    .setEmoji("<:logs:921093310368596008>")   
+    .setEmoji("<:logs:1011182282599575563>")   
 )
 
 class MemberResolver {
@@ -77,10 +77,10 @@ class MemberResolver {
             size: 1024
         }))
         .setDescription(`${member.user}`)
-        .addField("<:user_icon:958016031127904307> User", `${member.user.tag}`, true)
-        .addField("<:ID:975459612386025592> User ID", `${member.user.id}`, true)
-        .addField("<:search:959185395424321576> Log Amount", `${this.logamt}`, true)
-        .addField("<a:create:962717227705069629> Created At", `${moment(member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.user.createdAt, "YYYYMMDD").fromNow()}`, true)
+        .addField("<:user_icon:1011170605636259921> User", `${member.user.tag}`, true)
+        .addField("<:ID:1011170603228741642> User ID", `${member.user.id}`, true)
+        .addField("<:logs:1011182282599575563> Log Amount", `${this.logamt}`, true)
+        .addField("<:hi:1011182837866700840> Created At", `${moment(member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.user.createdAt, "YYYYMMDD").fromNow()}`, true)
         .setColor("#2f3136")
         .setFooter({text: `User-ID: ${member.user.id}`})
         .setTimestamp()
@@ -88,13 +88,13 @@ class MemberResolver {
             row.components[0].setDisabled(true);
             row.components[1].setDisabled(false);
 
-            UserEmbed.addField("<a:join:962717227705069629> Joined At", `Not Available`, true)
-            UserEmbed.addField("Ban Reason", `${member.reason}`)
+            UserEmbed.addField("<:verified:1011183456744636486> Joined At", `Not Available`, true)
+            UserEmbed.addField("<:banhammer:1011180749396901979> Ban Reason", `${member.reason}`)
         }else {
             row.components[0].setDisabled(false);
             row.components[1].setDisabled(false);
 
-            UserEmbed.addField("<a:join:962717227705069629> Joined At", `${moment(member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.joinedAt, "YYYYMMDD").fromNow()}`, true)
+            UserEmbed.addField("<:verified:1011183456744636486> Joined At", `${moment(member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.joinedAt, "YYYYMMDD").fromNow()}`, true)
         }
         
         if(this.interaction.type == "APPLICATION_COMMAND"){
@@ -149,8 +149,8 @@ class MemberResolver {
                 const permArr = perms.join(", ")
                 const permData = permArr.split("_").join(" ") || "None"
         
-                Embed.addField("<:roles:921093178046693377> Roles", `${roles}`)
-                Embed.addField("<:administration:915457421823078460> Permissions", `${permData.toLowerCase()}`)
+                Embed.addField("<:roles:1011184351737819226> Roles", `${roles}`)
+                Embed.addField("<:settings:1011184939657605162> Permissions", `${permData.toLowerCase()}`)
 
                 row.components[0].setDisabled(true);
                 await b.update({embeds: [Embed], components: [row]}).catch(err => {return console.log(err.stack)})
@@ -187,7 +187,7 @@ class MemberResolver {
 
             if(!bannedUser){
                 let embed = new MessageEmbed()
-                    .setDescription(`<:error:921057346891939840> Mentioned member is invalid`)
+                    .setDescription(`<:error:1011174128503500800> Mentioned member is invalid`)
                     .setColor("RED")
                 return this.Errors(embed);
             };

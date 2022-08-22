@@ -16,7 +16,7 @@ class BanManager{
             let oldBan = await this.FetchBanAudit(user);
             if(oldBan) {
 
-                Embed.setDescription(`<:error:921057346891939840> <@${user}> is already banned`)
+                Embed.setDescription(`<:error:1011174128503500800> <@${user}> is already banned`)
                 Embed.setColor("#2f3136")
                 return this.erroMessage(Embed);
 
@@ -47,10 +47,9 @@ class BanManager{
         await this.guild.bans.create(User, {days: 0, reason: `${reason} | ${User.user ? User.user.id : User} | ${this.interaction.member.user.tag}`})
         .then((msg) => {
             let Embed = new Discord.MessageEmbed()
-                .setDescription(`<:banHammer:921094864073011221> ${User.user ? User.user : "<@"+User+">"} was Banned | ${reason}`)
+                .setDescription(`<:banhammer:1011180749396901979> ${User.user ? User.user : "<@"+User+">"} was Banned | ${reason}`)
                 .setColor("#2f3136")
            
-            this.client.eventEmitter.emit('CmdUsed', this.interaction.member, "Ban", this.guild);
             return this.erroMessage(Embed)
         })
         .catch(err => {return console.log(err.stack)});
@@ -76,7 +75,7 @@ class BanManager{
 
         if(User.user.id == this.client.user.id){
             let Embed = new Discord.MessageEmbed()
-                .setDescription(`<:banHammer:921094864073011221> ${this.client.user} was bann ... wait im ${this.client.user.username} <:sweating:962363501081423923>`)
+                .setDescription(`<:banhammer:1011180749396901979> ${this.client.user} was bann ... wait im ${this.client.user.username} <:sweating:962363501081423923>`)
                 .setColor("#2f3136")
 
             this.erroMessage(Embed)

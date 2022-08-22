@@ -50,7 +50,7 @@ class UserLogs{
         if(!data){
             return this.interaction.reply({embeds: [
                 new MessageEmbed()
-                    .setDescription(`<:error:921057346891939840> The log-id is invalid`)
+                    .setDescription(`<:error:1011174128503500800> The log-id is invalid`)
                     .setColor("RED")
             ]})
         }
@@ -90,7 +90,7 @@ class UserLogs{
             if(b.customId === 'cancel'){
                 b.reply({
                     embeds: [new MessageEmbed()
-                        .setDescription(`<:check:959154334388584509> canceled`)
+                        .setDescription(`<:check:1011170584996106300> canceled`)
                         .setColor("#2f3136")
                     ], ephemeral: true
                 });
@@ -132,7 +132,7 @@ class UserLogs{
 
         msg.reply({
             embeds: [new MessageEmbed()
-                .setDescription(`<:check:959154334388584509> Log **${id}** was deleted`)
+                .setDescription(`<:check:1011170584996106300> Log **${id}** was deleted`)
                 .setColor("#2f3136")
             ]
         });

@@ -130,9 +130,9 @@ class ActionChannelManager{
         // Loop through Object and push the data to the user friendly array
         for (let [key, val] of Object.entries(typeList)){
             if(val == 'None'){
-                actionChannels.push(`<:deactive:959183127098568735> \`•\` ${Types(key)}: ${val}`) 
+                actionChannels.push(`<:active:1011170591933464637> \`•\` ${Types(key)}: ${val}`) 
             }else {
-                actionChannels.push(`<:avtive:959183126909845634> \`•\` ${Types(key)}: ${val}`)  
+                actionChannels.push(`<:disabled:1011170589739847700> \`•\` ${Types(key)}: ${val}`)  
             }
         };
 
@@ -210,7 +210,7 @@ class ActionChannelManager{
                 interact.followUp({embeds: [
                     new MessageEmbed()
                     .setAuthor({name: "Edit-mode: Online"})
-                    .setDescription("<:help:959185007778336809> **Log Type <channel>**\n<:example:897083777703084035>Action-log #mod-logs \n**Type \`Log-type <Disable>\` to disable a log channel** \n\n<:search:959185395424321576> **Available Log Types:**\n\`-\` Action-log, Ban-log, Message-log, User-log, Member-log, kick-log, welcome")
+                    .setDescription("<:help:1011170600754085930> **Log Type <channel>**\n<:example:897083777703084035>Action-log #mod-logs \n**Type \`Log-type <Disable>\` to disable a log channel** \n\n<:search:1011170587302953041> **Available Log Types:**\n\`-\` Action-log, Ban-log, Message-log, User-log, Member-log, kick-log, welcome")
                     .setFooter({text: "Hit the \"Help\" button for more help"})
                     .setColor("#2f3136")
                 ]});
@@ -229,13 +229,13 @@ class ActionChannelManager{
                     // New Error embed
                     let embed = new MessageEmbed()
                     if(!type){
-                        embed.setDescription("<:error:921057346891939840> Action log type is incorrect")
+                        embed.setDescription("<:error:1011174128503500800> Action log type is incorrect")
                         .setColor("RED")
                         return this.errorMessage(Button, embed);
                     }
 
                     if(!channel){
-                        embed.setDescription("<:error:921057346891939840> The channel is incorrect")
+                        embed.setDescription("<:error:1011174128503500800> The channel is incorrect")
                         .setColor("RED")
                         return this.errorMessage(Button, embed);
                     }
@@ -294,7 +294,7 @@ class ActionChannelManager{
                 interact.followUp({embeds: [
                     new MessageEmbed()
                     .setAuthor({name: "Help Menu"})
-                    .setDescription("**How to setup action log**❔\n<:reply:897083777703084035>While in edit mode bot will listen to your messages. Every message you send bot look for log type and channel for 5 minutes 👀. So to setup a log channel follow the instructions. \n\n<:help:959185007778336809> **Log type** \`<channel>\` \n <:reply:897083777703084035>**Action-log** \`#mod-logs\` \n\n🗒️ **Note**\n\n\`-\` Log types are available in edit mode, so you can just copy n paste\n\`-\` You can use lower case character for *log type* and you can ignore the (-)\n\`-\` You can use channel Name or channel Id instead of channel mention\n\`-\` If you get a error then read the error message and try again :D\n\`-\` To disable a log channel just type **disable** in the channel section E.g: **message-log** \`disable\`\n\`-\` Hit the **cancel** button to stop edit mode")
+                    .setDescription("**How to setup action log**❔\n<:reply:1011174493252755537> While in edit mode bot will listen to your messages. Every message you send bot look for log type and channel for 5 minutes 👀. So to setup a log channel follow the instructions. \n\n<:help:1011170600754085930> **Log type** \`<channel>\` \n <:reply:1011174493252755537>**Action-log** \`#mod-logs\` \n\n🗒️ **Note**\n\n\`-\` Log types are available in edit mode, so you can just copy n paste\n\`-\` You can use lower case character for *log type* and you can ignore the (-)\n\`-\` You can use channel Name or channel Id instead of channel mention\n\`-\` If you get a error then read the error message and try again :D\n\`-\` To disable a log channel just type **disable** in the channel section E.g: **message-log** \`disable\`\n\`-\` Hit the **cancel** button to stop edit mode")
                     .setColor("#2f3136")
                     .setImage("https://cdn.discordapp.com/attachments/959188995898740756/959189004870352946/unknown.png")
                 ]});
@@ -334,7 +334,7 @@ class ActionChannelManager{
             // If succeed, send the data
             interaction.channel.send({
                 embeds: [new MessageEmbed()
-                    .setDescription(`<:done:959154334388584509> **${Types(type)}** was __Disabled__`)
+                    .setDescription(`<:success:1011176253161738323> **${Types(type)}** was __Disabled__`)
                     .setColor("#2f3136")
                 ]
             }).then((m) =>{
@@ -351,7 +351,7 @@ class ActionChannelManager{
             // If succeed, send the data
             interaction.channel.send({
                 embeds: [new MessageEmbed()
-                    .setDescription(`<:done:959154334388584509> **${Types(type)}** was set to ${data.toString()}`)
+                    .setDescription(`<:success:1011176253161738323> **${Types(type)}** was set to ${data.toString()}`)
                     .setColor("#2f3136")
                 ]
             }).then((m) =>{

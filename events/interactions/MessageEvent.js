@@ -103,7 +103,7 @@ class CommandHandle{
             channel.send({
                 embeds: [new Discord.MessageEmbed()
                     .setAuthor({name: `Missing permissions`})
-                    .setDescription(`**Bot require**\n<:reply:897083777703084035>${missing.toLowerCase()}`)
+                    .setDescription(`**Bot require**\n<:reply:1011174493252755537>${missing.toLowerCase()}`)
                     .setColor("#2f3136")
                 ]
             }).catch(err => {
@@ -190,7 +190,7 @@ class CommandHandle{
                 embeds: [
                     new Discord.MessageEmbed()
                         .setAuthor({name: "Missing permission", iconURL: user.displayAvatarURL({dynamic: true})})
-                        .setDescription(`<:logs:921093310368596008> **Require**\n<:reply:897083777703084035> ${missing.toLowerCase()}`)
+                        .setDescription(`<:logs:1011182282599575563> **Require**\n<:reply:1011174493252755537> ${missing.toLowerCase()}`)
                         .setColor("#2f3136")
                     ]
             }).catch(err => {

@@ -40,7 +40,7 @@ class GuildMember extends Member{
         let ID = super.FormatMention(rawID)
 
         let errorEmbed = new Discord.MessageEmbed()
-            .setDescription("<:error:921057346891939840> Mentioned user is invalid")
+            .setDescription("<:error:1011174128503500800> Mentioned user is invalid")
             .setColor("RED")
 
         if(!ID){
@@ -106,7 +106,7 @@ class ClientMember extends Member{
         let ID = super.FormatMention()
 
         let errorEmbed = new Discord.MessageEmbed()
-            .setTitle("<:error:921057346891939840> Please mention a valid member")
+            .setTitle("<:error:1011174128503500800> Please mention a valid member")
             .setColor("RED")
 
         if(!ID){

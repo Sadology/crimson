@@ -35,14 +35,21 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 
     let Embed = new Discord.MessageEmbed()
         .setAuthor({name: `Timeout • ${newMember.user.username}`, iconURL: newMember.user.displayAvatarURL({dynamic: true, format: 'png'})})
-        .addField("<:user_icon:958016031127904307> User", `${newMember.user.tag}`, true)
-        .addField("<:staff:956457533957079080><:staff:956457534334566420> Moderator", `${logs.executor.tag}`, true)
-        .addField(`<:duration:958254873906933820> Duration`, `${durationFormat}`, true)
-        .addField("<:reason:958253321410445363> Reason", `${logs.reason ? logs.reason : "No reason was provided"}`)
+        .addField("<:user_icon:1011170605636259921> User", `${newMember.user.tag}`, true)
+        .addField("<:staff:1011186336058843266><:staff:1011186338533494814> Moderator", `${logs.executor.tag}`, true)
+        .addField(`<:clock:1011170596719173692> Duration`, `${durationFormat}`, true)
+        .addField("<:reason:1011187388371968051> Reason", `${logs.reason ? logs.reason : "No reason was provided"}`)
         .setColor("#2f3136")
         .setFooter({text: "ID • "+newMember.user.id})
         .setTimestamp()
 
-    client.eventEmitter.emit('CmdUsed', logs.executor, "Timeout", newMember.guild);
+    client.eventEmitter.emit('AuditAdd', {
+        User: logs.executor,
+        Guild: newMember.guild,
+        Reason: `Timedout ${newMember.user.tag} for ${durationFormat} with reason: ${logs.reason}`,
+        Date: new Date(),
+        Command: "Timeout",
+        Moderation: true
+    });
     new WebhookManager(client, newMember.guild).WebHook(Embed, 'actionlog')
 })
