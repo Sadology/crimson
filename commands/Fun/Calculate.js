@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const {MessageEmbed, MessageActionRow, MessageButton} = require('discord.js');
-const wait = require('util').promisify(setTimeout);
+const {MessageEmbed } = require('discord.js');
 
 class MeterManager{
     constructor(client, guild, interaction) {
@@ -39,7 +38,7 @@ class MeterManager{
                 percentage = this.PercentageGen(10);
                 
                 if(percentage == 0){
-                    embed.setDescription(`**${user.username}** has **${percentage}** crush on them <:dielaughing:962091762057379910>`)
+                    embed.setDescription(`**${user.username}** has **${percentage}** crush on them <:pepeLaugh:1011611765303414874>`)
                 }
                 
                 else {
@@ -69,7 +68,7 @@ class MeterManager{
                     embed.setDescription(`**${percentage}** fbi-agent watching **${user.username}**. Damn bro, what you've been upto? 😬`)
                 }
                 else {
-                    embed.setDescription(`**${percentage}** fbi-agent watching **${user.username}** <:uhm:854293548219236353>`) 
+                    embed.setDescription(`**${percentage}** fbi-agent watching **${user.username}** <:uhm:1011612436186546197>`) 
                 }
             break;
 
@@ -94,10 +93,10 @@ class MeterManager{
                     embed.setDescription(`**${user.username}** has **${percentage}** homework folder. Bro you're going to haven.`)
                 }
                 else if(percentage == 100000000){
-                    embed.setDescription(`**${user.username}** has **${percentage}** homework folders <:pepenani:853173076833599498>`)
+                    embed.setDescription(`**${user.username}** has **${percentage}** homework folders 🤓`)
                 }
                 else {
-                    embed.setDescription(`**${user.username}** has **${percentage}** homework folders <:pepo_troll:926708965805539338>`) 
+                    embed.setDescription(`**${user.username}** has **${percentage}** homework folders 🤨📸`) 
                 }
             break;
 
@@ -134,8 +133,8 @@ module.exports.run = {
 
 module.exports.slash = {
     data: new SlashCommandBuilder()
-        .setName('how-many')
-        .setDescription("Find out how many you have")
+        .setName('calculate')
+        .setDescription("Calculate how many of the options you have")
         .addSubcommand(option =>
             option
             .setName('love')
@@ -166,7 +165,7 @@ module.exports.slash = {
         .addSubcommand(option =>
             option
             .setName('fbi-agent')
-            .setDescription("How many fbi agent watching you")
+            .setDescription("How many fbi agent watching over you")
             .addUserOption(option => 
                 option.setName('member')
                 .setDescription("How many fbi agent watching another person")
