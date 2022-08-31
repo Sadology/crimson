@@ -7,7 +7,7 @@ client.on('messageCreate', async(message) => {
         return;
     };
     
-    if(message.channel.id !== "617360020459225138") return;
+    if(message.channel.id !== "617360020459225138" || message.channel.id !== "1011160713584189463") return;
     if(!message.content.startsWith(':') && !message.content.endsWith(':')) return;
     let sorted = message.content.split(':').slice().join('');
 
@@ -23,7 +23,7 @@ client.on('messageCreate', async(message) => {
         // Create a webhook and send the embed
         if(!webHook){
             message.channel.createWebhook(client.user.username, {
-                avatar: "https://media.discordapp.net/attachments/959188995898740756/980536793634066442/crimson.png?width=427&height=427"
+                avatar: "https://media.discordapp.net/attachments/1011166042493554750/1014462638803124235/d8a321eca9d98f6e2fb4f27b634b6c23.png"
             })
             .then(async web => {
                 await web.send({content: emote.toString(), username: message.author.username, avatarURL: message.author.displayAvatarURL({dynamic: true, size: 1024, format: 'png'})})
