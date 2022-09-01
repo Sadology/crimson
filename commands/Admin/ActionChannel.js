@@ -130,9 +130,9 @@ class ActionChannelManager{
         // Loop through Object and push the data to the user friendly array
         for (let [key, val] of Object.entries(typeList)){
             if(val == 'None'){
-                actionChannels.push(`<:active:1011170591933464637> \`•\` ${Types(key)}: ${val}`) 
+                actionChannels.push(`<:disabled:1011170589739847700> \`•\` ${Types(key)}: ${val}`) 
             }else {
-                actionChannels.push(`<:disabled:1011170589739847700> \`•\` ${Types(key)}: ${val}`)  
+                actionChannels.push(`<:active:1011170591933464637> \`•\` ${Types(key)}: ${val}`)  
             }
         };
 
