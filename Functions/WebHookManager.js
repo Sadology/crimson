@@ -40,7 +40,7 @@ class WebhookManager{
         if(!channel) return;
 
         // Check for Webhook permission
-        if(!this.guild.members.resolve(this.client.user).permissions.any("MANAGE_WEBHOOKS")){
+        if(!this.guild.members.resolve(this.client.user).permissions.any(["MANAGE_WEBHOOKS"])){
             // Send the data as bot message if no webhook perms
             return channel.send({embeds: [Embed]}).catch(err => {return console.log(err.stack)});
         };

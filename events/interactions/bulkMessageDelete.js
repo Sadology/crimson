@@ -11,7 +11,7 @@ client.on('messageDeleteBulk', async(deletedMessage) => {
     let ID = deletedMessage.first().guildId;
     let guild = client.guilds.cache.get(ID)
 
-    const clientPerm = guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
+    const clientPerm = guild.members.resolve( client.user ).permissions.any(["VIEW_AUDIT_LOG"]);
     if (!clientPerm || clientPerm == false) return
 
     let length = [...deletedMessage.values()].length;

@@ -6,7 +6,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 	if(oldMessage.channel.type === 'dm') return;
 	if(oldMessage.author.bot) return;
 
-	if(!oldMessage.guild.members.resolve(client.user).permissions.any("VIEW_AUDIT_LOG", "ADMINISTRATOR")){
+	if(!oldMessage.guild.members.resolve(client.user).permissions.any(["VIEW_AUDIT_LOG", "ADMINISTRATOR"])){
 		return false;
 	};
 

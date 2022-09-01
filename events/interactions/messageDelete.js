@@ -7,7 +7,7 @@ client.on('messageDelete', async(deletedMessage) => {
 	if(deletedMessage.channel.type === 'dm') return;
 	if(deletedMessage.author.bot) return;
 
-	if(!deletedMessage.guild.members.resolve(client.user).permissions.any("VIEW_AUDIT_LOG", "ADMINISTRATOR")){
+	if(!deletedMessage.guild.members.resolve(client.user).permissions.any(["VIEW_AUDIT_LOG", "ADMINISTRATOR"])){
 		return false;
 	};
 

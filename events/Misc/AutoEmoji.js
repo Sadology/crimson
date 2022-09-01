@@ -3,11 +3,14 @@ const { MessageEmbed } = require('discord.js');
 const client = require('../..');
 
 client.on('messageCreate', async(message) => {
-    if(!message.guild.members.resolve(client.user).permissions.any("MANAGE_WEBHOOKS")){
+    if(!message.guild.members.resolve(client.user).permissions.any(["MANAGE_WEBHOOKS"])){
         return;
     };
-    
-    if(message.channel.id !== "617360020459225138" || message.channel.id !== "1011160713584189463") return;
+
+    let guildArr = ["617360020459225138", "1011170283438223382", "1011160713584189463"]
+    let access = guildArr.find(i => i == message.channel.id)
+    if(!access) return;
+
     if(!message.content.startsWith(':') && !message.content.endsWith(':')) return;
     let sorted = message.content.split(':').slice().join('');
 
