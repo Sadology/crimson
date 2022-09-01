@@ -111,7 +111,7 @@ class ActionChannelManager{
             'userlog': "None",
             'memberlog': "None",
             'kicklog': "None",
-            'welcome': 'welcome'
+            'welcome': 'None'
         }
 
         // loop through the database query
@@ -486,7 +486,7 @@ module.exports.run = {
 
 module.exports.slash = {
     data: new SlashCommandBuilder()
-        .setName('action-log')
+        .setName('setup-log-channel')
         .setDescription('Setup action log channels for guild'),
     category: "Configuration",
     Permissions: ["MANAGE_GUILD"],
