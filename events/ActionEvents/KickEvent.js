@@ -1,5 +1,5 @@
 const client = require('../..');
-const { LogManagers, DatabaseManager, WebhookManager} = require('../../Functions');
+const { LogManager, WebhookManager} = require('../../Functions');
 const wait = require('util').promisify(setTimeout);
 
 client.on("guildMemberRemove", async(member) => {
@@ -24,13 +24,12 @@ client.on("guildMemberRemove", async(member) => {
 
     const {executor, target, reason} = KickLog;
 
-    let logData = new LogManagers(client, member.guild)
+    let logData = new LogManager(client, member.guild)
         .setUser(target)
         .setActions("Kick", reason)
         .setExecutor(executor)
         .setLengths()
-
-    new DatabaseManager(client).SaveLogData(logData.DataToJson());
+        .LogCreate()
 
     const Embed = {
         color: "#2f3136",

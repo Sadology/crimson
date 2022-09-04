@@ -1,16 +1,14 @@
 const Discord = require('discord.js');
 const client = require('../..');
-const { LogManagers, DatabaseManager, WebhookManager } = require('../../Functions');
+const { LogManager, WebhookManager } = require('../../Functions');
 
 client.eventEmitter.on('WarnAdded', async(Member, reason, executor) => {
-    let logData = new LogManagers(client, Member.guild)
+    let logData = new LogManager(client, Member.guild)
         .setUser(Member)
         .setActions("Warn", reason)
         .setExecutor(executor)
         .setLengths()
-
-    // Update database
-    new DatabaseManager(client).SaveLogData(logData.DataToJson());
+        .LogCreate()
     
     // Create mute embed
     let Embed = new Discord.MessageEmbed()

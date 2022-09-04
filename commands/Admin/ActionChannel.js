@@ -171,6 +171,7 @@ class ActionChannelManager{
             interaction.editReply({embeds: [Embed], components:[row]}).then(m => {
                 this.collectorHandle(m, interaction)
             })
+            .catch(err => {return console.log(err.stack)})
         }
     }
 
@@ -297,7 +298,8 @@ class ActionChannelManager{
                     .setDescription("**How to setup action log**❔\n<:reply:1011174493252755537> While in edit mode bot will listen to your messages. Every message you send bot look for log type and channel for 5 minutes 👀. So to setup a log channel follow the instructions. \n\n<:help:1011170600754085930> **Log type** \`<channel>\` \n <:reply:1011174493252755537>**Action-log** \`#mod-logs\` \n\n🗒️ **Note**\n\n\`-\` Log types are available in edit mode, so you can just copy n paste\n\`-\` You can use lower case character for *log type* and you can ignore the (-)\n\`-\` You can use channel Name or channel Id instead of channel mention\n\`-\` If you get a error then read the error message and try again :D\n\`-\` To disable a log channel just type **disable** in the channel section E.g: **message-log** \`disable\`\n\`-\` Hit the **cancel** button to stop edit mode")
                     .setColor("#2f3136")
                     .setImage("https://cdn.discordapp.com/attachments/959188995898740756/959189004870352946/unknown.png")
-                ]});
+                ]})
+                .catch(err => {return console.log(err.stack)});
             }
         })
 

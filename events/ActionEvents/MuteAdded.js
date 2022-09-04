@@ -1,12 +1,9 @@
 const Discord = require('discord.js');
 const client = require('../..');
-const {DatabaseManager, WebhookManager} = require('../../Functions')
+const {WebhookManager} = require('../../Functions')
 
 client.eventEmitter.on('MuteAdded', async(data, Member) => {
     const { moderator, actionLength, actionReason, Duration, guildID } = data
-
-    // Update database
-    new DatabaseManager(client).SaveLogData(data, true)
     
     // Create mute embed
     let Embed = new Discord.MessageEmbed()

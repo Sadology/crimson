@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const ms = require('ms');
 const { LogsDatabase } = require('../../models');
-const { UserRoleManager, LogManagers} = require('../../Functions');
+const { UserRoleManager, LogManager} = require('../../Functions');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 class MuteManager {
@@ -10,7 +10,7 @@ class MuteManager {
         this.guild = guild;
         this.interaction = interaction;
 
-        this.LogData = new LogManagers(this.client, this.guild)
+        this.LogData = new LogManager(this.client, this.guild)
     }
 
     async ManageMute(user, executor){
@@ -39,6 +39,7 @@ class MuteManager {
 
         this.LogData.setUser(Member)
         this.LogData.setExecutor(executor);
+        this.LogData.LogCreate(true)
 
         this.client.eventEmitter.emit('MuteAdded', this.LogData.DataToJson(), Member);
     }

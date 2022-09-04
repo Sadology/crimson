@@ -1,4 +1,4 @@
-const { LogManagers, DatabaseManager, WebhookManager } = require('../../Functions');
+const { LogManager, WebhookManager } = require('../../Functions');
 const wait = require('util').promisify(setTimeout);
 const client = require('../..');
 
@@ -24,13 +24,12 @@ client.on('guildBanAdd', async(User) => {
 
     const { executor, target, reason } = BanLog;
 
-    let logData = new LogManagers(client, User.guild)
+    let logData = new LogManager(client, User.guild)
         .setUser(User)
         .setActions("Ban", reason)
         .setExecutor(executor)
         .setLengths()
-
-    new DatabaseManager(client).SaveLogData(logData.DataToJson());
+        .LogCreate()
 
     const Embed = {
         color: "#2f3136",

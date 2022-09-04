@@ -1,4 +1,5 @@
-class LogManagers{
+const {LogsDatabase} = require('../models');
+class LogTemplate{
     constructor(client, guild, data = {}){
         this.client = client;
         this.guild = guild;
@@ -18,6 +19,7 @@ class LogManagers{
         this.moderator = data.moderator;
         this.moderatorID = data.moderatorID;
         this.actionDate = data.actionDate;
+        this.logID = data.logID
     }
 
     setUser(User){
@@ -64,4 +66,42 @@ class LogManagers{
     }
 }
 
-module.exports = {LogManagers}
+class LogManager extends LogTemplate{
+    constructor(client, guild){
+        super(client, guild)
+    }
+
+    CreateLogID(range){
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        for (var i = 0; i <= range; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        return text;
+    }
+
+    async LogCreate(isMute = false){
+        this.logID = this.CreateLogID(16);
+        this.actionDate = new Date();
+
+        // Save the data to database
+        await LogsDatabase.updateOne({
+            guildID: this.guildID,
+            userID: this.userID
+        }, {
+            guildName: this.guildName,
+            Muted: isMute,
+            Expire: this.Expire,
+            $push: {
+                [`Action`]: {
+                    ...this.DataToJson()
+                }
+            }
+        },{
+            upsert: true,
+        }).catch(err => {
+            return console.log(err.stack);
+        });
+    }
+}
+
+module.exports = {LogManager};

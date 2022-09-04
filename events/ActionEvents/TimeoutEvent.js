@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const ms = require('ms');
-const { LogManagers, DatabaseManager, WebhookManager } = require('../../Functions');
+const { LogManager, WebhookManager } = require('../../Functions');
 const client = require('../..');
 
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
@@ -24,21 +24,37 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 
     let durationFormat = ms(date+1000, {long: true})
 
-    let logData = new LogManagers(client, newMember.guild)
+    let logData = new LogManager(client, newMember.guild)
         .setUser(newMember)
         .setActions("Timeout", logs.reason ? logs.reason : "No reason was provided")
         .setExecutor(logs.executor)
         .setLengths(null, durationFormat)
-
-    // Update database
-    new DatabaseManager(client).SaveLogData(logData.DataToJson());
+        .LogCreate(true)
 
     let Embed = new Discord.MessageEmbed()
         .setAuthor({name: `Timeout • ${newMember.user.username}`, iconURL: newMember.user.displayAvatarURL({dynamic: true, format: 'png'})})
-        .addField("<:user_icon:1011170605636259921> User", `${newMember.user.tag}`, true)
-        .addField("<:staff:1011186336058843266><:staff:1011186338533494814> Moderator", `${logs.executor.tag}`, true)
-        .addField(`<:clock:1011170596719173692> Duration`, `${durationFormat}`, true)
-        .addField("<:reason:1011187388371968051> Reason", `${logs.reason ? logs.reason : "No reason was provided"}`)
+        .addFields([
+            {
+                name: "<:user_icon:1011170605636259921> User",
+                value: `${newMember.user.tag}`,
+                inline: true
+            },
+            {
+                name: "<:staff:1011186336058843266><:staff:1011186338533494814> Moderator",
+                value: `${logs.executor.tag}`,
+                inline: true
+            },
+            {
+                name: `<:clock:1011170596719173692> Duration`,
+                value: `${durationFormat}`,
+                inline: true
+            },
+            {
+                name: "<:reason:1011187388371968051> Reason",
+                value: `${logs.reason ? logs.reason : "No reason was provided"}`,
+                inline: true
+            }
+        ])
         .setColor("#2f3136")
         .setFooter({text: "ID • "+newMember.user.id})
         .setTimestamp()

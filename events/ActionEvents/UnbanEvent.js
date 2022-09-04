@@ -1,6 +1,6 @@
 const wait = require('util').promisify(setTimeout);
 const client = require('../..');
-const { LogManagers, DatabaseManager, WebhookManager } = require('../../Functions');
+const { LogManager, WebhookManager } = require('../../Functions');
 
 client.on('guildBanRemove', async(User) => {
     const clientPerm = User.guild.members.resolve( client.user ).permissions.any("VIEW_AUDIT_LOG");
@@ -22,14 +22,12 @@ client.on('guildBanRemove', async(User) => {
 
     const { executor, target } = unBanLog;
 
-    let logData = new LogManagers(client, User.guild)
+    let logData = new LogManager(client, User.guild)
         .setUser(User)
         .setActions("Unban", "/edit-reason to edit this log reason")
         .setExecutor(executor)
         .setLengths()
-
-    // Update database
-    new DatabaseManager(client).SaveLogData(logData.DataToJson());
+        .LogCreate()
 
     const Embed = {
         color: "#2f3136",

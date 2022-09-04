@@ -1,7 +1,6 @@
 
-const { LogManagers, LogManager } = require('./LogManager');
+const { LogManager } = require('./LogManager');
 const { errLog } = require('./erroHandling');
-const {DatabaseManager} = require('./DatabaseManager')
 const {Member, GuildMember, ClientMember, FindMember} = require('./MemberManager');
 const {RoleManager, UserRoleManager} = require('./RolesManager');
 const {Permissions} = require('./PermissionManager')
@@ -17,8 +16,7 @@ module.exports = {
     FindMember,
     RoleManager,
     UserRoleManager,
-    LogManagers,
-    DatabaseManager,
+    LogManager,
     Permissions,
     WebhookManager
 

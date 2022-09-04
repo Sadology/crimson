@@ -93,7 +93,7 @@ client.eventEmitter.on('AuditAdd', async(data) => {
 
     let memId = data.User.user ? data.User.user.id : data.User.id ? data.User.id : data.User;
 
-    let audit = new AudittingManager(client, data.Guild.id ? data.Guild.id : data.Guild, data).Mainframe(memId)
+    //let audit = new AudittingManager(client, data.Guild.id ? data.Guild.id : data.Guild, data).Mainframe(memId)
     // let stats = await Stats.findOne({
     //     guildID: data.Guild.id ? data.Guild.id : data.Guild,
     //     userID: memId,
