@@ -23,6 +23,6 @@ client.on('presenceUpdate', async(oldPresence, newPresence) => {
     }
 
     setTimeout(() => {
-        sent = true;
+        sent = false;
     }, 2000)
 });
