@@ -20,7 +20,7 @@ class Confession{
             new MessageEmbed()
                 .setDescription("<:check:1011170584996106300> Confession submited")
                 .setColor("GREEN")
-        ]})
+        ], ephemeral: true})
         new WebhookManager(this.client, this.guild).WebHook(Embed, 'confession').then((d) => {
             if(d == false){
                 return this.interaction.reply({
