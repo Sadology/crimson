@@ -51,7 +51,8 @@ function ClientPerms(cmd, interaction){
 
     if(interaction.guild.me.permissions.has(cmd.ClientPermissions)){
         return true;
-    }else {
+    }
+    else {
         interaction.reply({
             embeds: [new Discord.MessageEmbed()
                 .setAuthor({name: `Missing permissions`, iconURL: interaction.guild.me.displayAvatarURL({dynamic: true, format: 'png'})})

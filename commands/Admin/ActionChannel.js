@@ -8,7 +8,7 @@ const row = new MessageActionRow()
     new MessageButton()
     .setCustomId("actionEdit")
     .setStyle("PRIMARY")
-    .setLabel("Edit Mode")
+    .setLabel("Edit")
 )
 .addComponents(
     new MessageButton()
@@ -101,6 +101,7 @@ class ActionChannelManager{
             .replace('memberlog', 'Member-log')
             .replace('kicklog', 'Kick-log')
             .replace('welcome', 'Welcome')
+            .replace('confession', 'Confession')
         }
 
         // Object list of log types
@@ -111,7 +112,8 @@ class ActionChannelManager{
             'userlog': "None",
             'memberlog': "None",
             'kicklog': "None",
-            'welcome': 'None'
+            'welcome': 'None',
+            'confession': 'None'
         }
 
         // loop through the database query
@@ -147,14 +149,14 @@ class ActionChannelManager{
         else {
             // Customize the button number zero
             let b1 = row.components[0];
-            b1.setLabel("Edit mode");
+            b1.setLabel("Edit");
             b1.setCustomId("actionEdit");
             b1.setStyle("PRIMARY");
             b1.setDisabled(false);
 
             // Customize the button number two
             let b2 = row.components[2];
-            b2.setLabel("Del mode is off");
+            b2.setLabel("Delete: False");
             b2.setCustomId("deletemode");
             b2.setStyle("DANGER");
             b2.setDisabled(false);
@@ -199,7 +201,7 @@ class ActionChannelManager{
 
                 // Customize the button number zero
                 let b1 = row.components[0];
-                b1.setLabel("Edit mode off");
+                b1.setLabel("Go Back");
                 b1.setCustomId("cancel");
                 b1.setStyle("DANGER");
 
@@ -211,7 +213,7 @@ class ActionChannelManager{
                 interact.followUp({embeds: [
                     new MessageEmbed()
                     .setAuthor({name: "Edit-mode: Online"})
-                    .setDescription("<:help:1011170600754085930> **Log Type <channel>**\n<:example:897083777703084035>Action-log #mod-logs \n**Type \`Log-type <Disable>\` to disable a log channel** \n\n<:search:1011170587302953041> **Available Log Types:**\n\`-\` Action-log, Ban-log, Message-log, User-log, Member-log, kick-log, welcome")
+                    .setDescription("<:help:1011170600754085930> **Log Type <channel>**\n💠 Action-log #mod-logs \n**Type \`Log-type <Disable>\` to disable a log channel** \n\n<:search:1011170587302953041> **Available Log Types:**\n\`-\` Action-log, Ban-log, Message-log, User-log, Member-log, kick-log, welcome, confession")
                     .setFooter({text: "Hit the \"Help\" button for more help"})
                     .setColor("#2f3136")
                 ]});
@@ -250,7 +252,7 @@ class ActionChannelManager{
                 interact.deleteReply();
 
                 let b1 = row.components[0];
-                b1.setLabel("Edit mode");
+                b1.setLabel("Edit");
                 b1.setCustomId("actionEdit");
                 b1.setStyle("PRIMARY");
                 b1.setDisabled(false);
@@ -265,7 +267,7 @@ class ActionChannelManager{
                 this.delete = true;
 
                 let b2 = row.components[2];
-                b2.setLabel("Del mode is on");
+                b2.setLabel("Delete: True");
                 b2.setCustomId("deletemode");
                 b2.setStyle("SUCCESS");
 
@@ -326,6 +328,7 @@ class ActionChannelManager{
             .replace('memberlog', 'Member-log')
             .replace('kicklog', 'Kick-log')
             .replace('welcome', 'Welcome')
+            .replace('confession', 'Confession')
         }
 
         // If the 2nd parameter is disable then disable that specific data
@@ -417,7 +420,8 @@ class ActionChannelManager{
         'userlog', 'userlogs',
         'memberlog', 'memberlogs',
         'kicklog', 'kicklogs',
-        'welcome'
+        'welcome',
+        'confession'
         ];
 
         // Try to match the parameter to the array for possible match
@@ -481,7 +485,17 @@ class ActionChannelManager{
 }
 
 module.exports.run = {
-    run: async(client, interaction, args,prefix) =>{
+    run: async(client, interaction) =>{
+        let missing = interaction.channel.permissionsFor(client.user).has(["VIEW_CHANNEL"])
+        if(!missing){
+            return interaction.reply({
+                embeds: [new MessageEmbed()
+                    .setDescription(`Missing "VIEW_CHANNEL" permission`)
+                    .setColor("RED")
+                ]
+            })
+        }
+
         let data = new ActionChannelManager(client, interaction.guild).BaseFrame(interaction)
     }
 }
@@ -492,5 +506,5 @@ module.exports.slash = {
         .setDescription('Setup action log channels for guild'),
     category: "Configuration",
     Permissions: ["MANAGE_GUILD"],
-    ClientPermissions: ["MANAGE_WEBHOOKS"]
+    ClientPermissions: ["MANAGE_WEBHOOKS", "SEND_MESSAGES", "VIEW_CHANNEL"]
 }

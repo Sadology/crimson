@@ -21,7 +21,7 @@ class WebhookManager{
     async WebHook(Embed, Type){
         // Fetch database
         let data = await this.FetchDatabase()
-        if(!data) return;
+        if(!data) return false;
 
         // Destructure the database properties
         const { Logchannels } = data;

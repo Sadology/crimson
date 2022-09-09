@@ -21,6 +21,7 @@ class RoleManager{
                 };
             })
         }
+
         else {
             Roles = this.guild.roles.cache.find(r => r.name.toLowerCase() == data.name.toLowerCase()) || 
             this.guild.roles.cache.find(r => r.id == data.name);

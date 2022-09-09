@@ -179,7 +179,6 @@ class LogResolver{
         // Collector handler function
         function CollectorHandler(msg){
             const collector = msg.createMessageComponentCollector({ filter, componentType: 'BUTTON', time: 1000 * 60 * 5 });
-            let msgCollector = msg.channel.createMessageCollector({filter, time: 1000 * 60 * 5});
 
             collector.on('collect',async b => {
                 if(b.customId === 'NextPageModLog'){
