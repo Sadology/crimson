@@ -6,7 +6,7 @@ client.on('ready', () => {
     }
 
     else if(client.user.id == "811921753344311296"){
-        client.user.setPresence({ status: 'online', activities: [{ type: 'LISTENING', name: "The Sound Of Crimson Forest" }] });
+        client.user.setPresence({ status: 'online', activities: [{ type: 'LISTENING', name: "The breeze of Crimson Forest" }] });
     }
 
     console.log("💚 AT YOUR SERVICE MASTER");
