@@ -1,8 +1,7 @@
 const Discord = require('discord.js');
 const { LogsDatabase } = require('../../models');
 const moment = require('moment');
-const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js')
-const { GuildMember } = require('../../Functions');
+const { MessageActionRow, MessageButton} = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const wait = require('util').promisify(setTimeout);
 
@@ -20,34 +19,45 @@ const row = new MessageActionRow()
         .setEmoji("<:previous:1011181158807113760>")
 )
 
-class LogResolver{
-    constructor(Client, Guild, interaction){
-        this.client = Client;
-        this.guild = Guild;
+class CommandBuilder{
+    constructor(){
+        this.slashCmd = new SlashCommandBuilder()
+            .setName('logs')
+            .setDescription('Check moderation logs of a user')
+            .addUserOption(option => 
+                option.setName('user')
+                    .setDescription('The user you want to check logs')
+                    .setRequired(true)
+                )
+        this.Permissions = ["MODERATE_MEMBERS"];
+        this.category = "Moderation";
+    }
+};
+
+class Main{
+    constructor(client, interaction){
+        this.client = client;
         this.interaction = interaction;
-        this.DelMode = false;
+        this.guild = interaction;
     };
 
-    // First find the member in guild
-    async FindMember(ID){
+    async Mainframe(){
+        const {options} = interaction;
+        let user = options.getUser('user');
+
         // Error embed class
         let ErrorEmbed = new Discord.MessageEmbed()
-        .setColor("RED")
+            .setColor("RED")
 
         // Call the guild member class to find find the member
-        let Member = await new GuildMember(this.client, this.interaction.guild, this.interaction).MemberNonHandled(ID)
+        let Member = this.guild.members.cache.get(user.id);
 
         if(!Member){
             ErrorEmbed.setDescription("<:error:1011174128503500800> Mentioned user is invalid")
             return this.sendErrorData(ErrorEmbed)
         }
-        if(Member.ID){
-            this.User = Member.ID;
-            this.fetchData(Member.ID);
-        }else {
-            this.User = Member;
-            this.fetchData(Member);
-        }
+
+        this.user = Member.user ? Member.user : Member;
     };
 
     // Fetch data from database
@@ -57,7 +67,7 @@ class LogResolver{
         // Hit database for one specific data
         await LogsDatabase.findOne({
             guildID: this.guild.id,
-            userID: this.User.user ? this.User.user.id : this.User
+            userID: this.user.user ? this.user.user.id : this.user
         })
         .then(res => {
             if(!res){
@@ -75,7 +85,7 @@ class LogResolver{
     // Push log data to an array
     logCreate(Data){
         let errEmbed = new Discord.MessageEmbed()
-        .setColor("RED")
+            .setColor("RED")
 
         if(Data.Action.length == 0){
             errEmbed.setDescription("<:error:1011174128503500800> User doesn't have any logs")
@@ -98,8 +108,8 @@ class LogResolver{
         let MakeEmbed = start => {
             const SplitData = Data.slice(start, start + 2)
             const Embed = new Discord.MessageEmbed()
-                .setDescription(`${this.User.user ? this.User.user : "<@"+this.User+">"} Mod-Logs - \`[ ${Data.length} ]\``)
-                .setFooter({text: `User-ID: ${this.User.user ? this.User.user.id : this.User} ∙ Showing: ${start + 1} - ${start + SplitData.length}`})
+                .setDescription(`${this.user.user ? this.user.user : "<@"+this.user+">"} Mod-Logs - \`[ ${Data.length} ]\``)
+                .setFooter({text: `User-ID: ${this.user.user ? this.user.user.id : this.user} ∙ Showing: ${start + 1} - ${start + SplitData.length}`})
                 .setColor("#2f3136")
 
             for (let i = 0; i < SplitData.length; i++){
@@ -214,28 +224,6 @@ class LogResolver{
             .catch(err => {return console.log(err.stack)})
         }
     }
-}
+};
 
-module.exports.run = {
-    LogResolver,
-    run: async(client, interaction, args,prefix) =>{
-        const {options} = interaction;
-        let user = options.getUser('user');
-
-        // Calling the log resolver class for slash command
-        new LogResolver(client, interaction.guild, interaction).FindMember(user.id);
-    }
-}
-
-module.exports.slash = {
-    data: new SlashCommandBuilder()
-        .setName('logs')
-        .setDescription('Check moderation logs of a user')
-        .addUserOption(option => 
-            option.setName('user')
-                .setDescription('The user you want to check logs')
-                .setRequired(true)
-            ),
-    Permissions: ["MODERATE_MEMBERS"],
-    category: "Moderation",
-}
+module.exports.test = {Main, CommandBuilder};

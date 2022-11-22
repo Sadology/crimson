@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js')
+const { MessageEmbed, MessageButton, MessageActionRow, User } = require('discord.js')
 const { LogsDatabase } = require('../../models')
 const moment = require('moment');
 const file = require('./modLogs');
@@ -7,43 +7,43 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const wait = require('util').promisify(setTimeout);
 
 const row = new MessageActionRow()
-.addComponents(
-    new MessageButton()
-    .setStyle("PRIMARY")
-    .setCustomId("info")
-    .setLabel("Expand")
-    .setEmoji("<:down:1011170598505947228>")
-)
-.addComponents(
-    new MessageButton()
-    .setStyle("PRIMARY")
-    .setLabel("Logs")
-    .setCustomId("seekLogs")
-    .setEmoji("<:logs:1011182282599575563>")   
-)
+    .addComponents(
+        new MessageButton()
+        .setStyle("PRIMARY")
+        .setCustomId("info")
+        .setLabel("Expand")
+        .setEmoji("<:down:1011170598505947228>")
+    )
+    .addComponents(
+        new MessageButton()
+        .setStyle("PRIMARY")
+        .setLabel("Logs")
+        .setCustomId("seekLogs")
+        .setEmoji("<:logs:1011182282599575563>")
+    )
 
-class MemberResolver {
-    /**
-     * 
-     * @param {Object} client - Client function
-     * @param {Object} guild - Guild function
-     * @param {Object} interaction - Interaction function
-     */
-    constructor(client, guild, interaction){
+class CommandBuilder{
+    constructor(){
+        this.slashCmd = new SlashCommandBuilder()
+            .setName("fetch")
+            .setDescription("Fetch a member to view thie informations")
+            .addUserOption(option =>
+                option
+                .setName("user")
+                .setRequired(true)
+                .setDescription("The user you want to fetch. Also works for banned members")
+            )
+        this.Permissions = ["MODERATE_MEMBERS"];
+        this.ClientPermissions = ["VIEW_AUDIT_LOG", "BAN_MEMBERS"];
+        this.category = "Moderation";
+    }
+};
+
+class Main{
+    constructor(client, interaction){
         this.client = client;
-        this.guild = guild;
         this.interaction = interaction;
-    };
-
-    async FetchMember(user){
-        let Member = this.guild.members.cache.get(user)
-        if(!Member){
-            this.logamt = await this.FetchDatabase(user);
-            return this.FetchBanAudit(user);
-        }
-
-        this.logamt = await this.FetchDatabase(Member);
-        this.EmbedResolve(Member);
+        this.guild = interaction.guild;
     };
 
     async FetchDatabase(User){
@@ -54,12 +54,28 @@ class MemberResolver {
 
         let counter;
         if(FetchData){
-            counter = FetchData.Action.length
+            counter = FetchData.Action.length;
         }else {
             counter = 0
         }
 
         return counter;
+    };
+
+    async FetchBanAudit(user){
+        user = user.user ? user.user.id : user.id ? user.id : user
+        await this.guild.bans.fetch().then(data => {
+            let bannedUser = data.find(User => User.user.id == user);
+
+            if(!bannedUser){
+                let embed = new MessageEmbed()
+                    .setDescription(`<:error:1011174128503500800> Mentioned member is invalid`)
+                    .setColor("RED")
+                return this.Errors(embed);
+            };
+
+            this.EmbedResolve(bannedUser, true);
+        });
     };
 
     async EmbedResolve(member, isBanned){
@@ -77,24 +93,57 @@ class MemberResolver {
             size: 1024
         }))
         .setDescription(`${member.user}`)
-        .addField("<:user_icon:1011170605636259921> User", `${member.user.tag}`, true)
-        .addField("<:ID:1011170603228741642> User ID", `${member.user.id}`, true)
-        .addField("<:logs:1011182282599575563> Log Amount", `${this.logamt}`, true)
-        .addField("<:hi:1011182837866700840> Created At", `${moment(member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.user.createdAt, "YYYYMMDD").fromNow()}`, true)
+        .addFields([
+            {
+                name: "<:user_icon:1011170605636259921> User",
+                value: `${member.user.tag}`,
+                inline: true
+            },
+            {
+                name: "<:ID:1011170603228741642> User ID",
+                value: `${member.user.id}`,
+                inline: true 
+            },
+            {
+                name: "<:logs:1011182282599575563> Log Amount",
+                value: `${this.logamt}`,
+                inline: true 
+            },
+            {
+                name: "<:hi:1011182837866700840> Created At",
+                value: `${moment(member.user.createdAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.user.createdAt, "YYYYMMDD").fromNow()}`,
+                inline: true 
+            },
+        ])
         .setColor("#2f3136")
         .setFooter({text: `User-ID: ${member.user.id}`})
         .setTimestamp()
+
         if(isBanned){
             row.components[0].setDisabled(true);
             row.components[1].setDisabled(false);
 
-            UserEmbed.addField("<:verified:1011183456744636486> Joined At", `Not Available`, true)
-            UserEmbed.addField("<:banhammer:1011180749396901979> Ban Reason", `${member.reason}`)
+            UserEmbed.addFields([
+                {
+                    name: "<:verified:1011183456744636486> Joined At",
+                    value: `Not Available`,
+                    inline: true
+                },
+                {
+                    name: "<:banhammer:1011180749396901979> Ban Reason",
+                    value: `${member.reason}`,
+                    inline: false
+                }
+            ])
         }else {
             row.components[0].setDisabled(false);
             row.components[1].setDisabled(false);
 
-            UserEmbed.addField("<:verified:1011183456744636486> Joined At", `${moment(member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.joinedAt, "YYYYMMDD").fromNow()}`, true)
+            UserEmbed.addFields([{
+                name: "<:verified:1011183456744636486> Joined At", 
+                value: `${moment(member.joinedAt).format('MMMM Do YYYY, h:mm:ss a')} - ${moment(member.joinedAt, "YYYYMMDD").fromNow()}`, 
+                inline: true
+            }])
         }
         
         if(this.interaction.type == "APPLICATION_COMMAND"){
@@ -178,51 +227,22 @@ class MemberResolver {
         })
     }
 
+    async Mainframe(){
+        const {options} = this.interaction;
+        let user = options.getUser('user');
 
+        let Member = this.guild.members.cache.get(user.id);
+        if(!Member){
+            this.logamt = await this.FetchDatabase(user);
+            return this.FetchBanAudit(user);
+        }
 
-    async FetchBanAudit(user){
-        user = user.user ? user.user.id : user.id ? user.id : user
-        await this.guild.bans.fetch().then(data => {
-            let bannedUser = data.find(User => User.user.id == user);
-
-            if(!bannedUser){
-                let embed = new MessageEmbed()
-                    .setDescription(`<:error:1011174128503500800> Mentioned member is invalid`)
-                    .setColor("RED")
-                return this.Errors(embed);
-            };
-
-            this.EmbedResolve(bannedUser, true);
-        });
+        this.logamt = await this.FetchDatabase(Member);
+        this.EmbedResolve(Member);
     };
 
     Errors(embed){
         this.interaction.reply({embeds: [embed], ephemeral: true}).catch(err => {return console.log(err.stack)})
     };
-}
-module.exports.run = {
-    run: async(client, interaction, args,prefix) =>{
-        const {options} = interaction;
-        let user = options.getUser('user');
-
-        // Calling the log resolver class for slash command
-        let Data = new MemberResolver(client, interaction.guild, interaction).FetchMember(user ? user.id : user)
-
-    }
 };
-
-// Slash command export
-module.exports.slash = {
-    data: new SlashCommandBuilder()
-        .setName("fetch")
-        .setDescription("Seek a user out")
-        .addUserOption(option =>
-            option
-            .setName("user")
-            .setRequired(true)
-            .setDescription("The user you want to seek out. Works for banned member too")
-        ),
-    Permissions: ["MODERATE_MEMBERS"],
-    ClientPermissions: ["VIEW_AUDIT_LOG"],
-    category: "Moderation",
-}
+module.exports.test = {Main, CommandBuilder};

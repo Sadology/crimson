@@ -1,15 +1,38 @@
 const Discord = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-class BanManager{
-    constructor(client, guild, interaction){
-        this.client = client;
-        this.guild = guild;
-        this.interaction = interaction;
+class CommandBuilder{
+    constructor(){
+        this.slashCmd = new SlashCommandBuilder()
+        .setName("ban")
+        .setDescription("Ban a member from server")
+        .addUserOption(option =>
+            option
+            .setName("user")
+            .setDescription("The user you want to ban")
+            .setRequired(true))
+        .addStringOption(option =>
+            option.setName("reason")
+            .setDescription("Reason for the ban")),
+        this.category = "Moderation";
+        this.Permissions = ["BAN_MEMBERS"];
+        this.ClientPermissions = ["BAN_MEMBERS"];
     }
+};
 
-    async MainFrame(user, reason){
-        let Member = this.guild.members.cache.get(user);
+class Main{
+    constructor(client, interaction){
+        this.client = client;
+        this.interaction = interaction;
+        this.guild = this.interaction.guild;
+    };
+
+    async Mainframe(){
+        const {options} = this.interaction;
+        let user = options.getUser('user');
+        let reason = options.getString('reason');
+
+        let Member = this.guild.members.cache.get(user.id);
         let Embed = new Discord.MessageEmbed();
 
         if(!Member){
@@ -24,20 +47,28 @@ class BanManager{
 
             return this.BanCreate(user, reason);
         }
-        
+
         let ErrorEmbed = new Discord.MessageEmbed()
-            .setDescription("Can't Ban a Mod/Admin :(")
+            .setDescription("Can't Ban a Mod/Admin")
             .setColor("RED")
 
         let RolePosition = this.RolePosition(Member);
         if(!RolePosition) return;
 
-        if(Member.permissions.any(["BAN_MEMBERS", "KICK_MEMBERS", "MANAGE_CHANNELS", "MANAGE_ROLES", "MANAGE_MESSAGES", "MANAGE_GUILD", "ADMINISTRATOR"])){
+        if(Member.permissions.any(
+            ["BAN_MEMBERS", 
+            "KICK_MEMBERS",
+            "MANAGE_CHANNELS",
+            "MANAGE_ROLES",
+            "MANAGE_MESSAGES",
+            "MANAGE_GUILD",
+            "ADMINISTRATOR"
+            ])){
             return this.erroMessage(ErrorEmbed);
         };
         
         this.BanCreate(Member, reason)
-    }
+    };
 
     async BanCreate(User, reason){
         if(!reason){
@@ -107,34 +138,7 @@ class BanManager{
         this.interaction.reply({embeds: [embed], ephemeral: true}).catch(err => {return console.log(err.stack)})
     };
 
-}
-
-module.exports.run = {
-    run: async(client, interaction, args,prefix) =>{
-
-        const {options} = interaction;
-        let user = options.getUser('user');
-        let reason = options.getString('reason');
-
-        // Calling the log resolver class for slash command
-        let data = new BanManager(client, interaction.guild, interaction).MainFrame(user ? user.id : user, reason);
-    }
-}
+};
 
 // Slash command export
-module.exports.slash = {
-    data: new SlashCommandBuilder()
-        .setName("ban")
-        .setDescription("Ban a member from server")
-        .addUserOption(option =>
-            option
-            .setName("user")
-            .setDescription("The user you want to ban")
-            .setRequired(true))
-        .addStringOption(option =>
-            option.setName("reason")
-            .setDescription("Reason for the ban")),
-    Permissions: ["BAN_MEMBERS"],
-    ClientPermissions: ["BAN_MEMBERS"],
-    category: "Moderation",
-}
+module.exports.test = {Main, CommandBuilder};

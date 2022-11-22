@@ -1,29 +1,27 @@
-// const { SlashCommandBuilder, userMention, memberNicknameMention } = require('@discordjs/builders');
-// const Discord = require('discord.js')
-// const axios = require('axios');
-// const {WebhookManager} = require('../../Functions')
+const { SlashCommandBuilder, userMention, memberNicknameMention } = require('@discordjs/builders');
+const Discord = require('discord.js')
+const axios = require('axios');
+const {WebhookManager} = require('../../Functions')
 
-// module.exports.run = {
-//     run: async(client, interaction, args, prefix)=> {
-//         client.eventEmitter.emit('AuditAdd', {
-//             User: interaction.member,
-//             Guild: interaction.member.guild,
-//             Reason: `Warned sneee with reason: HI :)`,
-//             Date: new Date(),
-//             Command: "warn",
-//             Moderation: true
-//         });
+class CommandBuilder{
+    constructor(){
+        this.slashCmd = new SlashCommandBuilder()
+        .setName('test')
+        .setDescription("Test bot")
+        this.category = "Privet"
+    }
+};
 
-//         interaction.reply("done")
-//     }
+class Main{
+    constructor(client, interaction){
+        this.client = client;
+        this.interaction = interaction;
+        this.guild = interaction;
+    };
 
-// }
+    async Mainframe(){
 
-// module.exports.slash = {
-//     data: new SlashCommandBuilder()
-//         .setName('test')
-//         .setDescription("Test bot")
-//         .setDefaultPermission(false),
-//     privet: true,
-    
-// }
+    };
+};
+
+module.exports.test = {Main, CommandBuilder};

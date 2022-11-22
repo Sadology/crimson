@@ -2,19 +2,33 @@ const moment = require('moment');
 const ms = require('ms');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-module.exports.run = {
-    run: async(client, interaction, args,prefix) =>{
-        const guilds = client.guilds.cache.size
+class CommandBuilder{
+    constructor(){
+        this.slashCmd = new SlashCommandBuilder();
+        this.slashCmd.setName('bot-info');
+        this.slashCmd.setDescription("Check information about bot");
+    }
+};
+
+class Main{
+    constructor(client, interaction){
+        this.client = client;
+        this.interaction = interaction;
+    };
+
+    async Mainframe(){
+        const guilds = this.client.guilds.cache.size;
         let totalmember = 0;
-        client.guilds.cache.forEach(g => {
+
+        this.client.guilds.cache.forEach(g => {
             totalmember += parseInt(g.memberCount);
-        })
-        let uptime = ms(client.uptime, {long: true})
+        });
+        let uptime = ms(this.client.uptime, {long: true});
 
         const Embeds = {
             author: {
-                name: `${client.user.username}`,
-                icon_url: client.user.avatarURL({dynamic: false, size: 1024, format: 'png'})
+                name: `${this.client.user.username}`,
+                icon_url: this.client.user.avatarURL({dynamic: false, size: 1024, format: 'png'})
             },
             description: "The beginning after the end",
             fields: [
@@ -50,7 +64,7 @@ module.exports.run = {
                 },
                 {
                     name: "Creation Date",
-                    value: `${moment(client.user.createdAt).format('MMMM Do YYYY')} - ${moment(client.user.createdAt, "YYYYMMDD").fromNow()}`.toString(),
+                    value: `${moment(this.client.user.createdAt).format('MMMM Do YYYY')} - ${moment(this.client.user.createdAt, "YYYYMMDD").fromNow()}`.toString(),
                     inline: true
                 },
                 {
@@ -65,13 +79,8 @@ module.exports.run = {
             }
         }
 
-        return interaction.reply({embeds: [Embeds]}).catch(err => {return console.log(err.stack)})
-    }
-}
+        return this.interaction.reply({embeds: [Embeds]}).catch(err => {return console.log(err.stack)})
+    };
+};
 
-module.exports.slash = {
-    data: new SlashCommandBuilder()
-        .setName('about-me')
-        .setDescription("Learn more about me"),
-    category: "Utility",
-}
+module.exports.test = {Main, CommandBuilder};

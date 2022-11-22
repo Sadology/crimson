@@ -16,15 +16,17 @@ module.exports = {
 
             for (let file of commands) {
                 let data = require(`../commands/${dir}/${file}`);
-                if (data.slash) {
+                if (data.test) {
 
-                    let value = {
-                        ...data.run,
-                        ...data.slash,
+                    let cmdClass = new data.test.CommandBuilder();
+                    if(cmdClass.category == 'Privet'){
+                        privetCmds.push(cmdClass.slashCmd.toJSON());
+                        client.SlashCmd.set(cmdClass.slashCmd.name, data.test);
+                        return;
                     }
 
-                    client.SlashCmd.set(data.slash.data.name, value);
-                    cmds.push(data.slash.data.toJSON())
+                    client.SlashCmd.set(cmdClass.slashCmd.name, data.test);
+                    cmds.push(cmdClass.slashCmd.toJSON())
                 }else {
                     continue;
                 }
@@ -33,8 +35,15 @@ module.exports = {
 
         client.on("ready", async () => {
             client.guilds.cache.forEach(guild => {
+                if(guild.id == "1011160710123896913"){
+                    let seperate = [];
+                    let newarr = seperate.concat(cmds, privetCmds);
+                    guild.commands.set(newarr, guild.id).catch(console.error);
+                }
 
-                guild.commands.set(cmds, guild.id).catch(console.error);
+                else {
+                    guild.commands.set(cmds, guild.id).catch(console.error);
+                }
             });
         });
 
